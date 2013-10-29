@@ -156,8 +156,8 @@ switch($_POST['action'])
         $groupId = $resultUser[1]['GRP_UID'];
     // End Get the group name
 	
-    $urlTypo3 = 'http://'.$_SERVER['HTTP_HOST'].':8084/';
-    ini_set("soap.wsdl_cache_enabled", "0");
+    $urlTypo3 = 'http://' . HostName . '/';
+            ini_set("soap.wsdl_cache_enabled", "0");
     $hostTypo3 = $urlTypo3.'typo3conf/ext/pm_webservices/serveur.php?wsdl';    
     $pfServer = new SoapClient($hostTypo3);
     $key = rand();
@@ -343,7 +343,7 @@ function userTypo3Update(){
         $groupId = $result[1]['GRP_UID'];
     // End Get the group name
 
-    $urlTypo3 = 'http://'.$_SERVER['HTTP_HOST'].':8084/';
+    $urlTypo3 = 'http://' . HostName . '/';
     ini_set("soap.wsdl_cache_enabled", "0");
     $hostTypo3 = $urlTypo3.'typo3conf/ext/pm_webservices/serveur.php?wsdl';    
     $pfServer = new SoapClient($hostTypo3);

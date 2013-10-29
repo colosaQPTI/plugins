@@ -947,17 +947,71 @@ function Forcerlademande(){
          });
 }
 
+function cancelVoucher() {
+    var changed = 0;
+    changed = changeEtatStatutConfirm('Etes-vous sur de vouloir annuler ce bon de réduction ?', 11);
+    if(changed == 1) {
+        idField = myApp.addTab_inside();
+        urlData = "../convergenceList/actions/cancelVoucher.php?array=" + idField + "&statut=" + statut;
+        Ext.MessageBox.show({
+            msg: 'Mise à jour des données, veuillez patienter...',
+            progressText: 'En cours...',
+            width: 300,
+            wait: true,
+            waitConfig: {
+                interval: 200
+            }
+        });
+        Ext.Ajax.request({
+            url: urlData,
+            params: {
+                array: idField,
+                statut: statut
+            },
+            success: function(result, request) {
+                var response = Ext.util.JSON.decode(result.responseText);
+                if (response.success) {
+                    Ext.MessageBox.hide();
+                    alert(response.messageinfo);
+                    Ext.MessageBox.show({
+                        msg: response.messageinfo,
+                        progressText: 'En cours...',
+                        width: 300,
+                        wait: true,
+                        waitConfig: {
+                            interval: 200
+                        }
+                    });
+                }
+                else {
+                    Ext.MessageBox.hide();
+                    PMExt.warning(_('ID_WARNING'), response.message);
+                }
+                Ext.getCmp('gridNewTab').store.reload();
+            },
+            failure: function(result, request) {
+                Ext.MessageBox.hide();
+                Ext.getCmp('gridNewTab').store.reload();
+            }
+        });
+    }
+}
+
 function changeEtatStatutConfirm(message, statut) {
+    var changed = 0;
     Ext.MessageBox.show({
         title:'Confirmation',
         msg: message,
         width:300,
         buttons:Ext.MessageBox.YESNO,
         fn:function(btn) {
-            if(btn == 'yes')
+            if(btn == 'yes') {
                 changeEtatStatut(statut);
+                changed = 1;
+            }
         }
     });
+    return changed;
 }
 
 function changeEtatStatut(statut) {

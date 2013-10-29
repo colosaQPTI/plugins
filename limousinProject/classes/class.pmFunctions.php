@@ -157,6 +157,31 @@ function limousin_addTransactionPriv($codePartenaire, $porteurID, $montant, $lib
     executeQuery($queryInsertTransactionPriv);
 }
 
+function limousinProject_isCarteActive($porteurID) {
+    $isActive = false;
+    $arrayData = array();
+    $query = "SELECT CARTE_STATUT FROM PMT_CHEQUES WHERE CARTE_PORTEUR_ID = '".$porteurID."'";
+    $result = executeQuery($query);
+    if(sizeof($result) == 1)
+    {
+        $carteStatut = $result[1]['CARTE_STATUT'];
+        $isActive = $carteStatut == 'Active';
+    }
+    return $isActive;
+}
+
+function limousinProject_getDateNaissanceFromPorteurID($porteurID) {
+    $dateNaissance = '';
+    $arrayData = array();
+    $query = "SELECT FI_DATEDENAISSANCE FROM PMT_DEMANDES WHERE STATUT <> 0 AND STATUT <> 999 AND PORTEUR_ID = '".$porteurID."'";
+    $result = executeQuery($query);
+    if(sizeof($result) == 1)
+    {
+        $dateNaissance = $result[1]['FI_DATENAISSANCE'];
+    }
+    return $dateNaissance;
+}
+
 function limousinProject_nouvelleTransaction($operation = 0, $porteurId = 0, $sens = 'N', $montant = 0, $sousMontants = array()) {
 
     // INIT Ws 201
@@ -178,7 +203,7 @@ function limousinProject_nouvelleTransaction($operation = 0, $porteurId = 0, $se
 
     /* Mode Test On */
     //$t->porteurId = "30280000023";
-    //$t->porteurId = "30280055283";
+    //$t->porteurId = "30280055283"; 30280055364
     //$t->porteurId = "0009";
     //$t->sens = "C";
     //$t->montant = "200";
@@ -305,7 +330,7 @@ function limousinProject_getAutorisations() {
 function limousinProject_getActivation($porteurId = 0) {
 
     // INIT Ws 211    
-	$result = null;
+    $result = null;
     $v = new Activation();
 
     // SET Params
@@ -320,7 +345,7 @@ function limousinProject_getActivation($porteurId = 0) {
     try
     {
         $v->call();
-        // Si la carte est bien activée, on met à jour la table des cartes PMT_CHEQUES
+    // Si la carte est bien activée, on met à jour la table des cartes PMT_CHEQUES
         $query = 'update PMT_CHEQUES SET CARTE_STATUT = "Active", DATE_ACTIVE = "'.date('Ymd').'" where CARTE_PORTEUR_ID= "' . mysql_escape_string($porteurId) . '"';
         $resQuery = executeQuery($query);
         // Puis on change le usergroup dans Typo3 en Carte activé
@@ -332,9 +357,8 @@ function limousinProject_getActivation($porteurId = 0) {
     {
         $result = $v->errors;
     }
-	
-	// RETURN
-	return $result;
+    // RETURN
+    return $result;
 }
 function limousinProject_getSolde($porteurId = 0) {
 
@@ -355,15 +379,18 @@ function limousinProject_getSolde($porteurId = 0) {
     try
     {
         // TODOs
-        $retour = $s->call();
-        echo 'ok solde => ' . $retour->solde . '--- end retour';
-        //var_export($retour);
+        $obj = $s->call();
+
+
+
+        return $obj->sousSoldes->sousSolde[0]->attributes();
     }
     catch (Exception $e)
     {
         // TODO
-        $echo = $s->errors->code;
-        echo 'Code Erreur solde = ' . $echo . '--- End Error ---';
+        return $s->errors->code;
+        //return $s;
+        // echo 'Code Erreur solde = ' . $echo . '--- End Error ---';
     }
 }
 
@@ -379,7 +406,7 @@ function limousinProject_identification($porteurId = 0, $tel = '', $portable = '
     $i->email = $mail;
     $i->numcarte = $numCarte;
 
-    /* Mode Test On */
+    /* Mode Test On 
     //$i->porteurId = 30280055364;
     $i->porteurId = 30280055283;
     $i->numcarte = '0007';
@@ -407,8 +434,10 @@ function limousinProject_createUser($app_id, $role) {
     //PMFCreateUser(string userId, string password, string firstname, string lastname, string email, string role)
     $isCreate = PMFCreateUser($fields['MAIL'], $fields['PASSWORD'], $fields['NOM_CONTACT'], $fields['PRENOM_CONTACT'], $fields['MAIL'], $role);
     if ($isCreate == 0)
+    {
+        mail('nicolas@oblady.fr', date('H:i:s') . ' debug error PMFCreateUser mail ', var_export($isCreate, true));
         return FALSE;
-
+    }
     $uQuery = 'SELECT USR_UID FROM USERS WHERE USR_USERNAME ="' . $fields['MAIL'] . '"';
     $rQuery = executeQuery($uQuery);
     if (!empty($rQuery))
@@ -728,6 +757,7 @@ function limousinProject_getSituationLabel($situation) {
 
 function limousinProject_getCartePorteurId($porteur_id) {
 
+    // on check qu'il y ai bien une carte produite pour ce porteur id
     $qExist = 'select count(UID) as nb from PMT_CHEQUES where CARTE_PORTEUR_ID = "' . mysql_escape_string($porteur_id) . '" AND CODE_EVENT = 14';    
     $rExist = executeQuery($qExist);
     $nbID = intval($rExist[1]['nb']);
@@ -765,6 +795,90 @@ function limousinProject_updateUsergroupTypo($userInfo, $porteurid, $groupId) {
         'usergroup' => $groupId,
         'cHash' => md5($userInfo['username'] . '*' . $userInfo['lastname'] . '*' . $userInfo['firstname'] . '*' . $key)));
     return $ret;
+}
+
+function limousinProject_activationCarte($porteurId, $statut, $role_user = 'Bénéficiaires') {
+    $return = TRUE;
+    if (!empty($porteurId) && $statut == 1)
+    {
+        // on regarde si le porteurid fourni est correct et on remonte le cas echeant les infos de la demande
+        $exist = limousinProject_getCartePorteurId($porteurId);
+        if (!empty($exist) && ($exist['USER_ID'] == $_SESSION['USER_LOGGED'] || $role_user != 'Bénéficiaires'))
+        {
+            //on appel le WS d'activation de la carte, on ajoute un groupe utilsateur carte active dans le fe_user Typo3
+            //et mise a jour de la table des carte PMT_CHEQUES comme quoi elle est activée
+            $active = limousinProject_getActivation($porteurId);
+            if (!empty($active->CODE) && $active->CODE == 'OK')
+            {
+                // on appel le WS de televersement des montants
+                $sousMontants = array(165 => "800", "800", "1000", "800", "400", "1200");
+                $transaction = array();
+                $transaction = limousinProject_nouvelleTransaction('01', $porteurId, 'C', 5000, $sousMontants);
+                if (!empty($transaction['errors']))
+                {
+                    //on récupére le label du code erreur de transaction
+                    $erreur = limousinProject_getErrorAqoba($transaction['errors'], 'WS201') . ' (code' . $transaction['errors'] . ' du WS201)';
+                    $return = 'erreur';
+                }
+            }
+            else
+            {
+                if (!empty($active->Description))
+                {
+                    // Erreur lors de l'updateUsergroup dans Typo3
+                    $erreur = $active->Description;
+                    $return = 'erreur';
+                }
+                else
+                {
+                    // On récupére le label de l'erreur lors de l'appel ws activation carte
+                    $erreur = limousinProject_getErrorAqoba($active->code, 'WS211') . " (code $active->code du WS211)";
+                    $return = FALSE;
+                }
+            }
+        }
+        else
+        {
+            $return = FALSE;
+            if (empty($exist))
+                $erreur = 'Carte non produite.';
+            else
+                $erreur = 'PorteurId ' . $porteurId . ' incorrect.';
+        }
+    }
+    else
+    {
+        $return = FALSE;
+        if ($statut != 1)
+            $erreur = 'Activation annulée par le ' . $role_user;
+        else
+            $erreur = 'PorteurId incorrect.';
+    }
+    // Dans le cas où $return == 'erreur', alors la carte est activé, mais avec quand même des erreurs à signaler, donc on rentre dans les 2 conditions suivantes
+    if ($return !== FALSE)
+    {
+        insertHistoryLogPlugin($exist['APPLICATION'], $_SESSION['USER_LOGGED'], date('Y-m-d H:i:s'), '0', '', "Carte activée par le $role_user", $exist['STATUT']);
+    }
+    if ($return !== TRUE)
+    {
+        if (empty($exist))
+        {
+            $arrayDemandeInfos = array();
+            if ($role_user == 'Bénéficiaires')
+                $queryDemande = "SELECT APP_UID FROM PMT_DEMANDES WHERE USER_ID = '" . $_SESSION['USER_LOGGED'] . "' AND STATUT <> 0 AND STATUT <> 999";
+            else // cas où l'activation de carte est faite par un gestionnaire ou autre, et que le porteur id n'est pas valide
+                $queryDemande = "SELECT APP_UID FROM PMT_DEMANDES WHERE CARTE_PORTEUR_ID = '" . $porteurId . "' AND STATUT <> 0 AND STATUT <> 999";
+            $resultAppUid = executeQuery($queryDemande);
+            if (sizeof($resultAppUid) == 1)
+            {
+                $appUid = $resultAppUid[1]['APP_UID'];
+                $exist = convergence_getAllAppData($appUid, 1);
+            }
+        }
+        if (!empty($exist))
+            insertHistoryLogPlugin($exist['APPLICATION'], $_SESSION['USER_LOGGED'], date('Y-m-d H:i:s'), '0', '', "Erreur lors de l'activation de la carte : " . $erreur, $exist['STATUT']);
+    }
+    return $return;
 }
 
 ?>

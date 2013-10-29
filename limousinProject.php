@@ -44,9 +44,7 @@ class limousinProjectPlugin extends PMPlugin
   {
     $this->setCompanyLogo("/plugin/limousinProject/limousinProject.png");
     $this->registerPmFunction();
-    $this->redirectLogin("PROCESSMAKER_LIMOUSINPROJECT", "users/users_List");
-    
-    
+    $this->redirectLogin("PROCESSMAKER_LIMOUSINPROJECT", "users/users_List");  
   }
 
   public function install()
