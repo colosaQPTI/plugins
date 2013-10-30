@@ -4,7 +4,7 @@ $POST['PARTENAIRE_UID']='';
 $POST['PRESTA_NAME']='';
 $POST['VILLE']='';
 $POST['CODE_OPER']='';
-$sWhere = ' WHERE STATUT=1 ';
+$sWhere = ' WHERE STATUT=1 AND upper(TYPE_PRESTA) like "PRIVATIF" ';
 
 
 /*if(isset($_POST['codeOper']) && $_POST['codeOper'] !=""){

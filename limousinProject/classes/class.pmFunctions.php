@@ -152,8 +152,9 @@ function limousinProject_getDemandeFromPorteurID($porterId) {
     return $arrayDemandeInfos;
 }
 
-function limousin_addTransactionPriv($codePartenaire, $porteurID, $montant, $libelle, $thematique) {
-    $queryInsertTransactionPriv = "INSERT INTO PMT_TRANSACTIONS_PRIV(CODE_PARTENAIRE, PORTEUR_ID, MONTANT, LIBELLE, THEMATIQUE) VALUES('".$codePartenaire."','".$porteurID."','".$montant."','".$libelle."','".$thematique."')";
+function limousin_addTransactionPriv($codePartenaire, $porteurID, $montant, $libelle, $thematique, $type) {
+    $now = date('d-m-Y');
+    $queryInsertTransactionPriv = "INSERT INTO PMT_TRANSACTIONS_PRIV(CODE_PARTENAIRE, PORTEUR_ID, MONTANT, LIBELLE, THEMATIQUE, TYPE, DATE_EMISSION, STATUT) VALUES('".$codePartenaire."','".$porteurID."','".$montant."','".$libelle."','".$thematique."','".$type."','".$now."', '16')";
     executeQuery($queryInsertTransactionPriv);
 }
 
@@ -379,16 +380,32 @@ function limousinProject_getSolde($porteurId = 0) {
     try
     {
         // TODOs
+        $arraySolde = array();
+        $arraySousSoldes = array();        
         $obj = $s->call();
-
-
-
-        return $obj->sousSoldes->sousSolde[0]->attributes();
+        foreach($obj->sousSoldes->sousSolde as $sousSolde)
+        {
+            $attrib = $sousSolde->attributes();
+            $attrib = (array) $attrib['reseau'];
+            $value = (array) $sousSolde;
+            $arraySousSoldes[$attrib[0]] = $value[0];
+        }
+        $solde = (array) $obj->solde;
+        $arraySolde['solde'] = $solde[0];
+        $soldeBrut = (array) $obj->soldeBrut;
+        $arraySolde['soldeBrut'] = $soldeBrut[0];
+        $soldeComptable = (array) $obj->soldeComptable;
+        $arraySolde['soldeComptable'] = $soldeComptable[0];
+        $arraySolde['sousSoldes'] = $arraySousSoldes;
+        //$arraySolde = $obj->sousSoldes->sousSolde[0]->attributes();
+        //$arraySolde = (array) $arraySolde['reseau'];
+        //return $obj->sousSoldes->sousSolde[0]->attributes();
+        return $arraySolde;
     }
     catch (Exception $e)
     {
         // TODO
-        return $s->errors->code;
+        return $s;
         //return $s;
         // echo 'Code Erreur solde = ' . $echo . '--- End Error ---';
     }
@@ -429,13 +446,15 @@ function limousinProject_identification($porteurId = 0, $tel = '', $portable = '
 }
 
 
-function limousinProject_createUser($app_id, $role) {
+function limousinProject_createUser($app_id, $role, $pwd) {
     $fields = convergence_getAllAppData($app_id);
+    $fields['PASSWORD'] = $pwd;
+    if (empty($fields['PRENOM_CONTACT']))
+        $fields['PRENOM_CONTACT'] = $fields['NOM_CONTACT']; // need the both for create account on typo3
     //PMFCreateUser(string userId, string password, string firstname, string lastname, string email, string role)
     $isCreate = PMFCreateUser($fields['MAIL'], $fields['PASSWORD'], $fields['NOM_CONTACT'], $fields['PRENOM_CONTACT'], $fields['MAIL'], $role);
     if ($isCreate == 0)
     {
-        mail('nicolas@oblady.fr', date('H:i:s') . ' debug error PMFCreateUser mail ', var_export($isCreate, true));
         return FALSE;
     }
     $uQuery = 'SELECT USR_UID FROM USERS WHERE USR_USERNAME ="' . $fields['MAIL'] . '"';
@@ -473,7 +492,7 @@ function limousinProject_createUser($app_id, $role) {
     {
         return FALSE;
     }
-    return TRUE;
+    return $usr_uid;
 }
 
 function limousinProject_getEtablissementFromRNE($rneCode) {

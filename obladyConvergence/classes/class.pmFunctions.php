@@ -1418,35 +1418,35 @@ function convergence_checkFieldLog($value, $params, $type) {
                     $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format 'E-mail' attendu";
                 }
                 break;
-            case 'Date':  // ^(0[1-9]|1\d|2\d|3[0-1])[\/\.-]?(0[1-9]|1[0-2])[\/\.-]?(\d{4})$
-                if (preg_match('#^(0[1-9]|1\d|2\d|3[0-1])[\/\.-]?(0[1-9]|1[0-2])[\/\.-]?(\d{4})$#', $value, $match) == 1)
-                {
-                    if (!checkdate($match[2], $match[1], $match[3]))
-                    {
-                        $log[] = "la valeur '$value' du champ date '$field' n'existe pas dans le calendrier";
-                    }
-                }
-                else
-                {
-                    $log[] = "le format date du champ '$field' est invalide";
-                }
-                break;
-            case 'Yesno':
-                if (strtoupper($value) != 'O' && strtoupper($value) != 'N')
-                    $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format 'O / N'";
-                break;
-            case 'OuiNon':
-                if (strtolower($value) != 'oui' && strtolower($value) != 'non')
-                    $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format 'oui / non'";
-                break;
-            case 'binaire':
-                if ($value != 1 && $value != 0)
-                    $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format '1 / 0'";
-                break;
-            case 'AI':
-                if ($value != 'A' && $value != 'I')
-                    $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format Actif/Inactif 'A / I'";
-                break;
+            /* case 'Date':  // ^(0[1-9]|1\d|2\d|3[0-1])[\/\.-]?(0[1-9]|1[0-2])[\/\.-]?(\d{4})$
+              if (preg_match('#^(0[1-9]|1\d|2\d|3[0-1])[\/\.-]?(0[1-9]|1[0-2])[\/\.-]?(\d{4})$#', $value, $match) == 1)
+              {
+              if (!checkdate($match[2], $match[1], $match[3]))
+              {
+              $log[] = "la valeur '$value' du champ date '$field' n'existe pas dans le calendrier";
+              }
+              }
+              else
+              {
+              $log[] = "le format date du champ '$field' est invalide";
+              }
+              break;
+              case 'Yesno':
+              if (strtoupper($value) != 'O' && strtoupper($value) != 'N')
+              $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format 'O / N'";
+              break;
+              case 'OuiNon':
+              if (strtolower($value) != 'oui' && strtolower($value) != 'non')
+              $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format 'oui / non'";
+              break;
+              case 'binaire':
+              if ($value != 1 && $value != 0)
+              $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format '1 / 0'";
+              break;
+              case 'AI':
+              if ($value != 'A' && $value != 'I')
+              $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format Actif/Inactif 'A / I'";
+              break; */
             case 'NCommande':
                 $val = $value + 0;
                 $val = "$val";
@@ -1911,8 +1911,9 @@ function convergence_countCaseToProduct($statut, $codeOper, $detailChequier = 1)
  */
 
 //LOCALE mais doit etre GLOBAL
-function convergence_justeOneDemande($user) {
+function convergence_justeOneDemande($user, $porcess_id) {
     $query = 'SELECT APP_UID FROM APPLICATION WHERE APP_INIT_USER ="' . $user . '"';
+    //$query = 'SELECT APP_UID FROM APPLICATION JOIN ON PMT_DEMANDESWHERE APP_INIT_USER ="' . $user . '" AND APP_STATUS = "COMPLETED" AND PRO_UID = "'.$porcess_id.'"';
     $res = executeQuery($query);
 
     if (!empty($res))

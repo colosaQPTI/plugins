@@ -31,7 +31,7 @@ if ( isset($_REQUEST['USR_LASTNAMEORIG'])) {
     		
     	}
     }
-    genDataReport ('PMT_DEMANDES');
+    // genDataReport ('PMT_DEMANDES');
    
 	$result->success = true;
 	$result->msg = 'mise a jour';

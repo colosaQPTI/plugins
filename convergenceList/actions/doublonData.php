@@ -46,66 +46,7 @@ function getTotalDuplicateRecords($reg, $fldNamStat, $fldValStat) {
    	}
    	return (array($totalRegisters, $aCase_elected, $exist_case_elected));
 }
-/*
-function genDataReport ($tableName){
-    G::loadClass( 'pmTable' );
-    G::loadClass ( 'pmFunctions' );
-    require_once 'classes/model/AdditionalTables.php';
-    
-    $tableType = "Report";
-   
-    // Check if the Table is Report or PM Table
 
-    $sqlAddTable = "SELECT * FROM ADDITIONAL_TABLES WHERE ADD_TAB_NAME = '$tableName' ";
-    $resAddTable=executeQuery($sqlAddTable);
-    if(sizeof($resAddTable)){
-	    if($resAddTable[1]['PRO_UID'] == ''){
-		    $tableType = "pmTable";	    
-	    }		
-    }
-    if($tableType == "Report" )
-    {
-        $cnn = Propel::getConnection('workflow');
-	    $stmt = $cnn->createStatement();
-        $additionalTables = new AdditionalTables(); 
-        $oPmTable = $additionalTables->loadByName($tableName);
-        $table 	  = $additionalTables->load($oPmTable['ADD_TAB_UID']);
-        if ($table['PRO_UID'] != '') {
-    	    $truncateRPTable = "TRUNCATE TABLE  ".$tableName." ";
-	        $rs = $stmt->executeQuery($truncateRPTable, ResultSet::FETCHMODE_NUM);   
-	        $additionalTables->populateReportTable( $table['ADD_TAB_NAME'], pmTable::resolveDbSource( $table['DBS_UID'] ), $table['ADD_TAB_TYPE'], $table['PRO_UID'], $table['ADD_TAB_GRID'], $table['ADD_TAB_UID'] ); 
-        }
-    }
-}
-
-function deletePMCases($caseId) {
-	
-	$query1="DELETE FROM wf_".SYS_SYS.".APPLICATION WHERE APP_UID='".$caseId."' ";
-	$apps1=executeQuery($query1);
-	$query2="DELETE FROM wf_".SYS_SYS.".APP_DELAY WHERE APP_UID='".$caseId."'";
-	$apps2=executeQuery($query2);
-	$query3="DELETE FROM wf_".SYS_SYS.".APP_DELEGATION WHERE APP_UID='".$caseId."'";
-	$apps3=executeQuery($query3);
-	$query4="DELETE FROM wf_".SYS_SYS.".APP_DOCUMENT WHERE APP_UID='".$caseId."'";
-	$apps4=executeQuery($query4);
-	$query5="DELETE FROM wf_".SYS_SYS.".APP_MESSAGE WHERE APP_UID='".$caseId."'";
-	$apps5=executeQuery($query5);
-	$query6="DELETE FROM wf_".SYS_SYS.".APP_OWNER WHERE APP_UID='".$caseId."'";
-	$apps6=executeQuery($query6);
-	$query7="DELETE FROM wf_".SYS_SYS.".APP_THREAD WHERE APP_UID='".$caseId."'";
-	$apps7=executeQuery($query7);
-	$query8="DELETE FROM wf_".SYS_SYS.".SUB_APPLICATION WHERE APP_UID='".$caseId."'";
-	$apps8=executeQuery($query8);
-	$query9="DELETE FROM wf_".SYS_SYS.".CONTENT WHERE CON_CATEGORY LIKE 'APP_%' AND CON_ID='".$caseId."'";
-	$apps9=executeQuery($query9);	
-	$query10="DELETE FROM wf_".SYS_SYS.".APP_EVENT WHERE APP_UID='".$caseId."'";
-	$apps10=executeQuery($query10);
-	$query11="DELETE FROM wf_".SYS_SYS.".APP_CACHE_VIEW WHERE APP_UID='".$caseId."'";
-	$apps11=executeQuery($query11);
-	$query12="DELETE FROM wf_".SYS_SYS.".APP_HISTORY WHERE APP_UID='".$caseId."'";
-	$apps12=executeQuery($query12);
-}
-*/
 function deleteDuplicatedCases($appUidElected, $tableName ='') {
 	G::LoadClass("case");
 	$numDeletedCases = 0;
@@ -118,7 +59,7 @@ function deleteDuplicatedCases($appUidElected, $tableName ='') {
 			insertHistoryLogPlugin($appUidElected,$_SESSION['USER_LOGGED'],$CurDateTime,'1',$caseId,'Delete Case');//insertHistoryLogPlugin(father,......child)
 		}	
 	}
-	genDataReport($tableName);
+	// genDataReport($tableName);
 	unset($_SESSION['ELIMINATE_POSSIBLE_CASES']);
 	return $numDeletedCases;
 }
