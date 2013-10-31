@@ -166,7 +166,7 @@ function limousinProject_isCarteActive($porteurID) {
     if(sizeof($result) == 1)
     {
         $carteStatut = $result[1]['CARTE_STATUT'];
-        $isActive = $carteStatut == 'Active';
+        $isActive = $carteStatut == 'Active' ? 1 : 0;
     }
     return $isActive;
 }
@@ -213,8 +213,6 @@ function limousinProject_nouvelleTransaction($operation = 0, $porteurId = 0, $se
         $t->addSousMontant($rsx, $sm);
     }
     /* Mode Test Off */
-
-
     // CALL Ws
     try
     {
@@ -388,7 +386,7 @@ function limousinProject_getSolde($porteurId = 0) {
             $attrib = $sousSolde->attributes();
             $attrib = (array) $attrib['reseau'];
             $value = (array) $sousSolde;
-            $arraySousSoldes[$attrib[0]] = $value[0];
+            $arraySousSoldes[$attrib[0]] = (int) $value[0];
         }
         $solde = (array) $obj->solde;
         $arraySolde['solde'] = $solde[0];
@@ -409,6 +407,20 @@ function limousinProject_getSolde($porteurId = 0) {
         //return $s;
         // echo 'Code Erreur solde = ' . $echo . '--- End Error ---';
     }
+}
+
+function limousinProject_testSolde($soldeReseau, $montant)
+{
+    $result = -1;
+    if($soldeReseau >= $montant)
+    {
+        $result = 1;
+    }
+    else
+    {
+        $result = 0;
+    }
+    return $result;
 }
 
 function limousinProject_identification($porteurId = 0, $tel = '', $portable = '', $mail = '', $numCarte = '') {
@@ -720,7 +732,7 @@ function limousinProject_readLineFromAQCARTE($datas) {
                         $set[] = $key . '="' . $value . '"';
                     }
                     $update = implode(',', $set);
-                    $query = 'update PMT_CHEQUES SET ' . $update . ' where CARTE_PORTEUR_ID= "' . $escapeLine['CARTE_PORTEUR_ID'] . '"';
+                    $query = 'update PMT_CHEQUES SET ' . $update . ' where CARTE_PORTEUR_ID= "' . $escapeLine['CARTE_PORTEUR_ID'] . '" AND CARTE_STATUT != "Bloquée"';
                     $result = executeQuery($query);
                 }
                 else
@@ -898,6 +910,43 @@ function limousinProject_activationCarte($porteurId, $statut, $role_user = 'Bén
             insertHistoryLogPlugin($exist['APPLICATION'], $_SESSION['USER_LOGGED'], date('Y-m-d H:i:s'), '0', '', "Erreur lors de l'activation de la carte : " . $erreur, $exist['STATUT']);
     }
     return $return;
+}
+
+function limousinProject_getThematiqueFromPartenaire($userId) {
+    //array('1' => array('CODE'=>'165', 'TYPE'=>'Cinéma'));
+    $query = "SELECT CONCAT(TH_CINE, '-', TH_SPECTACLE, '-', TH_ACHAT, '-', TH_ARTS, '-', TH_SPORT, '-', IF(TH_ADH_ART = '0', TH_ADH_SPORT, TH_ADH_ART)) AS THEMATIQUE FROM PMT_PRESTATAIRE where STATUT=1 AND USER_ID ='".$userId."'";
+    $result = executeQuery($query);
+    $thematiquesArray = array();
+    if(isset($result))        
+    {
+        $thematiqueString = $result[1]['THEMATIQUE'];
+        $thematiquePrestaArray = explode('-', $thematiqueString);
+        if($thematiquePrestaArray[0] == 1)
+        {
+            $thematiquesArray['1'] = array('CODE'=>'165', 'TYPE'=>'Cinéma');
+        }
+        if($thematiquePrestaArray[1] == 1)
+        {
+            $thematiquesArray['2'] = array('CODE'=>'166', 'TYPE'=>'Spectacle Vivant');
+        }
+        if($thematiquePrestaArray[2] == 1)
+        {
+            $thematiquesArray['3'] = array('CODE'=>'167', 'TYPE'=>'Achat de livre et produtis multimédia');
+        }
+        if($thematiquePrestaArray[3] == 1)
+        {
+            $thematiquesArray['4'] = array('CODE'=>'168', 'TYPE'=>'Arts Plastiques');
+        }
+        if($thematiquePrestaArray[4] == 1)
+        {
+            $thematiquesArray['5'] = array('CODE'=>'169', 'TYPE'=>'Manifestation ou évènement sportif');
+        }
+        if($thematiquePrestaArray[5] == 1)
+        {
+            $thematiquesArray['6'] = array('CODE'=>'170', 'TYPE'=>'Adhésion pratique sportive ou artistique');
+        }
+    }   
+    return $thematiquesArray;    
 }
 
 ?>

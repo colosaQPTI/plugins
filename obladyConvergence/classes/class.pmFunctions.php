@@ -1907,29 +1907,24 @@ function convergence_countCaseToProduct($statut, $codeOper, $detailChequier = 1)
 /* * ***
  *  Fonction pour vérifier si la demande n'as pas déjà était faite, par un même bénéficiaire
  *
- *  $user     @string    le @@USER_LOGGED du dynaform courant.
+ *  $user           @string    le @@USER_LOGGED du dynaform courant.
+ *  $porcess_id     @string    le @@PROCESS du dynaform courant.
  */
 
 //LOCALE mais doit etre GLOBAL
 function convergence_justeOneDemande($user, $porcess_id) {
-    $query = 'SELECT APP_UID FROM APPLICATION WHERE APP_INIT_USER ="' . $user . '"';
-    //$query = 'SELECT APP_UID FROM APPLICATION JOIN ON PMT_DEMANDESWHERE APP_INIT_USER ="' . $user . '" AND APP_STATUS = "COMPLETED" AND PRO_UID = "'.$porcess_id.'"';
+
+    $query = 'SELECT APPLICATION.APP_UID
+              FROM APPLICATION
+                JOIN PMT_DEMANDES
+                    ON APPLICATION.APP_UID = PMT_DEMANDES.APP_UID 
+              WHERE APPLICATION.APP_INIT_USER ="' . $user . '" AND APPLICATION.APP_STATUS = "COMPLETED" AND PRO_UID = "' . $porcess_id . '"
+              AND PMT_DEMANDES.STATUT <> 999 AND PMT_DEMANDES.STATUT <> 0';
     $res = executeQuery($query);
 
     if (!empty($res))
     {
-        foreach ($res as $key => $array)
-        {
-            foreach ($array as $uid)
-            {
-                $qDemande = 'SELECT APP_UID FROM PMT_DEMANDES WHERE APP_UID = "' . $uid . '" AND STATUT <> 999 AND STATUT <> 0';
-                $rDemande = executeQuery($qDemande);
-                if (!empty($rDemande))
-                {
-                    return 0;
-                }
-            }
-        }
+        return 0;
     }
     return 1;
 }
