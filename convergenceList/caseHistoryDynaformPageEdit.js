@@ -120,9 +120,18 @@ function ajaxPostRequest(url, callback_function, id){
             items : [TabPanel]
           });          
       }
+      
+      for(var i = 0; i < DATALABELS.length; i++)
+      {
+    	  //var id_+DATALABELS[i]['NAME_LABEL'] = DATALABELS[i]['DESCRIPTION'];
+    	  var data = ("var id_" + DATALABELS[i]['NAME_LABEL'] + "= '" + DATALABELS[i]['DESCRIPTION']) + "';";
+    	  eval(data);
+      }
       if(DYNAFORMSLIST.length == 0 || ACTIVEFORMS == 1)
-    	  fn_add_tab_principal('DynaForms','cases_EditJS.php?APP_UID='+APP_UID+'&ADAPTIVEHEIGHT='+ADAPTIVEHEIGHT,TabPanel);      
-
+      {
+    	  idTabfroms = 'DynaForms';
+    	  fn_add_tab_principal(id_DynaForms,'cases_EditJS.php?APP_UID='+APP_UID+'&ADAPTIVEHEIGHT='+ADAPTIVEHEIGHT,TabPanel, idTabfroms);      
+      }
       else
       {
     	  var i=0;
@@ -135,15 +144,17 @@ function ajaxPostRequest(url, callback_function, id){
       
       //ajout des commentaires
       if (SHOWCOMMENT == 1) {
-    	  fn_add_tab_principal('Commentaires','viewCaseNotes.php?APP_UID='+APP_UID,TabPanel);
-    
-    	  fn_add_tab_principal('Explication Statut','actions/explicationStatut.php?APP_UID='+APP_UID+'&ADAPTIVEHEIGHT='+ADAPTIVEHEIGHT,TabPanel);
+    	  idTabComentarie = 'Commentaires';
+    	  fn_add_tab_principal(id_Commentaires,'viewCaseNotes.php?APP_UID='+APP_UID,TabPanel, idTabComentarie);
+    	  idTabexplication = 'Explication Statut';
+    	  fn_add_tab_principal(id_Explicatio_Statut,'actions/explicationStatut.php?APP_UID='+APP_UID+'&ADAPTIVEHEIGHT='+ADAPTIVEHEIGHT,TabPanel, idTabexplication);
       }
       // ajout nico pour les statut remboursement
       if (SHOWCOMMENT == 2) {
+    	  idTabComentarie = 'Commentaires';
     	  fn_add_tab_principal('Commentaires','viewCaseNotes.php?APP_UID='+APP_UID,TabPanel);
-
-    	  fn_add_tab_principal('Explication Statut','actions/explicationStatutRmb.php?APP_UID='+APP_UID+'&ADAPTIVEHEIGHT='+ADAPTIVEHEIGHT,TabPanel);
+    	  idTabexplication = 'Explication Statut';
+    	  fn_add_tab_principal('Explication Statut','actions/explicationStatutRmb.php?APP_UID='+APP_UID+'&ADAPTIVEHEIGHT='+ADAPTIVEHEIGHT,TabPanel,idTabexplication );
       }
       
       TabPanel.setActiveTab(1);
@@ -153,12 +164,12 @@ function ajaxPostRequest(url, callback_function, id){
       		TabPanel.setActiveTab(1);
   		}, 200);
       
-      function fn_add_tab_principal(sName,sUrl,TabPanel)
+      function fn_add_tab_principal(sName,sUrl,TabPanel, idTabfroms)
       {       	  
           TabPanel.add({
-            id: 'iframe-' + sName,      
+            id: 'iframe-' + idTabfroms,      
             title: sName,
-            frameConfig:{name: sName + 'Frame', id: sName + 'Frame'},     
+            frameConfig:{name: idTabfroms + 'Frame', id: idTabfroms + 'Frame'},     
             loadMask:{msg:'Chargement ...'},
             closable:false,
             autoScroll: true,       

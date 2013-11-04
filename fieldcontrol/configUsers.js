@@ -3,6 +3,82 @@ var fieldNameData;
 
 Ext.onReady(function() 
 {
+	var lanConfigList ='Config list users';
+	var lanAdd='Add';
+	var lanEdit='Edit';
+	var lanRemove='Remove';
+	var lanSaveCon = 'Save Config';	
+	var lanConfig ='Config List Users';
+	var lanMsgEmpty = 'There are no options to display';
+	var lanMsgEmpty2= 'No actions to display';
+	var lanAddConfig = 'Add Config Users';
+	var lanEditConfig = 'Edit Config Users';
+	
+	var lanSave = 'Save';
+	var lanCancel = 'Cancel';
+	var lanSelectType= 'Select a type...';
+	var lanSelectTypeAction= 'Select a type action...';	
+	var lanRegParam= 'Register parameters select';
+	var lanMsgSave ='The data was saved sucessfully!';
+	var lanActRem = 'Remove Action of Inbox';
+	var lanMsgOpe = 'The operation completed sucessfully!';
+	var lanMsgOpeError= 'The operation was not completed sucessfully!';
+	var lanMsgDisplay = 'Displaying {0} - {1} of {2}';
+	var lanMsgClosePan = 'Close Panel';
+	var lanCmbType = 'Type Action';
+	var lanParamSelect = 'Parameters select';
+	var lanAddOpt= 'Add Options';
+	var lanEditOpt= 'Edit Options';
+	var lanRemOpt= 'Remove Options';
+	var lanMsgAddPlease = "Add options please";
+	var lanFieldName= "Field Name";
+	var lanDescription= "Description";
+	var lanStatus= "Status";
+	var lanSorry = 'Sorry...';
+	var lanSelectVendor = 'You must select a Vendor to Remove.';
+	
+	if(language == 'fr')
+	{
+		lanConfigList='Config liste des utilisateurs';
+		lanAdd='Ajouter';
+		lanEdit='Edition';
+		lanRemove='Supprimer';
+		lanSaveCon='Sauver Config';
+		lanConfig='Config liste des utilisateurs';
+		lanMsgEmpty = "Il n'y a aucune action \u00E0 afficher";
+		lanMsgEmpty2 = 'Aucune action \u00E0 afficher';
+		lanAddConfig = 'Ajouter des utilisateurs Config';
+		lanEditConfig = 'Editer des utilisateurs Config';
+		
+		lanSave='Sauver';
+		lanCancel='Annuler';
+		lanSelectType='S\u00E9lectionnez un type';
+		lanRegParam='Registre param \u00E8tres select';
+		lanMsgSave='Les donn\u00E9es ont \u00E9t\u00E9 enregistr\u00E9es avec succ\u00E8s!';
+		lanActRem = "Supprimer l'action de Inbox";
+		lanMsgOpe = "L'opération s'est termin\u00E9e avec succ\u00E8s!";
+		lanMsgOpeError= "L'op\u00E9ration n'a pas \u00E9t\u00E9 compl\u00E9t\u00E9e avec succ\u00E8s!";
+		lanSelectTypeAction= 'S\u00E9lectionnez une action de type...';
+		lanMsgDisplay='Affichage {0} - {1} sur {2}';
+		lanMsgClosePan='Fermer le panneau';
+		lanCmbType='Une action du type';
+		lanParamSelect ='Param\u00E8tres Select';
+		lanAddOpt= "Ajouter des Options";
+		lanEditOpt="Editer les options";
+		lanRemOpt="Supprimer des options";
+		lanMsgAddPlease="Ajouter les options s'il vous pla\u00EEt";
+		lanFieldName ="Nom du champ";
+		lanDescription = 'Description';
+		lanStatus='\u00c9tat';
+		lanSorry = 'Désolé...';
+	        lanSelectVendor = 'Vous devez s\u00E9lectionner un fournisseur pour le retirer.';
+	}
+	
+	
+	
+	
+	
+	
 	var tooltipRenderer = function(data, metadata, record, rowIndex, columnIndex,store) 
 	{
 		metadata.attr = 'ext:qtip="' + data + '" style="white-space: normal; "';
@@ -24,7 +100,7 @@ Ext.onReady(function()
 			//iconCls:'boton-nuevo-exportador',
 			closable: true,
 			maximizable: true,
-			title: 'Config list users',			
+			title: lanConfigList,			
 			bodyStyle:'padding:8px',
 			width:900,
 			height: 480,
@@ -44,7 +120,7 @@ Ext.onReady(function()
 		    }],
 		    buttons:[{
 				iconCls:'boton-guardar',
-				text:'Close Panel',
+				text:lanMsgClosePan,
 				handler: function(){
 					win.destroy();
 				}
@@ -101,24 +177,24 @@ Ext.onReady(function()
 				viewConfig 		: {
 		          forceFit 		: true,
 		          scrollOffset 	: 0,
-		          emptyText		: 'There are no actions to display'
+		          emptyText		: lanMsgEmpty
 		       },
 				bbar			: new Ext.PagingToolbar({
 			          pageSize: 50,
 			          store: ConfigUsers_store,
 			          displayInfo: true,
-			          displayMsg: 'Displaying {0} - {1} of {2}',
-			          emptyMsg: "No actions to display"
+			          displayMsg: lanMsgDisplay,
+			          emptyMsg: lanMsgEmpty2
 				}),
 				tbar 			: [{
-							text: 'Add ',
+							text: lanAdd,
 							cls : 'x-btn-text-icon',
 							icon : '/images/ext/default/tree/drop-add.gif',
 							handler: function(){
 								add_ConfigUsers_popup();
 							}
 						}, {
-							text	: 'Edit ',
+							text	: lanEdit,
 							cls 	: 'x-btn-text-icon',
 							icon 	: '/images/edit-table.png',
 							id		: 'editConfigUsers',
@@ -127,7 +203,7 @@ Ext.onReady(function()
 								edit_ConfigUsers_popup(ConfigUsers_grid);
 							}		
 						} , {
-							text	: 'Remove ',
+							text	: lanRemove,
 							cls 	: 'x-btn-text-icon',
 							icon 	: '/images/delete-16x16.gif',
 							id		: 'removeConfigUsers',
@@ -136,7 +212,7 @@ Ext.onReady(function()
 								remove_ConfigUsers_popup(ConfigUsers_grid);
 							}
 						} , {
-							text: 'Save Config ',
+							text: lanSaveCon,
 							cls : 'x-btn-text-icon',
 							icon : '/images/ok.png',
 							tooltip  : 'Add drag and drop',
@@ -144,7 +220,7 @@ Ext.onReady(function()
 								saveConfigUsers_DragAndDrop(ConfigUsers_store);
 							}
 						} , {
-							text:('Config List Users'),
+							text:(lanConfig),
 							  iconCls :'button_menu_ext ss_configListUsers',
 							  handler: ConfigListUserPage,
 							  disabled: false 
@@ -326,31 +402,31 @@ Ext.onReady(function()
 			viewConfig : {
 	          forceFit : true,
 	          scrollOffset : 0,
-	          emptyText: 'There are no options to display'
+	          emptyText: lanMsgEmpty
 	       },
 	       bbar			: new Ext.PagingToolbar({
 		          pageSize: 50,
 		          store: gridOptionsConfig_store,
 		          displayInfo: true,
-		          displayMsg: 'Displaying {0} - {1} of {2}',
-		          emptyMsg: "No actions to display"
+		          displayMsg: lanMsgDisplay,
+		          emptyMsg: lanMsgEmpty2
 			}),
 	       tbar : [{
-				text: 'Add Options',
+				text: lanAddOpt,
 				cls : 'x-btn-text-icon',
 				icon : '/images/ext/default/tree/drop-add.gif',
 				handler: function(){
 					addColumn(gridOptionsConfig, gridOptionsConfig_store, editor);
 				}	
 	       }, {
-				text: 'Edit Options',
+				text: lanEditOpt,
 				cls : 'x-btn-text-icon',
 				icon : '/images/edit-table.png',
 				handler: function(){
 	    	   		editColumn(gridOptionsConfig, gridOptionsConfig_store, editor);
 				}	
 	       }, {
-				text: 'Remove Options',
+				text: lanRemOpt,
 				cls : 'x-btn-text-icon',
 				icon : '/images/delete-16x16.gif',
 				handler: function(){
@@ -377,7 +453,7 @@ Ext.onReady(function()
 					xtype: 'textfield',
 		            id:'idFieldName', 
 		            width: 350,
-					fieldLabel: 'Field Name',
+					fieldLabel: lanFieldName,
 					name: 'first',
 					allowBlank:false,
 					autoCreate: {tag: 'input', type: 'text', size: '20', autocomplete: 'off', maxlength: '30'},
@@ -401,12 +477,12 @@ Ext.onReady(function()
 					xtype: 'textfield',
 		            id:'idDescription', 
 		            width: 350,
-					fieldLabel: 'Description',
+					fieldLabel: lanDescription,
 					name: 'first',
 					vtype : 'fieldDescription',
 					allowBlank:false
 				} , new Ext.form.ComboBox({
-                    fieldLabel: 'Status',
+                    fieldLabel: lanStatus,
                     hiddenName:'Status',
                     store: new Ext.data.ArrayStore({
                     	fields: ['ID', 'NAME'],
@@ -420,7 +496,7 @@ Ext.onReady(function()
                     typeAhead: true,
                     mode: 'local',
                     triggerAction: 'all',
-                    emptyText:'Select a type...',
+                    emptyText:lanSelectType,
                     selectOnFocus:true,
                     width:350
                 }), new Ext.form.ComboBox({
@@ -438,7 +514,7 @@ Ext.onReady(function()
                     typeAhead: true,
                     mode: 'local',
                     triggerAction: 'all',
-                    emptyText:'Select a type...',
+                    emptyText:lanSelectType,
                     selectOnFocus:true,
                     width:350,
                     listeners:
@@ -473,7 +549,7 @@ Ext.onReady(function()
 						}
    		    	 	}
                 }),  new Ext.form.ComboBox({
-                    fieldLabel: 'Type Action',
+                    fieldLabel: lanCmbType,
                     hiddenName:'typeAction',
                     store: new Ext.data.ArrayStore({
                     	fields: ['ID', 'NAME'],
@@ -487,7 +563,7 @@ Ext.onReady(function()
                     typeAhead: true,
                     mode: 'local',
                     triggerAction: 'all',
-                    emptyText:'Select a type action...',
+                    emptyText:lanSelectTypeAction,
                     selectOnFocus:true,
                     hidden:true,
                     width:350,
@@ -519,7 +595,7 @@ Ext.onReady(function()
                 }), {                                                                                              
 					xtype: 'textarea',
 					id:'parametersfield', 
-					fieldLabel: "Parameters Select", 
+					fieldLabel: lanParamSelect, 
 					name: 'parameters', 
 					width: 350, 
 					allowBlank: true,
@@ -530,7 +606,7 @@ Ext.onReady(function()
 		});		
 		
 	    add_ConfigUsers_popup_window = new Ext.Window({
-			title: 'Add Config Users',
+			title:lanAddConfig,
 			id:'add_ConfigUsers_popup_window',
 			width: 500,
 			autoHeight: true,
@@ -542,7 +618,7 @@ Ext.onReady(function()
 			layout: 'form',
 			items: [add_ConfigUsers_popup_form],
 			buttons: [{
-	            text: 'Save',
+	            text: lanSave,
 	            type: 'submit',
 	            scope: this,
 	            handler: function() {   					
@@ -573,7 +649,7 @@ Ext.onReady(function()
 	                    		var data = Ext.decode(a.response.responseText);                        
 	                    		if(data.success == true){ 
 	                    			Ext.MessageBox.show({                            
-	                    				msg : 'The data was saved sucessfully!',
+	                    				msg : lanMsgSave,
 	                    				buttons : Ext.MessageBox.OK,
 	                    				icon : Ext.MessageBox.INFO
 	                    			});
@@ -588,10 +664,10 @@ Ext.onReady(function()
 						})
 					}
 					else
-						alert("Register parameters select");
+						alert(lanRegParam);
 	            }
 	        },{
-	            text: 'Cancel',            
+	            text: lanCancel,            
 	            handler: function (){                
 	                Ext.getCmp('add_ConfigUsers_popup_window').close();
 	            }
@@ -682,31 +758,31 @@ Ext.onReady(function()
 				viewConfig : {
 		          forceFit : true,
 		          scrollOffset : 0,
-		          emptyText: 'There are no options to display'
+		          emptyText: lanMsgEmpty
 		       },
 		       bbar			: new Ext.PagingToolbar({
 			          pageSize: 50,
 			          store: gridOptionsConfig_store,
 			          displayInfo: true,
-			          displayMsg: 'Displaying {0} - {1} of {2}',
-			          emptyMsg: "No actions to display"
+			          displayMsg: lanMsgDisplay,
+			          emptyMsg: lanMsgEmpty2
 				}),
 		       tbar : [{
-					text: 'Add Options',
+					text: lanAddOpt,
 					cls : 'x-btn-text-icon',
 					icon : '/images/ext/default/tree/drop-add.gif',
 					handler: function(){
 						addColumn(gridOptionsConfig, gridOptionsConfig_store, editor);
 					}	
 		       }, {
-					text: 'Edit Options',
+					text: lanEditOpt,
 					cls : 'x-btn-text-icon',
 					icon : '/images/edit-table.png',
 					handler: function(){
 		    	   		editColumn(gridOptionsConfig, gridOptionsConfig_store, editor);
 					}	
 		       }, {
-					text: 'Remove Options',
+					text: lanRemOpt,
 					cls : 'x-btn-text-icon',
 					icon : '/images/delete-16x16.gif',
 					handler: function(){
@@ -733,7 +809,7 @@ Ext.onReady(function()
     		    	 xtype: 'textfield',
     		    	 id:'idFieldName', 
     		    	 width: 350,
-    		    	 fieldLabel: 'Field Name',
+    		    	 fieldLabel: lanFieldName,
     		    	 name: 'first',
     		    	 allowBlank:false,
     		    	 vtype : 'idField',
@@ -758,12 +834,12 @@ Ext.onReady(function()
     		    	 xtype: 'textfield',
     		    	 id:'idDescription', 
     		    	 width: 350,
-    		    	 fieldLabel: 'Description',
+    		    	 fieldLabel: lanDescription,
     		    	 name: 'first',
     		    	 vtype : 'fieldDescription',
     		    	 allowBlank:false
     		     } , new Ext.form.ComboBox({
-                     fieldLabel: 'Status',
+                     fieldLabel: lanStatus,
                      hiddenName:'Status',
                      store: new Ext.data.ArrayStore({
                      	fields: ['ID', 'NAME'],
@@ -777,7 +853,7 @@ Ext.onReady(function()
                      typeAhead: true,
                      mode: 'local',
                      triggerAction: 'all',
-                     emptyText:'Select a type...',
+                     emptyText:lanSelectType,
                      selectOnFocus:true,
                      width:350
                  }), new Ext.form.ComboBox({
@@ -795,7 +871,7 @@ Ext.onReady(function()
     		    	 typeAhead: true,
     		    	 mode: 'local',
     		    	 triggerAction: 'all',
-    		    	 emptyText:'Select a type...',
+    		    	 emptyText:lanSelectType,
     		    	 selectOnFocus:true,
     		    	 width:350,
     		    	 listeners:
@@ -830,7 +906,7 @@ Ext.onReady(function()
  						}
     		    	 }
     		     }),  new Ext.form.ComboBox({
-    		    	 fieldLabel: 'Type Action',
+    		    	 fieldLabel: lanCmbType,
     		    	 hiddenName:'typeAction',
     		    	 store: new Ext.data.ArrayStore({
     		    		 fields: ['ID', 'NAME'],
@@ -844,7 +920,7 @@ Ext.onReady(function()
     		    	 typeAhead: true,
     		    	 mode: 'local',
     		    	 triggerAction: 'all',
-    		    	 emptyText:'Select a type action...',
+    		    	 emptyText:lanSelectTypeAction,
     		    	 selectOnFocus:true,
     		    	 width:350,
     		    	 listeners:
@@ -875,7 +951,7 @@ Ext.onReady(function()
     		     }), {                                                                                              
     		    	 xtype: 'textarea',
     		    	 id:'parametersfield', 
-    		    	 fieldLabel: "Parameters Select", 
+    		    	 fieldLabel: lanParamSelect, 
     		    	 name: 'parameters', 
     		    	 width: 350, 
     		    	 allowBlank: true,
@@ -886,7 +962,7 @@ Ext.onReady(function()
     	 });		
     	 		
     	 edit_ConfigUsers_popup_window = new Ext.Window({
-    		 title: 'Add Config Users',
+    		 title: lanEditConfig,
     		 id:'edit_ConfigUsers_popup_window',
     		 width: 500,
     		 autoHeight: true,
@@ -898,7 +974,7 @@ Ext.onReady(function()
     		 layout: 'form',
     		 items: [edit_ConfigUsers_popup_form],
     		 buttons: [{
-    			 text: 'Save',
+    			 text: lanSave,
     			 type: 'submit',
     			 scope: this,
     			 handler: function() {   
@@ -931,7 +1007,7 @@ Ext.onReady(function()
     	 						var data = Ext.decode(a.response.responseText);                        
     	 						if(data.success == true){ 
     	 							Ext.MessageBox.show({                            
-    	 								msg : 'The data was saved sucessfully!',
+    	 								msg : lanMsgSave,
     	 								buttons : Ext.MessageBox.OK,
     	 								icon : Ext.MessageBox.INFO
     	 							});
@@ -946,10 +1022,10 @@ Ext.onReady(function()
     	 				})
     			 	}
     			 	else
-    			 		alert("Register parameters select");
+    			 		alert(lanRegParam);
     		 	}
     		 },{
-    			 text: 'Cancel',            
+    			 text: lanCancel,            
     			 handler: function (){                
     			 	Ext.getCmp('edit_ConfigUsers_popup_window').close();
     		 	}
@@ -1015,9 +1091,9 @@ Ext.onReady(function()
 	            if (sm.hasSelection()) {
 	            	
 	            	  Ext.Msg.show({
-			                title : 'Remove Action of Inbox',
+			                title : lanActRem,
 			                buttons : Ext.MessageBox.YESNOCANCEL,
-			                msg : 'Remove Action of Inbox : ' + rowModel.data.NAME + ' ?',
+			                msg : lanActRem+' : ' + rowModel.data.NAME + ' ?',
 			                fn : function(btn) {
 			                  if (btn == 'yes') {
 			                      var ID = rowModel.data.CONFIG_USERS_ID;
@@ -1032,7 +1108,7 @@ Ext.onReady(function()
 					                        var url = data.success; 
 					                          if (url == true) {
 					                            Ext.MessageBox.show({                            
-						                            msg : 'The data was removed sucessfully!',
+						                            msg : lanMsgSave,
 						                            buttons : Ext.MessageBox.OK,
 						                            icon : Ext.MessageBox.INFO
 						                         });    
@@ -1046,7 +1122,7 @@ Ext.onReady(function()
 					                          var url = data.success; 
 					                          if (url == true) {
 					                            Ext.MessageBox.show({                            
-						                            msg : 'The data was removed sucessfully!',
+						                            msg : lanMsgSave,
 						                            buttons : Ext.MessageBox.OK,
 						                            icon : Ext.MessageBox.INFO
 						                         });    
@@ -1066,7 +1142,7 @@ Ext.onReady(function()
 	            }
 		
 	  	    }else {
-	  	    	Ext.MessageBox.alert('Sorry...','You must select a Vendor to Remove.');
+	  	    	Ext.MessageBox.alert(lanSorry,lanSelectVendor);
 	  	    }
 		}
 
@@ -1118,13 +1194,13 @@ Ext.onReady(function()
 	        success: function(r,o){
 				Ext.MessageBox.hide();
 				Ext.MessageBox.show({                            
-					msg : 'The operation completed sucessfully!',
+					msg : lanMsgOpe,
 					buttons : Ext.MessageBox.OK,
 					icon : Ext.MessageBox.INFO
                 }); 
 	         },
 	        failure: function(){
-	        	Ext.MessageBox.alert('Error','The operation was not completed sucessfully!');
+	        	Ext.MessageBox.alert('Error',lanMsgOpeError);
 	        	Ext.MessageBox.hide();
 	        }
 		});
@@ -1203,7 +1279,7 @@ Ext.onReady(function()
 		}
 		else
 		{
-			alert('Add options please');
+			alert(lanMsgAddPlease);
 		}
 		
 	}
@@ -1246,7 +1322,7 @@ Ext.onReady(function()
 	                
 	            },
 	            failure : function() {
-	            	Ext.MessageBox.alert('Error', 'The operation was not completed sucessfully!');
+	            	Ext.MessageBox.alert('Error', lanMsgOpeError);
 	            	
 	            }
 	     });

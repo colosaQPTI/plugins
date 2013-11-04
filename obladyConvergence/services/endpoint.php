@@ -6,8 +6,10 @@ function FupdateAPPDATATYPO3($APP_UID,$new = 0){
     $caseInstance = new Cases ();
     $newFields = $caseInstance->loadCase ($APP_UID);
     $newFields['APP_DATA']['FLAGTYPO3'] = 'On';
-    
-    $newFields['APP_DATA']['FLAG_REDIRECT_PAGE'] = urldecode($_REQUEST['redirect']);
+    $newFields['APP_DATA']['FLAG_ACTIONTYPO3'] = 'actionCreateCase';
+
+    if ($_REQUEST['redirect'])
+        $newFields['APP_DATA']['FLAG_REDIRECT_PAGE'] = urldecode($_REQUEST['redirect']);
     
     if ($new == 1) {
         
@@ -57,7 +59,11 @@ try {
         case 'mesdemandes':        
             // Redirect to inbox
             //G::header('Location: ../../convergenceList/inboxDinamic.php?table=95654345151237be9ca3ab2040266744&filter=demande');
-            G::header('Location: ../../convergenceList/inboxDinamic.php?idInbox=DEMANDES');        
+            if (!isset($_REQUEST['task'])) {
+                G::header('Location: ../../convergenceList/inboxDinamic.php?idInbox=DEMANDES');
+            }
+            else
+                G::header('Location: ../../convergenceList/inboxDinamic.php?idInbox='.$_REQUEST['task']);
             die();
             break;
         case 'inbox':
@@ -154,4 +160,5 @@ try {
     $result->message = $error->getMessage();
 }
 
-die(G::json_encode($result));
+$messageError = "<p style='margin-bottom: 0cm'>« ce compte n’existe pas , veuillez vous inscrire » ?</p>";
+die($messageError);

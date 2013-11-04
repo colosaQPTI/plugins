@@ -60,6 +60,8 @@ $configPage = $c->getConfiguration('usersList', 'pageSize','',$_SESSION['USER_LO
 $Config['pageSize'] = isset($configPage['pageSize']) ? $configPage['pageSize'] : 20;
 
 $oHeadPublisher =& headPublisher::getSingleton();
+$language = SYS_LANG;
+$oHeadPublisher->assign('language', $language);
 $oHeadPublisher->addExtJsScript('fieldcontrol/adminInbox', false);    //adding a javascript file .js
 $oHeadPublisher->addContent('fieldcontrol/admininbox'); //adding a html file  .html.
 $oHeadPublisher->assign('CONFIG', $Config);

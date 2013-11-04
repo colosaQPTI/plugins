@@ -2,7 +2,9 @@
 ob_start();
 
 $request = isset($_POST['request'])? $_POST['request'] : (isset($_GET['request'])? $_GET['request'] : null);
-
+$nameDoublonnage = 'Duplicate Rules';
+if(SYS_LANG == 'fr')
+	$nameDoublonnage = 'D&eacute;doublonnage Rules';
 switch ($request) {
   case 'loadMenu':
     if (!isset($_GET['menu'])) {
@@ -25,7 +27,7 @@ switch ($request) {
         $items[] = array(
           'id'  => 'ID_DOUBLORULES',
           'url' => '../ProductionAS400/dedoublonageRules',
-          'text' => 'Dedoublonage Rules',
+          'text' => $nameDoublonnage,
           'loaded'  => true,
           'leaf'    => true,
           'cls'     => 'pm-tree-node',

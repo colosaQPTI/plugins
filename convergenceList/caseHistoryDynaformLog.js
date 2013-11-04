@@ -15,7 +15,7 @@ Ext.onReady(function(){
                    else
                        HLOG_APP_UID = rowModel.data.HLOG_APP_UID;		   
 		   
-                   ADAPTIVEHEIGHT = ADAPTIVEHEIGHT - 50;
+            ADAPTIVEHEIGHT = ADAPTIVEHEIGHT - 50;
                    urlData = "../convergenceList/DynaformsListener.php?actionType=view&appUid=" + HLOG_APP_UID + "&adaptiveHeight="+ADAPTIVEHEIGHT;	
                    
                    var TabPanel = new Ext.TabPanel({                  

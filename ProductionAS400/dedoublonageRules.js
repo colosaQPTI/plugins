@@ -18,6 +18,20 @@ Ext.onReady(function()
 	    return value;
 	}
 
+	var titleGrid = 'Duplicate Rules Column List:';
+	var select = 'Select';
+	var copy = ' Copy';
+	var process = 'Process';
+	var delet = ' Delete';
+	if(language == 'fr')
+	{
+		titleGrid = 'D\u00E9doublonnage Rules Liste des Colonnes:';
+		select = 'S\u00E9lectionner';
+		copy = ' Copier';
+		delet = ' Supprimer';
+		process = 'Processus';
+	}
+	
 	var TableComboStore = new Ext.data.Store({
 		proxy : new Ext.data.HttpProxy({url: 'ajaxDedoublonTableCombo.php?TYPE=DedoublonTableCombo'}),
 		reader : new Ext.data.JsonReader({
@@ -66,8 +80,8 @@ Ext.onReady(function()
 		valueField    : 'ID',
 		displayField  : 'NAME',
 		id            : 'idTableCombo',
-		fieldLabel    : '<span style="color: red">*</span>Select Table',
-		emptyText     : 'Select a Table...',
+		fieldLabel    : '<span style="color: red">*</span>' + select + ' ' + 'Table',
+		emptyText     : select + 'Table...',
 		typeAhead     : true,
 		triggerAction : 'all',
 		editable      : false,
@@ -92,8 +106,8 @@ Ext.onReady(function()
 		valueField    : 'ID',
 		displayField  : 'NAME',
 		id            : 'idProcessCombo',
-		fieldLabel    : '<span style="color: red">*</span>Select Process',
-		emptyText     : 'Select a Process...',
+		fieldLabel    : '<span style="color: red">*</span>'+select + ' '+process,
+		emptyText     : select + ' ' + process + '..',
 		typeAhead     : true,
 		triggerAction : 'all',
 		editable      : false,
@@ -179,21 +193,13 @@ Ext.onReady(function()
     // / --------- Head ----------- ///
 	
 	 var enable = true;
-	 /*saveFields = new Ext.Action({
-	        text    :'Save',
-	        iconCls :'button_menu_ext ss_save',
-			id      : 'addup',
-	        handler : dataGridreview
-	 });
-	 */
+	
 	 
     var FieldPanelToolBars = new Ext.FormPanel({            
     	bodyCssClass: 'frameRules', // Css Production
     	frame		: false,
     	width		: 200,
- 		labelAlign  : 'center',
  		labelStyle  : 'font-weight:bold;',
- 		labelWidth  : 90,
  	    labelAlign  : 'right',
  	    border      : false, 
  		height      : 50,  
@@ -209,14 +215,15 @@ Ext.onReady(function()
 			    border:false,
 			    bodyCssClass: 'frameRules'
 			},
+			labelWidth: 150,
 			items  :[
 	                {   // column #1
-	                    columnWidth: .29,
+	                    columnWidth: .32,
 	                    layout: 'form',
 	                    border: false,
 	                    items: [ ProcessCombo ] // close items for first column
 	                } ,{   // column #1
-	                    columnWidth: .29,
+	                    columnWidth: .32,
 	                    layout: 'form',
 	                    border: false,
 	                    items: [ TableCombo ] // close items for second column
@@ -224,7 +231,7 @@ Ext.onReady(function()
 	                    columnWidth: .10,
 	                    items: [ {
 	    	    			xtype	: 'button',
-	    	             	text    :' Copy Field ', 
+	    	             	text    : copy + ' Field ', 
 	    	    			id      : 'idButtonAddRow',
 	    	    			disabled: true,
 	    	    			//icon    : '/plugin/ProductionAS400/duplicate.png', 
@@ -266,7 +273,7 @@ Ext.onReady(function()
 	                    border: false,
 	                    items: [{
 	    	    			xtype	: 'button',
-	    	             	text    :' Delete Field ', 
+	    	             	text    : delet + ' Field ', 
 	    	    			id      : 'idButtonDelRow',
 	    	    			disabled: true,
 	    	    			//icon    : '/plugin/ProductionAS400/delete_item.png', 
@@ -304,7 +311,7 @@ Ext.onReady(function()
 	                    border: false,
 	                    items: [{
 							xtype : 'button',
-							text    :'Save',
+							text    :_('ID_SAVE'),
 					        iconCls :'button_menu_ext ss_save',
 							id      : 'addup',
 							width : 70,
@@ -501,7 +508,7 @@ Ext.onReady(function()
 		tbar           : FieldPanelToolBars,
 		columnLines    : true,
 		plugins        : [checkColumnInclude],
-		title          : 'Production Column List: ',
+		title          : titleGrid,
 		stateId        : 'grid',
 		border         : false,
 		loadMask       : true,

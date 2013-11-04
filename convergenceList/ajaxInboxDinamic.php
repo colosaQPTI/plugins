@@ -246,8 +246,7 @@ try {
 	else 
 	{
 		$sSQL = "SELECT $dataSelected  FROM  $idTable $sJoins $sWhere $sOrderBy ";	
-	}
-	
+	}	
 	$aData = executeQuery($sSQL);
 	$total = sizeof($aData);
 	foreach ( $aData as $index ) {

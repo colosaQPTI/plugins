@@ -1,0 +1,312 @@
+<fieldset>
+  <legend>Users List &nbsp;&nbsp;<a onclick="adduser(this)" class="bug-action btn btn-mini btn btn-info" data-toggle="modal" href="#newuserpanel">New User</a></legend>
+  <table cellpadding="0" cellspacing="0" border="0" class="table table-striped " id="example">
+    <thead>
+      <tr>            
+        <th>Username</th>
+        <th>Real Name</th>
+        <th>Email</th>
+        <th>Enabled</th>
+        <th>Access Level</th>
+        <th style="display:none">Value Access Level</th>
+        <th></th>            
+      </tr>
+    </thead>
+    <tbody>      
+      {foreach $this->users as $users}
+      <tr class="gradeA" id="usr_{$this->escape($users['id'])}">                        
+        <td>{$this->escape($users['username'])}<span style="display:none">{$this->escape($users['json_data'])}</span></td>
+        <td>{$this->escape($users['realname'])}</td>
+        <td>{$this->escape($users['email'])}</td>
+        <td><b>{$users['enabled']}</b></td>
+        <td><b>{$users['access_level']}</b></td>
+        <td style="display:none"><b>{$users['value_access_level']}</b></td>
+        <td><a usr-id="{$users['id']}" onclick="usredit(this)" class="bug-action btn btn-mini btn btn-info" data-toggle="modal" href="#newuserpanel">Edit</a></td>            
+      </tr>                        
+    </tr>
+    {/foreach}      
+  </tbody>
+</table>
+</fieldset>
+
+
+<script type="text/javascript" language="javascript" >
+
+function action(o){
+  ticketId = $(o).attr('ticket-id');    
+}
+
+$(document).ready(function(){  
+
+  $('#newuser-form').validate({
+    rules: {
+
+      realname: {
+        required: true          
+      },
+
+      username: {
+        minlength: 2,
+        required: true
+      },
+      email: {
+        minlength: 2,
+        email: true,
+        required: true
+      }
+    },
+    highlight: function(label) {
+      $(label).closest('.control-group').addClass('error');      
+
+    },
+    success: function(label) {
+      label
+      .text('OK!').addClass('valid')
+      .closest('.control-group').addClass('success');
+    }
+  });
+
+
+}); // end document.ready
+
+
+</script>
+
+<div id="domMessage" style="display:none;"> 
+  <h1>Please wait...</h1> 
+</div> 
+
+<div class="modal" id="newuserpanel" style="display:none">
+  <div class="page-header" align="center">    
+  </div>
+  <div class="row">
+    <div class="span6">
+      <form action="" id="newuser-form" class="form-horizontal">
+        <fieldset>
+          <div class="control-group">            
+            <div class="controls">
+              <input type="hidden" class="input-xlarge" name="hdd_id_user" id="hdd_id_user">
+            </div>
+          </div>
+          <div class="control-group">
+            <center><b>USER INFORMATION</b></center>            
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="username">Username</label>
+            <div class="controls">
+              <input type="text" class="input-xlarge" name="username" id="username">
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="realname">Realname</label>
+            <div class="controls">
+              <input type="text" class="input-xlarge" name="realname" id="realname">
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="email">Email</label>
+            <div class="controls">
+              <input type="text" class="input-xlarge" name="email" id="email">
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="Status">Status</label>
+            <div class="controls">
+              <select name="Status" id="Status">
+                <option value="1" selected="selected">Enabled</option>                
+                <option value="0">Disabled</option>     
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="Role">Role</label>
+            <div class="controls">
+              <select name="Role" id="Role">
+                <option value="10" selected="selected">Client Viewer</option>                
+                <option value="25">Client Reporter</option>
+                <option value="40">Client Updater</option>
+                <option value="55">Profesional Services</option>
+                <option value="70">Support</option>
+                <option value="90">Project Administrator</option>
+              </select>
+            </div>
+          </div>                                                
+          <div align="center">
+            <button type="button" id="submitNewUser" class="btn btn-primary btn-large">Create User</button>
+            <button class="btn" type="button" id="CancelNewUser">Cancel</button>
+          </div>
+        </fieldset>
+      </form>
+    </div><!-- .span -->                
+  </div><!-- .row -->                 
+</div>
+
+<script type="text/javascript" language="javascript" >
+
+function usredit(gridObject){      
+  usrId = $(gridObject).attr('usr-id');      
+  var td0 = $('#usr_'+usrId+' td')[0];      
+  data = $.parseJSON($(td0).find('span').text());      
+  $('#hdd_id_user').val(usrId);
+  $('#username').val(data.username);
+  $('#realname').val(data.realname);
+  $('#email').val(data.email);      
+  Editstatus = 1;
+  if(data.enabled == "No"){
+    Editstatus=0;
+  }        
+  $('#Status').val(Editstatus);      
+  $('#Role').val(data.value_access_level);
+  $('#submitNewUser').html("Edit User");      
+}
+
+//////////////////// Functions /////////////////////////
+
+function clearFormFields(oForm){
+  
+  var frm_elements = document.getElementById(oForm).elements;
+
+  for (i = 0; i < frm_elements.length; i++)
+  {
+      field_type = frm_elements[i].type.toLowerCase();
+      switch (field_type)
+      {
+      case "text":
+      case "password":
+      case "textarea":
+      case "hidden":
+          frm_elements[i].value = "";
+          break;
+      case "radio":
+      case "checkbox":
+          if (frm_elements[i].checked)
+          {
+              frm_elements[i].checked = false;
+          }
+          break;
+      case "select-one":
+      case "select-multi":
+          frm_elements[i].selectedIndex = -1;
+          break;
+      default:
+          break;
+      }
+  }
+}
+
+//////////////////// End Functions /////////////////////////
+
+/* Button Actions */
+
+$('#CancelNewUser').click(function() {
+  $('#newuserpanel').modal('hide');
+  /////// Clean the modal new user window  ///////
+      clearFormFields('newuser-form');      
+  /////// End Clean the modal new user window  ///////
+});
+
+$('#submitNewUser').click(function(){            
+  
+  // Validation Form//
+
+  var auxval = $("#newuser-form").validate().form();
+  if(auxval == false){
+    alert("Please complete the required fields!");
+    return false;  
+  }
+
+  // End Validation Form //  
+
+  var hdd_id_user = $('#hdd_id_user').val();
+  var username = $('#username').val();
+  var email = $('#email').val();
+  var realname = $('#realname').val();
+  var Status = $('#Status').val();
+  var Role = $('#Role').val();
+  userId = $('#userId').val();
+
+  $.post(
+    '/profesionalservices/savenewuser',
+    {
+      hdd_id_user: hdd_id_user,
+      username: username,                    
+      email: email,
+      realname: realname,
+      Status: Status,
+      Role: Role                    
+    },
+    function(resp) {
+      if (resp.success) {
+        $('#newuserpanel').modal('hide');            
+        alert('User processed successfully!');                        
+        $.blockUI({ message: $('#domMessage') }); 
+        location.reload();
+      }
+      else {
+        alert(resp.message +'\n\nTry again later please!');
+      }
+    }
+    );
+});
+
+$('#cancelBtn1').click(function() {
+  $('#newuserpanel').modal('hide');
+});
+
+/*End Button Actions*/
+
+
+/* Table initialisation */
+var baseUrl = "{$this->baseUrl()}";
+var bugId;
+var userId;
+var data;
+
+function adduser(o){
+
+      /////// Clean the modal new user window  ///////
+
+      $('#hdd_id_user').val("");
+      $('#username').val("");
+      $('#realname').val("");
+      $('#email').val("");
+      $('#Status').val("");
+      $('#Role').val("");
+
+      /////// End Clean the modal new user window  ///////
+
+      $('#submitNewUser').html("Create User");
+
+    };
+
+    $(document).ready(function()
+    {
+      var data;        
+
+      $('#example').dataTable( {
+        "sDom": "<'row'<'span6'l><'span6'f>r>t<'row'<'span6'i><'span6'p>>",
+        "sPaginationType": "bootstrap",
+        "oLanguage": {
+          "sLengthMenu": "_MENU_ records per page"
+        }           
+      }).columnFilter({
+        sPlaceHolder: "head:before",
+        aoColumns: [ 
+        null, { type: "text" },
+        { type: "text" },
+        {
+          type: "select",
+          values: [ 'Yes', 'No']
+        },
+        {
+          type: "select",
+          values: [ 'Client Reporter', 'Client Viewer' , 'Client Updater'
+          , 'Profesional Services', 'Support', 'Project Administrator'
+          ]
+        }
+        ]
+      });
+
+    } );
+
+    </script>

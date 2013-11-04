@@ -6,7 +6,8 @@
     G::LoadClass('configuration');
     G::loadClass('pmFunctions');    
     $oHeadPublisher   =& headPublisher::getSingleton();   
-    
+    $language = SYS_LANG;
+     $oHeadPublisher->assign('language', $language);
     $oHeadPublisher->addExtJsScript(PATH_PLUGINS.SYS_COLLECTION.'/configListUsers', false, true); 
     G::RenderPage('publish', 'extJs');
 ?> 

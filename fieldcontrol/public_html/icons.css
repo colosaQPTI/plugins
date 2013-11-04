@@ -18,10 +18,9 @@
 	background: transparent url(/plugin/fieldcontrol/sql.png) left center no-repeat scroll !important;
 }
 
-.clear_data{
-	background: transparent url(/plugin/fieldcontrol/Clear.png) left center no-repeat scroll !important;
+.ss_cleardata{
+	background: transparent url(/plugin/fieldcontrol/delete-icon.png) left center no-repeat scroll !important;
 }
-
 
 
 .addQuery{

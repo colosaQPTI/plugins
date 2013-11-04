@@ -93,8 +93,8 @@ if(sizeof($select))
 #Update the flag typo3
 $oCase = new Cases ();
 $olfFields = $oCase->loadCase($APP_UID);
-unset($olfFields['APP_DATA']['FLAG_ACTION']);
-//$olfFields['APP_DATA']['FLAG_USER_ROLE'] = convergence_getUserRole($_SESSION['USER_LOGGED']);
+unset($olfFields['APP_DATA']['FLAG_ACTION']);		
+unset($olfFields['APP_DATA']['FLAG_ACTIONTYPO3']);
 PMFSendVariables($APP_UID, $olfFields);
 $oCase->updateCase($APP_UID, $olfFields);
 # End Update the flag typo3      
@@ -107,14 +107,26 @@ $queryId = "SELECT max(USR_CTR_CAS_ID) AS MAX_ID FROM  PMT_USER_CONTROL_CASES  "
 $maxId = executeQuery ( $queryId );
 $sgtIdIn = $maxId[1]['MAX_ID'] + 1;
 $insert = "INSERT INTO PMT_USER_CONTROL_CASES (
-		       USR_CTR_CAS_ID, APP_UID, USR_UID, USR_CTR_CAS_START_DATE, USR_CTR_CAS_END_DATE )
-		       VALUES(
-		       '$sgtIdIn', '$APP_UID', '".$_SESSION['USER_LOGGED']."','$date_start' ,'' ) ";
+		   USR_CTR_CAS_ID, APP_UID, USR_UID, USR_CTR_CAS_START_DATE, USR_CTR_CAS_END_DATE )
+		   VALUES(
+		   '$sgtIdIn', '$APP_UID', '".$_SESSION['USER_LOGGED']."','$date_start' ,'' ) ";
 executeQuery($insert);
 # end control user case
-
+$dataLabels = Array();
 $oHeadPublisher =& headPublisher::getSingleton();     
 $conf = new Configurations;
+# control labels language
+$language = strtoupper(SYS_LANG);
+$queryLabels = "SELECT NAME_LABEL, DESCRIPTION_$language DESCRIPTION FROM PMT_CUSTOMIZE_LABEL ";
+$dataLabelsQuery = executeQuery($queryLabels);
+if(sizeof($dataLabelsQuery))
+{
+	foreach($dataLabelsQuery as $row)
+	{
+		$dataLabels[] = $row;
+	}
+}
+# end control labels language
 $oHeadPublisher->assign('ACTIONTYPE', $ACTIONTYPE);
 $oHeadPublisher->assign('APP_UID', $APP_UID);
 $oHeadPublisher->assign('FINDEX', $FINDEX);
@@ -127,6 +139,7 @@ $oHeadPublisher->assign('ADAPTIVEHEIGHT', $ADAPTIVEHEIGHT);
 $oHeadPublisher->assign('SHOWCOMMENT', $SHOWCOMMENT);
 $oHeadPublisher->assign('SWTAB', '');
 $oHeadPublisher->assign('ACTIVEFORMS', $userActiveForm);
+$oHeadPublisher->assign('DATALABELS', $dataLabels);
 $oHeadPublisher->addExtJsScript('convergenceList/caseHistoryDynaformPageEdit', true );    //adding a javascript file .js
 $oHeadPublisher->addContent    ('convergenceList/caseHistoryDynaformPage'); //adding a html file  .html.      
 $oHeadPublisher->assign('pageSize', $conf->getEnvSetting('casesListRowNumber'));    

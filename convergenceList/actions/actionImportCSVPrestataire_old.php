@@ -7,7 +7,7 @@ G::loadClass ( 'pmFunctions' );
 G::LoadClass("form");
 // memory_limit max_execution_time
 
-function getProUid($tableName){
+/*function getProUid($tableName){
     $sSQL ="SELECT * FROM ADDITIONAL_TABLES WHERE ADD_TAB_NAME ='$tableName'";
     $aResult= executeQuery($sSQL);
     $proUid = '0';
@@ -233,12 +233,12 @@ function importCreateCase($jsonMatchFields,$uidTask, $tableName,$firstLineHeader
         PMFSendVariables($caseUID, $newFields['APP_DATA']);		    
         $caseInstance->updateCase($caseUID, $newFields);
         /* FIN modify FRED NUM DOSSIER */
-        $totalCases++;
+ /*       $totalCases++;
 
     }
     unset($_SESSION['REQ_DATA_CSV']);
     return $totalCases;
-}
+}*/
 
 try {
   $sOption = $_REQUEST["option"];

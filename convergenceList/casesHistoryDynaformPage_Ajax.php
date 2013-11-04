@@ -1,3 +1,4 @@
+
 <?php
 G::loadClass ( 'pmFunctions' );
 G::LoadClass ( 'form' );       
@@ -266,7 +267,7 @@ if($actionAjax== 'historyDynaformGridPreview')
       }
       if(isset($_REQUEST['ACTIONSAVE']) && $_REQUEST['ACTIONSAVE'] == 1)
       { 
-        echo "<script language='javascript'>  var TabPanel = parent.parent.Ext.getCmp('iframe-DynaForms'); console.log(TabPanel); TabPanel.doAutoLoad();</script>";
+        echo "<script language='javascript'>  var TabPanel = parent.parent.Ext.getCmp('iframe-DynaForms'); TabPanel.doAutoLoad();</script>";
       }          
       
 	  if(isset($_SESSION['APPLICATION_EDIT']) && $_SESSION['APPLICATION_EDIT'] != '')
@@ -297,7 +298,7 @@ if($actionAjax== 'historyDynaformGridPreview')
       if($ACTIONTYPE == 'edit')
       {
         $postInfo = 'saveDynaformLog.php?APP_UID='.$APP_UID.'&CURRENTDATETIME='.$CURRENTDATETIME.'&DYN_UID='.$_POST['DYN_UID'].'&PROCESS='.$PRO_UID;
-       
+        $url = '../convergenceList/'.$postInfo;
         $query = "SELECT APP_UID FROM PMT_USER_CONTROL_CASES WHERE APP_UID = '$APP_UID' AND USR_UID != '".$_SESSION['USER_LOGGED']."'  ";
 	    $dataUsrCase = executeQuery($query);
         if(sizeof($dataUsrCase) > 0)
@@ -351,7 +352,34 @@ if($actionAjax== 'historyDynaformGridPreview')
       G::RenderPage('publish', 'blank');
       
 ?>      
-        <script language="javascript">
+    <link href="/plugin/convergenceList/modal.css" rel="stylesheet" type="text/css" media="screen" /> 
+    <style type="text/css">
+#confirmBox {
+	width:30em;
+	height:10em;
+	position:absolute;
+	z-index:150;
+	visibility:hidden;
+	background:#FFFFFF;
+	color:#000000;
+	top: 40%;
+    left: 40%;
+	border:3px solid #000000;
+	text-align:center;
+ 	padding: 15px;
+}
+</style>
+<body>
+<div id="confirmBox" style= "display:none; position:absolute;">
+	<p>Continue?</p>
+	<p><input type="button" onclick=" document.getElementById('confirmBox').style.visibility='hidden'; showModal();  document.forms[0].submit();  " value="Ok">
+	<input type="button" onclick="document.getElementById('confirmBox').style.visibility='hidden'; parent.parent.Ext.getCmp('win2').hide();" value="Cancel"></p>
+</div>
+</body>
+    <script type='text/javascript' src='/plugin/convergenceList/jsModal.js'></script>    
+    <script language="javascript">
+    var changeStatusSubmitFields = function(newStatusTo) {
+    };
         var flag = false;
         var _dataForms = new Array();
        
@@ -372,32 +400,80 @@ if($actionAjax== 'historyDynaformGridPreview')
 ?>
 			function confirmCreationNewForm()
 			{
+				if (!validateForm(document.getElementById("DynaformRequiredFields").value)) return false;
 				var swcase = <?php echo $swCase ?>; 
 				if(swcase == 1)
-				{
-			    	var answer = confirm("Une autre personne est en train d\u0027\u00E9diter cet enregistrement. Voulez-vous quand m\u00E9me l\u0027\u00E9diter ? ");
-					if (answer){
-							
-					}
-					else{
-						return false;
-					}
+				{						
+					tester("Une autre personne est en train d\u0027\u00E9diter cet enregistrement. Voulez-vous quand m\u00E9me l\u0027\u00E9diter ? ");
+			    	//var answer = window.confirm("Une autre personne est en train d\u0027\u00E9diter cet enregistrement. Voulez-vous quand m\u00E9me l\u0027\u00E9diter ? ");
+					return false;
 				}
 				else
-				{
-					var answer = confirm("A new case will be created. Do you like to continue?");
-					if (answer){
-						
-					}
-					else{
-						return false;
-					}
-			  }
+				{ 					
+            			showModal();
+			    }
 			}
+
+      navigator.sayswho= (function(){
+          var N= navigator.appName, ua= navigator.userAgent, tem;
+          var M= ua.match(/(opera|chrome|safari|firefox|msie)\/?\s*(\.?\d+(\.\d+)*)/i);
+          if(M && (tem= ua.match(/version\/([\.\d]+)/i))!= null) M[2]= tem[1];
+          M= M? [M[1], M[2]]: [N, navigator.appVersion, '-?'];
+          return M;
+      })();
+      function showModal(){
+        if(navigator.sayswho[0] && navigator.sayswho[0]=='MSIE' && navigator.sayswho[1]  && parseInt(navigator.sayswho[1])<=9.0) {
+           TINY.box.show({html:'<img src="/plugin/convergenceList/cargando5.gif">Sauvegarde...',fixed:false, width:150,height:21,animate:false,close:false,opacity:45,mask:true,boxid:'success'});  
+        }
+        else{
+          TINY.box.show({html:'<img src="/plugin/convergenceList/cargando5.gif">Sauvegarde...', width:135,height:15,animate:false,close:false,opacity:45,mask:true,boxid:'success'});  
+        }
+      }
+
         document.getElementById("<?php echo $G_FORM->id;?>").onsubmit=confirmCreationNewForm;
-          
+        var answerFunction;
+
+        function myConfirm(text,button1,button2)
+        {
+        	var box = document.getElementById("confirmBox");
+        	box.getElementsByTagName("p")[0].firstChild.nodeValue = text;
+        	var button = box.getElementsByTagName("input");
+        	button[0].value=button1;
+        	button[1].value=button2;
+        	//answerFunction = answerFunc;
+        	box.style.visibility="visible";
+        	
+        	
+        }
+
+        function answer(response) 
+        {
+        	document.getElementById('confirmBox').style.display = '';
+        	var rpta = myConfirm(message,"Continue","Anuler") 
+        	document.getElementById("confirmBox").style.visibility="hidden";
+        	/*if (response){
+    			showModal();
+    			
+    			location.href = "<?php echo $url;?>"; 
+    			
+  			}
+			else{
+				return false;
+			}*/
+        	return response;
+        	
+        }
+
+        function tester(message)
+        {
+        	document.getElementById('confirmBox').style.display = '';
+        	var rpta = myConfirm(message,"Continue","Anuler")   
+        	
+        	
+        }
         
-        </script>
+      </script>
+      
 <?php      
     
 }

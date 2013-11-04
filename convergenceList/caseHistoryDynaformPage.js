@@ -119,7 +119,12 @@ function ajaxPostRequest(url, callback_function, id){
             items : [TabPanel]
           });          
       }
-            
+      for(var i = 0; i < DATALABELS.length; i++)
+      {
+    	  //var id_+DATALABELS[i]['NAME_LABEL'] = DATALABELS[i]['DESCRIPTION'];
+    	  var data = ("var id_" + DATALABELS[i]['NAME_LABEL'] + "= '" + DATALABELS[i]['DESCRIPTION']) + "';";
+    	  eval(data);
+      }       
       for(var i=0;i<DYNAFORMSLIST.length;i++){
         var tabTitle = DYNAFORMSLIST[i]['DYN_TITLE'];
         var DYN_UID=DYNAFORMSLIST[i]['DYN_UID'];   
@@ -129,15 +134,15 @@ function ajaxPostRequest(url, callback_function, id){
       
       //ajout des commentaires
       if (SHOWCOMMENT == 1) {
-    	  fn_add_tab('Commentaires','viewCaseNotes.php?APP_UID='+APP_UID,TabPanel);
+    	  fn_add_tab(id_Commentaires,'viewCaseNotes.php?APP_UID='+APP_UID,TabPanel);
     	    
-    	  fn_add_tab('Explication Statut','actions/explicationStatut.php?APP_UID='+APP_UID+'&ADAPTIVEHEIGHT='+ADAPTIVEHEIGHT,TabPanel);
+    	  fn_add_tab(id_Explicatio_Statut,'actions/explicationStatut.php?APP_UID='+APP_UID+'&ADAPTIVEHEIGHT='+ADAPTIVEHEIGHT,TabPanel);
       }
       // ajout nico pour les statut remboursement
       if (SHOWCOMMENT == 2) {
-    	  fn_add_tab('Commentaires','viewCaseNotes.php?APP_UID='+APP_UID,TabPanel);
+    	  fn_add_tab(id_Commentaires,'viewCaseNotes.php?APP_UID='+APP_UID,TabPanel);
 
-    	  fn_add_tab('Explication Statut','actions/explicationStatutRmb.php?APP_UID='+APP_UID+'&ADAPTIVEHEIGHT='+ADAPTIVEHEIGHT,TabPanel);
+    	  fn_add_tab(id_Explicatio_Statut,'actions/explicationStatutRmb.php?APP_UID='+APP_UID+'&ADAPTIVEHEIGHT='+ADAPTIVEHEIGHT,TabPanel);
       }
       
       TabPanel.setActiveTab(1);

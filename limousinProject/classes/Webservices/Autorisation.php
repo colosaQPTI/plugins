@@ -3,22 +3,22 @@
 require_once dirname(__FILE__).'/Webservice.php';
 
 
-class Solde extends Webservices {   
+class Autorisation extends Webservices {   
 
 	
 	public function __construct() { 
 		parent::__construct(); 
 		
 		// INIT
-       	$this->url = "";
+       	$this->url = "https://extranet.aqoba-preprod.customers.artful.net/api/v09/autorisation?access_token=99ac21619656c825e788ffb8ac6bfa23f08f4b08";
 		$this->wsId = "306";
 		
 		// GET Bouchon
-		$bouchonFileName = dirname(__FILE__).'/bouchonAutorisation.txt';
-        $handle = fopen($bouchonFileName, "r");
-		while (!feof($handle)) { 
-			$this->bouchonWs .= fgets($handle, 4096); 
-		}
+		// $bouchonFileName = dirname(__FILE__).'/bouchonAutorisation.txt';
+        // $handle = fopen($bouchonFileName, "r");
+		// while (!feof($handle)) { 
+			// $this->bouchonWs .= fgets($handle, 4096); 
+		// }
 		
 	} 
     

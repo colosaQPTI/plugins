@@ -60,7 +60,7 @@ function removeAllRequiredFields(){
           fields[j][i].removeAttribute('pm:required');
           // supprime le non modifiable
           fields[j][i].removeAttribute('pm:readonly');
-          fields[j][i].removeAttribute('readonly');
+          fields[j][i].removeAttribute('readOnly');
           fields[j][i].className = 'module_app_input___gray';
         }
         

@@ -3,6 +3,23 @@ var fieldNameData;
 
 Ext.onReady(function() 
 {
+	var lanMsgEmpty = 'There are no options to display';
+	var lanMsgEmpty2= 'No actions to display';
+	var lanSaveConfig = 'Save config';
+	var lanMsgDisplay = 'Displaying {0} - {1} of {2}';
+	var lanMsgOpe = 'The operation completed sucessfully!';
+	var lanMsgOpeError= 'The operation was not completed sucessfully!';
+	
+	if(language == 'fr')
+	{
+		lanMsgEmpty = "Il n'y a aucune action \u00E0 afficher";
+		lanMsgEmpty2 = 'Aucune action \u00E0 afficher';
+		lanSaveConfig = 'Sauver config';
+		lanMsgDisplay = 'Affichage {0} - {1} sur {2}';
+		lanMsgOpe = "L'opération s'est termin\u00E9e avec succ\u00E8s!";
+		lanMsgOpeError= "L'op\u00E9ration n'a pas \u00E9t\u00E9 compl\u00E9t\u00E9e avec succ\u00E8s!";
+		
+	}
 	var tooltipRenderer = function(data, metadata, record, rowIndex, columnIndex,store) 
 	{
 		metadata.attr = 'ext:qtip="' + data + '" style="white-space: normal; "';
@@ -103,18 +120,18 @@ Ext.onReady(function()
 		viewConfig 		: {
 			forceFit 		: true,
 			scrollOffset 	: 0,
-			emptyText		: 'There are no actions to display'
+			emptyText		: lanMsgEmpty
 		},
 		plugins        	: [checkColumnHidden,checkColumnInclude],
 		bbar			: new Ext.PagingToolbar({
 			pageSize	: 50,
 			store		: ConfigUsers_store,
 			displayInfo	: true,
-			displayMsg	: 'Displaying {0} - {1} of {2}',
-			emptyMsg	: "No actions to display"
+			displayMsg	: lanMsgDisplay,
+			emptyMsg	: lanMsgEmpty2
 		}),
 		tbar 			: [ {
-			text: 'Save Config ',
+			text: lanSaveConfig,
 			cls : 'x-btn-text-icon',
 			icon : '/images/ok.png',
 			tooltip  : 'Add drag and drop',
@@ -254,14 +271,14 @@ Ext.onReady(function()
 				Ext.MessageBox.hide();
 				Ext.getCmp('ConfigUsers_grid').getStore().reload(); 
 				Ext.MessageBox.show({                            
-					msg : 'The operation completed sucessfully!',
+					msg : lanMsgOpe,
 					buttons : Ext.MessageBox.OK,
 					icon : Ext.MessageBox.INFO
                 });
 				
 	         },
 	        failure: function(){
-	        	Ext.MessageBox.alert('Error','The operation was not completed sucessfully!');
+	        	Ext.MessageBox.alert('Error',lanMsgOpeError);
 	        	Ext.MessageBox.hide();
 	        }
 		});

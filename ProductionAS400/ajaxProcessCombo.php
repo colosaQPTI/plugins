@@ -14,19 +14,19 @@ $Roles = $Us->load ( $USER_UID );
 $rolesAdmin = $Roles ['USR_ROLE'];
 if(isset($_GET['Type']) && $_GET['Type'] == 'ProcessCombo'){
 	
-	$sQuery = "     SELECT P.PRO_UID as ID, C.CON_VALUE AS NAME
-   					FROM PROCESS P
-   					INNER JOIN CONTENT C ON (C.CON_ID = P.PRO_UID)
-   					WHERE C.CON_CATEGORY = 'PRO_TITLE'       
-   					GROUP BY  PRO_UID                                                                               
-                  ";
+	$sQuery = "	SELECT P.PRO_UID as ID, C.CON_VALUE AS NAME
+   				FROM PROCESS P
+   				INNER JOIN CONTENT C ON (C.CON_ID = P.PRO_UID)
+   				WHERE C.CON_CATEGORY = 'PRO_TITLE' AND C.CON_LANG = '".SYS_LANG."'     
+   				GROUP BY  PRO_UID                                                                               
+              ";
 	$aDatos = executeQuery ( $sQuery );
 	
 	$array = Array ();
 	foreach ( $aDatos as $valor ) {
-	$array [] = $valor;
+		$array [] = $valor;
 	}
-	$total = count ( $aDatos );
+	$total = count ( $array );
 }
 
 header ( "Content-Type: text/plain" );

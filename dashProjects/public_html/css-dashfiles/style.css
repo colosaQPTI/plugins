@@ -1,0 +1,40 @@
+body {
+    margin: 0;
+    padding: 0;
+    font: 100% normal arial, verdana, helvetica, sans-serif;
+}
+
+.clearf {
+    clear: both;
+
+    height: 0;
+
+    line-height: 0;
+
+    font-size: 0;
+}
+
+.floatl {
+      float: left;
+}
+
+.floatr {
+      float: right;
+}
+
+.dnone {
+      display: none;
+}
+
+
+
+
+
+.floatr a{
+    text-decoration: none;
+}
+
+.floatr a:hover{
+    background: #B2B2B2;
+}
+

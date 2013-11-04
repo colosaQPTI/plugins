@@ -85,7 +85,7 @@ $callback = $_REQUEST['canBeDeletedFunc'];
 $tableType = "Report";
 $tableName = '';
 
-    // Check if the Table is Report or PM Table
+// Check if the Table is Report or PM Table
     $sqlAddTable = "SELECT * FROM ADDITIONAL_TABLES WHERE ADD_TAB_UID = '$pmTableId' ";
     $resAddTable=executeQuery($sqlAddTable);
     if(sizeof($resAddTable)){

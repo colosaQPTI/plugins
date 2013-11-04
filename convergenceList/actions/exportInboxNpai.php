@@ -145,22 +145,47 @@ else if ($type != 'npai')
     {//34669712651e874bb6e5ba1068843455
         $query = 'SELECT max(HLOG_DATECREATED) as HLOG_DATECREATED FROM PMT_HISTORY_LOG WHERE HLOG_APP_UID="' . $npai['APP_UID'] . '" AND HLOG_ACTION LIKE "Retour de production%"'; //2013-07-19 04:26:00
         $resultDate = executeQuery($query);
-        $qSetPnd = 'SELECT max(HLOG_DATECREATED) as HLOG_DATECREATED FROM PMT_HISTORY_LOG WHERE HLOG_APP_UID="' . $npai['APP_UID'] . '" AND HLOG_ACTION="Classer en PND"'; //2013-07-23 06:13:06
+        $qSetPnd = 'SELECT max(HLOG_DATECREATED) as HLOG_DATECREATED,count(*) as nb_pnd FROM PMT_HISTORY_LOG WHERE HLOG_APP_UID="' . $npai['APP_UID'] . '" AND HLOG_ACTION="Classer en PND"'; //2013-07-23 06:13:06
         $rSetPnd = executeQuery($qSetPnd);
+        $qSetPnd = 'SELECT max(HLOG_DATECREATED) as HLOG_DATECREATED,count(*) as nb_pnd FROM PMT_HISTORY_LOG WHERE HLOG_APP_UID="' . $npai['APP_UID'] . '" AND HLOG_ACTION="Classer en PND"'; //2013-07-23 06:13:06
+        $rUnsetPnd = executeQuery($qUnsetPnd);
         if (isset($resultDate[1]['HLOG_DATECREATED']) && $resultDate[1]['HLOG_DATECREATED'] != '' && isset($rSetPnd[1]['HLOG_DATECREATED']) && $rSetPnd[1]['HLOG_DATECREATED'] != '')
-        {
-            $query2 = 'SELECT count(*) as NB, HLOG_APP_UID FROM PMT_HISTORY_LOG WHERE HLOG_APP_UID="' . $npai['APP_UID'] . '" AND HLOG_DATECREATED > "' . $resultDate[1]['HLOG_DATECREATED'] . '" AND HLOG_DATECREATED < "' . $rSetPnd[1]['HLOG_DATECREATED'] . '" AND HLOG_ACTION="Modification de l\'adresse"';
-            $result2 = executeQuery($query2);
-            if ($result2[1]['NB'] > 0)
+        {/* Modifié le 16/09/13 de HLOG_DATECREATED < $rSetPnd[1]['HLOG_DATECREATED'] à HLOG_DATECREATED > $rSetPnd[1]['HLOG_DATECREATED'] selon le mail de Stéphane du 9 Sept 2013
+          -> On doit pouvoir exporter la liste des PND dont l'adresse a été modifiée avec les règles ci-après:
+            -> Si chéquier jamais topé PND: Export de tout PND dont l'adresse a été modifiée avant ou après classement PND,
+            -> Si chéquier déjà topé PND  et déjà renvoyé dans le passé, on exporte uniquement les dossiers dont l'adresse a été modifiée après la date de renvoi du 1er PND. */
+            if ($rSetPnd[1]['nb_pnd'] > 1 && !empty($rUnsetPnd[1]['HLOG_DATECREATED'])) // Si chéquier déjà topé PND
             {
-                $listeApp_uid[] = $npai['APP_UID'];
-                unset($rSQL[$k]['APP_UID']);
+                $query2 = 'SELECT count(*) as NB, HLOG_APP_UID FROM PMT_HISTORY_LOG WHERE HLOG_APP_UID="' . $npai['APP_UID'] . '" AND HLOG_DATECREATED > "' . $resultDate[1]['HLOG_DATECREATED'] . '" AND HLOG_DATECREATED > "' . $rUnsetPnd[1]['HLOG_DATECREATED'] . '" AND HLOG_ACTION="Modification de l\'adresse"';
+                $result2 = executeQuery($query2);
+                if ($result2[1]['NB'] > 0)
+                {
+                    $listeApp_uid[] = $npai['APP_UID'];
+                    unset($rSQL[$k]['APP_UID']);
+                }
+                else
+                {
+                    unset($rSQL[$k]);
+                }
+            }
+            elseif ($rSetPnd[1]['nb_pnd'] == 1)
+            {
+                $query3 = 'SELECT count(*) as NB, HLOG_APP_UID FROM PMT_HISTORY_LOG WHERE HLOG_APP_UID="' . $npai['APP_UID'] . '" AND HLOG_DATECREATED > "' . $resultDate[1]['HLOG_DATECREATED'] . '" AND HLOG_ACTION="Modification de l\'adresse"';
+                $result3 = executeQuery($query3);
+                if ($result3[1]['NB'] > 0)
+                {
+                    $listeApp_uid[] = $npai['APP_UID'];
+                    unset($rSQL[$k]['APP_UID']);
+                }
+                else
+                {
+                    unset($rSQL[$k]);
+                }
             }
             else
             {
                 unset($rSQL[$k]);
             }
-            
         }
         else
         {

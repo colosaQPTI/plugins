@@ -17,7 +17,22 @@ Ext.onReady(function()
 	    metadata.attr = 'ext:qtip="' + value + '"';
 	    return value;
 	}
-
+	var titleGrid = 'Column List:';
+	var process = 'Process';
+	var select = 'Select';
+	var task = 'Task';
+	var copy = ' Copy';
+	var delet = ' Delete';
+	if(language == 'fr')
+	{
+		titleGrid = 'Liste des Colonnes:';
+		select = 'S\u00E9lectionner';
+		process = 'Processus';
+		task = 'T\u00E2che';
+		copy = ' Copier';
+		delet = ' Supprimer';
+	}
+	  
 	var TableComboStore = new Ext.data.Store({
 		proxy : new Ext.data.HttpProxy({url: 'ajaxReporTableCombo.php?TYPE=reportTableCombo'}),
 		reader : new Ext.data.JsonReader({
@@ -110,6 +125,8 @@ Ext.onReady(function()
 		 		buttonWhereConfig.setDisabled(false);
 		 		buttonAddRow = Ext.getCmp('idButtonAddRow');
 		 		buttonAddRow.setDisabled(false);
+		 		buttonAddUp = Ext.getCmp('addup');
+		 		buttonAddUp.setDisabled(false);
 		 		buttonDelRow = Ext.getCmp('idButtonDelRow');
 		 		buttonDelRow.setDisabled(false);
 		 		Ext.getCmp('idQuery').setValue(record.data.INNER_JOIN);
@@ -129,8 +146,8 @@ Ext.onReady(function()
 		valueField    : 'ID',
 		displayField  : 'NAME',
 		id            : 'idProcessCombo',
-		fieldLabel    : '<span style="color: red">*</span>Select Process',
-		emptyText     : 'Select a Process...',
+		fieldLabel    : '<span style="color: red">*</span>' + select + ' ' + process,
+		emptyText     : select + ' ' + process + '...',
 		typeAhead     : true,
 		triggerAction : 'all',
 		editable      : false,
@@ -168,8 +185,8 @@ Ext.onReady(function()
 		valueField    : 'ID',
 		displayField  : 'NAME',
 		id            : 'idTaskCombo',
-		fieldLabel    : 'Select Task',
-		emptyText     : 'Select a Task...',
+		fieldLabel    : select + ' ' + task,
+		emptyText     : select + ' ' + task + '...',
 		typeAhead     : true,
 		triggerAction : 'all',
 		editable      : false,
@@ -216,6 +233,8 @@ Ext.onReady(function()
 				  		 		  buttonWhereConfig.setDisabled(false);
 				  		 		  buttonAddRow = Ext.getCmp('idButtonAddRow');
 				  		 		  buttonAddRow.setDisabled(false);
+				  		 		  buttonAddUp = Ext.getCmp('addup');
+				  		 		  buttonAddUp.setDisabled(false);
 				  		 		  buttonDelRow = Ext.getCmp('idButtonDelRow');
 						 		  buttonDelRow.setDisabled(false);
 						 		
@@ -264,9 +283,8 @@ Ext.onReady(function()
     	bodyCssClass: 'frameForm',
         frame: false,
         width: 200,
-		labelAlign : 'center',
 		labelStyle : 'font-weight:bold;',
-		labelWidth: 90,
+		labelWidth: 130,
 	    labelAlign: 'right',
 		height     : 95,  
 		items      : [{
@@ -306,6 +324,7 @@ Ext.onReady(function()
 				},
 				layout : "form",
 				border : false,
+				labelWidth: 85,
 				bodyCssClass: 'frameForm',
                 items: [{
                 	labelAlign	: 'right',
@@ -326,6 +345,7 @@ Ext.onReady(function()
 					"width": 15,
                     border : false
 				},
+				
 				items: 
 					[{
 		             	xtype	: 'button',
@@ -374,6 +394,7 @@ Ext.onReady(function()
 					},
 					layout : "form",
 					border : false,
+					labelWidth: 85,
 	                items: [{
 	                	labelAlign	: 'right',
 	                	fieldLabel	: 'Add Where',
@@ -409,7 +430,7 @@ Ext.onReady(function()
 			             	text    :' Where ', 
 			    			id      : 'idButtonWhereConfig',
 			    			disabled: true,
-			    			width : 70,
+			    			width : 80,
 			    			align : 'center',
 			    			icon    : '/plugin/ProductionAS400/where_query.png', 
 			    			iconCls :'addWhere',
@@ -418,10 +439,11 @@ Ext.onReady(function()
 			            		}
 			            	} , {
 							xtype : 'button',
-							text    :'Save',
+							text    :_('ID_SAVE'),
 					        iconCls :'button_menu_ext ss_save',
 							id      : 'addup',
-							width : 70,
+							disabled: true,
+							width : 80,
 					        handler : function() {
 								dataGridreview();
 							}
@@ -435,13 +457,13 @@ Ext.onReady(function()
 					items:
 						[{
 					    			xtype	: 'button',
-					             	text    :' Copy <br> Field ', 
+					             	text    : '&nbsp;' + copy +' <br> &nbsp; Field ', 
 					    			id      : 'idButtonAddRow',
 					    			disabled: true,
 					    			icon    : '/plugin/ProductionAS400/duplicate.png', 
 					    			iconCls : 'copyField',
 					    			tooltip : 'Edit',
-					    			
+					    			width 	: 80,
 					    			handler : function() {
 										
 										if(numberRow==undefined)
@@ -475,13 +497,13 @@ Ext.onReady(function()
 					            	}
 				             } , {
 					    			xtype	: 'button',
-					             	text    :' Delete <br> Field ', 
+					             	text    : '&nbsp;' + delet + '<br> &nbsp; Field ', 
 					    			id      : 'idButtonDelRow',
 					    			disabled: true,
 					    			icon    : '/plugin/ProductionAS400/delete_item.png', 
 					    			iconCls : 'delField',
 					    			tooltip : 'Edit',
-					    			
+					    			width   : 80,
 					    			handler : function() {
 										
 										if(numberRow==undefined)
@@ -602,10 +624,24 @@ Ext.onReady(function()
 	var typeAsComboStore = new Ext.data.SimpleStore({
 	fields: ['ID', 'NAME'],
 	data: [["String","Chaine"],
-	                    ["Integer","Entier"],
-	                    ["Date","Date"],		
-	                    ["Decimal","Decimal"],
-	                    ["Telephone","Telephone"],
+        ["strSecure", "Chaine sans accents"],
+        ["strSecureL", "Sans accents en minuscule"],
+        ["strSecureU", "Sans accents en majuscule"],
+        ["Integer", "Entier"],
+        ["Ymd", "Date AAAAMMJJ"],
+        ["Y.m.d", "Date AAAA.MM.JJ"],
+        ["Y-m-d", "Date AAAA-MM-JJ"],
+        ["dmY", "Date JJMMAAAA"],
+        ["d.m.Y", "Date JJ.MM.AAAA"],
+        ["d-m-Y", "Date JJ-MM-AAAA"],
+        ["ymd", "Date AAMMJJ"],
+        ["y.m.d", "Date AA.MM.JJ"],
+        ["y-m-d", "Date AA-MM-JJ"],
+        ["dmy", "Date JJMMAA"],
+        ["d.m.y", "Date JJ.MM.AA"],
+        ["d-m-y", "Date JJ-MM-AA"],
+        ["Decimal", "Decimal"],
+        ["Telephone", "Telephone"],
             ["AI", "Actif / Inactif"],
             ["cp", "Code postal"],
             ["Yesno", "O ou N"],
@@ -753,7 +789,7 @@ Ext.onReady(function()
 		tbar           : FieldPanelToolBars,
 		columnLines    : true,
 		plugins        : [checkColumnInclude,checkColumnRequired],
-		title          : 'Production Column List: ',
+		title          : 'Production ' + titleGrid,
 		stateId        : 'grid',
 		border         : false,
 		loadMask       : true,
@@ -771,34 +807,7 @@ Ext.onReady(function()
 			listeners    :{
 	            rowselect: function(sm, rowIndex , record){
 					numberRow = rowIndex;
-					/*Ext.each(row.get('COLOR'), function(color, index) {
-	    			 	rowParams.tstyle += "background-color:" + color + ';';
-	    			});
-					record.tstyle = "background-color: #FFFFFC;";
-					record.tstyle = "background-color: #E1E0CF;";
-					*/
-	    			/*console.log(record.data);
-	    			var row = record.data;
-	    			
-	    			GridLength = Ext.getCmp('grid').getStore().data.length;
-	    			var newRow = new dateRow({ ADD_TAB_NAME : row.ADD_TAB_NAME,
-	    									FLD_UID : row.FLD_UID , 
-	    				 					FLD_DESCRIPTION : row.FLD_DESCRIPTION,
-	    				 					FIELD_NAME : row.FLD_DESCRIPTION,
-	    				 					ROL_CODE : row.ROL_CODE,
-	    				 					LENGTH_FIELD : row.LENGTH_FIELD,
-	    				 					AS400_TYPE : row.AS400_TYPE,
-	    				 					INNER_JOIN : row.INNER_JOIN,
-	    				 					FIELD_REPLACE : row.FIELD_REPLACE,
-	    				 					ID_INBOX : row.ID_INBOX,
-	    				 					ALIAS_TABLE : row.ALIAS_TABLE,
-	    				 					ID_TABLE : row.ID_TABLE,
-	    				 					COLOR : row.COLOR,
-	    				 					INCLUDE_OPTION : row.INCLUDE_OPTION,
-	    				 					CONSTANT : row.CONSTANT
-	    				 					});
-	    			
-	    			store.insert(rowIndex+1,newRow);*/
+					
 	            }
 		      }
 			}),

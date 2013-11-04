@@ -1,7 +1,103 @@
 
 Ext.onReady(function() 
 {
+	var CustomName = 'Custom Column';
+	var titleGrid = 'Inbox Column List:';
+	var select = 'Select'
+	// Variables for language
+	var CustomColumnsTitle = 'Custom Columns';
+	var CustomColumnsNew = 'New Select Query';
+	var CustomColumnsEdit = 'Edit Select Query';
+	var CustomColumnsRemove = 'Remove Select Query';
+	var CustomColAdd = 'Add Select Query';
+	var CustomColParameters = 'Parameters Select';
+	var CustomColAddParam = 'Add Parameter';
+	var CustomColEmpty = 'There are no actions to display';
+	var CustomColEmpty2 = 'No actions to display';
+	var Action = 'Actions';
+	var ActionAdd = 'Add actions to inbox';
+	var ActionEdit = 'Edit actions to inbox';
+	var ActionRemove = 'Remove actions to inbox';
+	var ActionSave = 'Save actions';
+	var ActionFields = 'By fields';
+	var ActionNewInbox = 'New actions of inbox';
+	var ActionParamSent = 'Parameters sent function';
+	var ActionAddInbox = 'Add actions of inbox';
+	var MsgSave = "The data was saved sucessfully!";
+	var MsgRemove = "The data was removed sucessfully!";
+	var Save ="Save";
+	var Cancel ="Cancel";
+	var ActionRemInbox = 'Remove actions of inbox';
+	var ActionEditInbox ="Edit Actions of Inbox";
+	var ActionInboxTitle="Action Inbox";
+	var MsgOperation = 'The operation completed sucessfully!';
+	var MsgOpError = 'The operation was not completed sucessfully!';
+	var MsgSelectItem='Select Items please';
+	var lanSaveConditions='Save Conditions';
+	var lanDisplaying = 'Displaying {0} - {1} of {2}';
+	var lanActionRemTitle ='Remove Select Query of Inbox';
+	var lanActionDelPar = "Delete Parameter";
+	var lanAddWhere = "Add Where to Inbox";
+	var lanEditWhere = "Edit Where to Inbox";
+	var lanRemWhere = "Remove Where to Inbox";
+	var lanAddConfig = "&nbsp; Add Config Users";
+	var lanPLeaseWhere= "Please type the Where Statement";
+	var lanSaveQuery= "Save Query";
+	var lanRemConfirm= "Do you want to remove this where statement?";
+	var lanConfigUser ="Config User Where:";
+	var lanQueryReq="the query is required!";
+	var lanAddEdit = "Add & Edit Join";
+	var lanPleaseQuery ="Please type the Query Statement:";
+	
+	if(language == 'fr')
+	{
+		CustomName = 'Colonne Personnalis\u00E9e';
+		titleGrid = 'Inbox Liste des Colonnes:';
+		select = 'S\u00E9lectionner';
+		CustomColumnsTitle= 'Colonnes personnalis\u00E9es';
+		CustomColumnsNew= 'Nouveau Select Query';
+		CustomColumnsEdit= 'Edition Select Query';
+		CustomColumnsRemove= 'Supprimer Select Query';
+	    CustomColAdd = 'Ajouter Select Query';
+		CustomColParameters = 'Param\u00E8tres Select';
+		CustomColAddParam = 'Ajouter un param\u00E8tre';
+		CustomColEmpty = "Il n'y a aucune action \u00E0 afficher";
+		CustomColEmpty2 = 'Aucune action \u00E0 afficher';
+		ActionAdd= "Ajouter actions de Inbox";
+		ActionEdit = "Editer actions de Inbox";
+		ActionRemove= "Supprimer actions de Inbox";
+		ActionSave= "Sauver actions";
+		ActionFields = "Par champs";
+		ActionNewInbox = "Nouvelle action de inbox";
+		ActionParamSent = "Param\u00E8tres envoy\u00E9s fonction";
+		ActionAddInbox="Ajouter action de inbox";
+		MsgSave="Les donn\u00E9es ont \u00E9t\u00E9 enregistr\u00E9es avec succ\u00E8s!";
+		Save="Sauver";
+		Cancel ="Annuler";
+		ActionRemInbox= "Supprimer action de inbox";
+		MsgRemove="Les donn\u00E9es ont \u00E9t\u00E9 supprim\u00E9es avec succ\u00E8s!";
+		ActionEditInbox ="Editer actions de Inbox";
+		ActionInboxTitle ="Action Inbox";
+		MsgOperation="L'op\u00E9ration s'est termin\u00E9e avec succ\u00E8s!";
+		MsgOpError="L'op\u00E9ration n'a pas été compl\u00E9t\u00E9e avec succ\u00E8s!";
+		MsgSelectItem="S\u00E9lectionnez les Articles veuillez";
+		lanSaveConditions ="Sauver conditions";
+		lanDisplaying = 'Affichage {0} - {1} sur {2}';
+		lanActionRemTitle = "Supprimer Select Query de Inbox";
+		lanActionDelPar = "Supprimer Param\u00E8tre";
+		lanAddWhere = "Ajouter Where au Inbox";
+		lanEditWhere = "Editer Where au Inbox";
+		lanRemWhere = "Supprimer Where au Inbox";
+		lanAddConfig = "&nbsp; Ajouter des utilisateurs config";
+		lanPLeaseWhere= "S'il vous pla\u00EEt taper le instruction Where";
+		lanSaveQuery= "Sauver Query";
+		lanRemConfirm= "Voulez-vous supprimer cette d\u00E9claration Where?";
+		lanConfigUser ="Config utilisateur Where";
+		lanQueryReq="La Query est nécessaire!";
+		lanAddEdit = "Ajouter & Edit Join";
+		lanPleaseQuery ="S'il vous pla\u00EEt entrez le Query Statement:";
 		
+	}	
 	var tooltipRenderer = function(data, metadata, record, rowIndex, columnIndex,store) 
 	{
 		metadata.attr = 'ext:qtip="' + data + '" style="white-space: normal; "';
@@ -84,8 +180,8 @@ Ext.onReady(function()
 		valueField    : 'ID',
 		displayField  : 'NAME',
 		id            : 'idTableCombo',
-		fieldLabel    : '<span style="color: red">*</span>Select Table',
-		emptyText     : 'Select a Table...',
+		fieldLabel    : '<span style="color: red">*</span>' + select + ' Table',
+		emptyText     : select + ' Table...',
 		typeAhead     : true,
 		triggerAction : 'all',
 		editable      : false,
@@ -111,13 +207,14 @@ Ext.onReady(function()
 		 		buttonAction.setDisabled(false);
 		 		buttonConcat = Ext.getCmp('idConcatFields');
 		 		buttonConcat.setDisabled(false);
-		 		
+		 		Ext.getCmp('idQuery').setValue('');
 		 		//Ext.getCmp('idQuery').setValue(record.data.INNER_JOIN);
 		 		idInbox = Ext.getCmp('idInboxCombo').getValue();	
 				store.load({
 					params : {
 						'idTable' :combo.getRawValue(),
-						'idInboxData' :idInbox
+						'idInboxData' :idInbox,
+						'swinner' : 1
 					}
 				});
 			}  
@@ -128,8 +225,8 @@ Ext.onReady(function()
 		valueField    : 'ID',
 		displayField  : 'NAME',
 		id            : 'idInboxCombo',
-		fieldLabel    : '<span style="color: red">*</span>Select Inbox',
-		emptyText     : 'Select an Inbox...',
+		fieldLabel    : '<span style="color: red">*</span>' + select + ' Inbox',
+		emptyText     : select +' Inbox...',
 		typeAhead     : true,
 		triggerAction : 'all',
 		editable      : false,
@@ -189,7 +286,15 @@ Ext.onReady(function()
 			        		  params : {
 								'idTable' 	  :idTable,
 								'idInboxData' :idInbox
-								}
+								},
+								callback: function(records, operation, success) {
+					            	var error = store.reader.jsonData.response;
+					            	var self = this;
+					            	if(success == true)
+					            		Ext.MessageBox.hide();
+					            	else
+					            		Ext.MessageBox.alert('Error', error);
+					            }
 			        	  })
 			          }
 			          else
@@ -208,7 +313,7 @@ Ext.onReady(function()
 	
 	 var enable = true;
 	 saveFields = new Ext.Action({
-	        text    :'Save',
+	        text    :_('ID_SAVE'),
 	        iconCls :'button_menu_ext ss_save',
 			id      : 'addup',
 	        handler : dataGridreview
@@ -231,7 +336,7 @@ Ext.onReady(function()
 	  });
 	 
 	 ConcatFields = new Ext.Action({
-	      text     : 'Custom Columns',
+	      text     : CustomName,
 	      id	   : 'idConcatFields',
 	      iconCls  : 'button_menu_ext ss_sprite  ss_sql',
 	      tooltip  : 'Management actions that will have the inbox',
@@ -254,7 +359,7 @@ Ext.onReady(function()
 		    	border 	 : false
 			},
           	border		: false,
-          	labelWidth 	: 80, 
+          	labelWidth 	: 120, 
           	items: [{
 				rowspan  : 2,
 				xtype    : 'panel',
@@ -527,7 +632,7 @@ Ext.onReady(function()
 		cm 			   : gridcolumns,
 		tbar           : FieldPanelToolBars,
 		plugins        : [checkColumnInclude, checkColumnHidden, checkColumnFilter],
-		title          : 'Inbox Column List: ',
+		title          : titleGrid,
 		stateId        : 'grid',
 		border         : false,
 		loadMask       : true,
@@ -634,7 +739,7 @@ Ext.onReady(function()
 		formQuery.getForm().findField('queryfield').setValue(textQuery);
 		  
 	    wQuery = new Ext.Window({
-	        title       : "Add & Edit Join",
+	        title       : lanAddEdit,
 	        closeAction : 'hide',
 		    autoDestroy : true,
 		    maximizable : true,     
@@ -663,15 +768,15 @@ Ext.onReady(function()
 		items 	:[{
 			id			:'queryfield', 
 			xtype		: 'textarea', 
-			fieldLabel	: "Please type the Query Statement", 
+			fieldLabel	: lanPleaseQuery, 
 			name		: 'nameQuery', 
 			width		: 450,
 			height		: 200,
 			disabled	: false
 		}],
 		buttons	: [
-		    {text : "Save" , handler:  saveQuery},
-		    {text : "Cancel", handler: CloseWindow}
+		    {text : Save , handler:  saveQuery},
+		    {text : Cancel, handler: CloseWindow}
 		]
 	});
 	
@@ -977,7 +1082,7 @@ Ext.onReady(function()
 	    	 items : add_FieldsRepeat_popup_form,
 	    	 layout: 'fit',
 	    	 buttons: [{
-		            text: 'Save',
+		            text: Save,
 		            type: 'submit',
 		            scope: this,
 		            handler: function() {   
@@ -1067,7 +1172,7 @@ Ext.onReady(function()
 	    		 		
 		            }
 		        },{
-		            text: 'Cancel',            
+		            text: Cancel,            
 		            handler: function (){                
 		                Ext.getCmp('FieldsRepeat_popup_window').close();
 		            }
@@ -1112,7 +1217,7 @@ Ext.onReady(function()
 		},{
 			xtype: 'textarea',
 			id:'whereTxaField', 
-			fieldLabel: "Please type the Where Statement", 
+			fieldLabel: lanPLeaseWhere, 
 			name: 'parameters', 
 			width: 550,
 			height: 200, 
@@ -1123,7 +1228,7 @@ Ext.onReady(function()
 		buttonAlign: 'center',
 		buttons: [
 		          {		
-		        	  text: 'Save Query',
+		        	  text: lanSaveQuery,
 		        	  handler: function(){
 		        	  if (Ext.getCmp('whereTxaField').getValue() != '') {
 		        		  Ext.MessageBox.show({ msg: _('ID_PROCESSING'), wait:true,waitConfig: {interval:200} });
@@ -1144,7 +1249,7 @@ Ext.onReady(function()
 		        		  });
 		        	  } 
 		        	  else {
-		        		  alert("the query is required!");
+		        		  alert(lanQueryReq);
 		        		  return false;				
 		        	  }
 
@@ -1243,7 +1348,7 @@ Ext.onReady(function()
 			pageSize: 50,
 			store: WhereInbox_popup_store,
 			displayInfo: true,
-			displayMsg: 'Displaying {0} - {1} of {2}',
+			displayMsg: lanDisplaying,
 			emptyMsg: "No where queries to display"
 			});
 
@@ -1260,14 +1365,14 @@ Ext.onReady(function()
 				},
 				bbar: WhereInbox_popup_bbar,
 				tbar : [{
-					text: 'Add Where to Inbox',
+					text: lanAddWhere,
 					cls : 'x-btn-text-icon',
 					icon : '/images/ext/default/tree/drop-add.gif',
 					handler: function(){
 						add_WhereInbox_popup(ID_INBOX,ROLE_CODE);
 					}
 				}, {
-					text: 'Edit Where to Inbox',
+					text: lanEditWhere,
 					cls : 'x-btn-text-icon',
 					icon : '/images/edit-table.png',
 					id : 'editWhere',
@@ -1284,7 +1389,7 @@ Ext.onReady(function()
 						}
 					}		
 				} , {
-					text: 'Remove Where to Inbox',
+					text: lanRemWhere,
 					cls : 'x-btn-text-icon',
 					icon : '/images/delete-16x16.gif',
 					disabled : true,
@@ -1294,7 +1399,7 @@ Ext.onReady(function()
 						var rowSelected = gridWhereInbox.getSelectionModel().getSelected();
 						var ID_WHERE = rowSelected.data.IWHERE_UID;
 						var tableName = rowSelected.data.TABLE_NAME;
-						PMExt.confirm(_('ID_CONFIRM'),"Do you want to remove this where statement?", function(){
+						PMExt.confirm(_('ID_CONFIRM'),lanRemConfirm, function(){
 						   	Ext.MessageBox.show({ msg: _('ID_PROCESSING'), wait:true,waitConfig: {interval:200} });
 						   	Ext.Ajax.request({
 							url: 'SaveWhereInbox.php?ID=' + ID_INBOX,
@@ -1311,7 +1416,7 @@ Ext.onReady(function()
 						});					
 					}
 				} ,  {
-					text: '&nbsp;Add Config Users',
+					text: lanAddConfig,
 					cls : 'x-btn-text-icon',
 					icon : '/images/add.png',
 					handler: function(){
@@ -1416,24 +1521,24 @@ Ext.onReady(function()
 					viewConfig 		: {
 			          forceFit 		: true,
 			          scrollOffset 	: 0,
-			          emptyText		: 'There are no actions to display'
+			          emptyText		: CustomColEmpty
 			       },
 					bbar			: new Ext.PagingToolbar({
 				          pageSize: 50,
 				          store: ActionInbox_popup_store,
 				          displayInfo: true,
-				          displayMsg: 'Displaying {0} - {1} of {2}',
-				          emptyMsg: "No actions to display"
+				          displayMsg: lanDisplaying,
+				          emptyMsg: CustomColEmpty2
 					}),
 					tbar 			: [{
-								text: 'Add Actions to Inbox',
+								text: ActionAdd,
 								cls : 'x-btn-text-icon',
 								icon : '/images/ext/default/tree/drop-add.gif',
 								handler: function(){
 									add_ActionInbox_popup(ID_INBOX);
 								}
 							}, {
-								text	: 'Edit Actions to Inbox',
+								text	: ActionEdit,
 								cls 	: 'x-btn-text-icon',
 								icon 	: '/images/edit-table.png',
 								id		: 'editActionsInbox',
@@ -1442,7 +1547,7 @@ Ext.onReady(function()
 									edit_ActionInbox_popup(ID_INBOX);
 								}		
 							} , {
-								text	: 'Remove Actions to Inbox',
+								text	: ActionRemove,
 								cls 	: 'x-btn-text-icon',
 								icon 	: '/images/delete-16x16.gif',
 								id		: 'removeActionsInbox',
@@ -1451,7 +1556,7 @@ Ext.onReady(function()
 											remove_ActionInbox_popup(ActionInbox_popup_grid);
 								}
 							} , {
-								text: 'Save Actions ',
+								text: ActionSave,
 								cls : 'x-btn-text-icon',
 								icon : '/images/ok.png',
 								tooltip  : 'Add drag and drop',
@@ -1459,7 +1564,7 @@ Ext.onReady(function()
 										saveActions_DragAndDrop(ActionInbox_popup_store);
 								}
 							} , {
-								text	: 'By Fields',
+								text	: ActionFields,
 								cls 	: 'x-btn-text-icon',
 								icon 	: '/images/checkedsmall.gif',
 								id		: 'byFieldActionsInbox',
@@ -1569,10 +1674,11 @@ Ext.onReady(function()
 			viewConfig : {
 	          forceFit : true,
 	          scrollOffset : 0,
-	          emptyText: 'There are no actions to display'
+	          emptyText: CustomColEmpty 
+
 	       },
 	       tbar : [{
-					text: 'Add Parameter',
+					text: CustomColAddParam,
 					cls : 'x-btn-text-icon',
 					icon : '/images/ext/default/tree/drop-add.gif',
 					handler: function(){
@@ -1599,7 +1705,7 @@ Ext.onReady(function()
 		  	
 			var add_ActionInbox_popup_field =  new Ext.form.ComboBox({
 		        id : 'add_ActionInbox_popup_field',
-		        fieldLabel: 'New Action of Inbox',
+		        fieldLabel: ActionNewInbox,
 		        name: 'ACTION_ID',
 		        maxLength: 45,
 				allowBlank: false,
@@ -1642,7 +1748,7 @@ Ext.onReady(function()
 			items: [add_ActionInbox_popup_field,
 			        {
 						id : 'idParameters',
-						title : 'Parameters Sent Function',
+						title : ActionParamSent,
 						xtype : 'fieldset',
 						checkboxToggle : true,
 						autoHeight : true,
@@ -1659,7 +1765,7 @@ Ext.onReady(function()
 							items : [  {                                                                                              
 					            xtype: 'textfield',
 					            id:'helpparametersfield', 
-					        	fieldLabel: "Parameters Sent of Function", 
+					        	fieldLabel: ActionParamSent, 
 					        	name: 'helpparams', 
 					        	width: 160,
 					        	height: 50,
@@ -1672,7 +1778,7 @@ Ext.onReady(function()
 			        } ,  {                                                                                              
 			            xtype: 'textarea',
 			            id:'parametersfield', 
-			        	  fieldLabel: "Parameters Sent Function", 
+			        	  fieldLabel: ActionParamSent, 
 			        	  name: 'parameters', 
 			        	  width: 300, 
 			        	  allowBlank: true,
@@ -1683,7 +1789,7 @@ Ext.onReady(function()
 			});		
 			
 			add_ActionInbox_popup_window = new Ext.Window({
-			title: 'Add Actions of Inbox',
+			title: ActionAddInbox,
 			id:'add_ActionInbox_popup_window',
 			width: 380,
 			autoHeight: true,
@@ -1695,7 +1801,7 @@ Ext.onReady(function()
 			layout: 'form',
 			items: [add_ActionInbox_popup_form],
 			buttons: [{
-	            text: 'Save',
+	            text: Save,
 	            type: 'submit',
 	            scope: this,
 	            handler: function() {   
@@ -1720,7 +1826,7 @@ Ext.onReady(function()
 	                        var data = Ext.decode(a.response.responseText);                        
 	                        if(data.success == true){ 
 	                          Ext.MessageBox.show({                            
-	                            msg : 'The data was saved sucessfully!',
+	                            msg : MsgSave,
 	                            buttons : Ext.MessageBox.OK,
 	                            icon : Ext.MessageBox.INFO
 	                          });
@@ -1734,7 +1840,7 @@ Ext.onReady(function()
 	                })
 	            }
 	        },{
-	            text: 'Cancel',            
+	            text: Cancel,            
 	            handler: function (){                
 	                Ext.getCmp('add_ActionInbox_popup_window').close();
 	            }
@@ -1767,7 +1873,7 @@ Ext.onReady(function()
 		  
 				var edit_ActionInbox_popup_field =  new Ext.form.ComboBox({
 		        id : 'comboEditAction',
-		        fieldLabel: 'New Action of Inbox',
+		        fieldLabel: ActionNewInbox,
 		        name: 'ACTION_ID',
 		        maxLength: 45,
 				allowBlank: false,
@@ -1831,10 +1937,10 @@ Ext.onReady(function()
 					viewConfig : {
 			          forceFit : true,
 			          scrollOffset : 0,
-			          emptyText: 'There are no actions to display'
+			          emptyText: CustomColEmpty
 			       },
 			       tbar : [{
-							text: 'Add Parameter',
+							text: CustomColAddParam,
 							cls : 'x-btn-text-icon',
 							icon : '/images/ext/default/tree/drop-add.gif',
 							handler: function(){
@@ -1851,7 +1957,7 @@ Ext.onReady(function()
 			items: [edit_ActionInbox_popup_field,
 					    {
 						id : 'idParameters',
-						title : 'Parameters Sent Function',
+						title : ActionParamSent,
 						xtype : 'fieldset',
 						checkboxToggle : true,
 						autoHeight : true,
@@ -1880,7 +1986,7 @@ Ext.onReady(function()
 				} ,  {                                                                                              
 			            xtype: 'textarea',
 			            id:'parametersfield', 
-			        	  fieldLabel: "Parameters Sent Function", 
+			        	  fieldLabel: ActionParamSent, 
 			        	  name: 'parameters', 
 			        	  width: 250, 
 			        	  allowBlank: true,
@@ -1891,7 +1997,7 @@ Ext.onReady(function()
 			});		
 			
 			edit_ActionInbox_popup_window = new Ext.Window({
-			title: 'Edit Actions of Inbox',
+			title: ActionEditInbox,
 			id:'edit_ActionInbox_popup_window',
 			width: 380,
 			autoHeight: true,
@@ -1903,7 +2009,7 @@ Ext.onReady(function()
 			layout: 'form',
 			items: [edit_ActionInbox_popup_form],
 			buttons: [{
-	            text: 'Save',
+	            text: Save,
 	            type: 'submit',
 	            scope: this,
 	            handler: function() {   
@@ -1932,7 +2038,7 @@ Ext.onReady(function()
                         var data = Ext.decode(a.response.responseText);                        
                         if(data.success == true){ 
                           Ext.MessageBox.show({                            
-                            msg : 'The data was saved sucessfully!',
+                            msg : MsgSave,
                             buttons : Ext.MessageBox.OK,
                             icon : Ext.MessageBox.INFO
                           });
@@ -1946,7 +2052,7 @@ Ext.onReady(function()
                 })
 	            }
 	        },{
-	            text: 'Cancel',            
+	            text: Cancel,            
 	            handler: function (){                
 	                Ext.getCmp('edit_ActionInbox_popup_window').close();
 	            }
@@ -1992,9 +2098,9 @@ Ext.onReady(function()
 	            if (sm.hasSelection()) {
 	            	
 	            	  Ext.Msg.show({
-			                title : 'Remove Action of Inbox',
+			                title : ActionRemInbox,
 			                buttons : Ext.MessageBox.YESNOCANCEL,
-			                msg : 'Remove Action of Inbox : ' + rowModel.data.NAME + ' ?',
+			                msg : ActionRemInbox+' : ' + rowModel.data.NAME + ' ?',
 			                fn : function(btn) {
 			                  if (btn == 'yes') {
 			                      var ID = rowModel.data.ID;
@@ -2009,7 +2115,7 @@ Ext.onReady(function()
 					                        var url = data.success; 
 					                          if (url == true) {
 					                            Ext.MessageBox.show({                            
-						                            msg : 'The data was removed sucessfully!',
+						                            msg : MsgRemove,
 						                            buttons : Ext.MessageBox.OK,
 						                            icon : Ext.MessageBox.INFO
 						                         });    
@@ -2023,7 +2129,7 @@ Ext.onReady(function()
 					                          var url = data.success; 
 					                          if (url == true) {
 					                            Ext.MessageBox.show({                            
-						                            msg : 'The data was removed sucessfully!',
+						                            msg : MsgRemove,
 						                            buttons : Ext.MessageBox.OK,
 						                            icon : Ext.MessageBox.INFO
 						                         });    
@@ -2091,7 +2197,7 @@ Ext.onReady(function()
 			}
 			else
 			{
-				alert('Select Items please');
+				alert(MsgSelectItem);
 			}
 		}
 		
@@ -2117,13 +2223,13 @@ Ext.onReady(function()
 	  		        //var url = data.success; 
 	                //if (url == true) {
 	                    Ext.MessageBox.show({                            
-	                         msg : 'The operation completed sucessfully!',
+	                         msg : MsgOperation,
 	                         buttons : Ext.MessageBox.OK,
 	                         icon : Ext.MessageBox.INFO
 	                }); 
 		         },
 		        failure: function(){
-		        	Ext.MessageBox.alert('Error','The operation was not completed sucessfully!');
+		        	Ext.MessageBox.alert('Error',MsgOpError);
 		        	Ext.MessageBox.hide();
 		        }
 		      });
@@ -2240,7 +2346,8 @@ Ext.onReady(function()
 			    		width     	: 20,
 			    		hidden	  	: false,
 			    		items     	: [{
-			    			icon    : '/plugin/fieldcontrol/Clear.png', 
+			    			iconCls :'button_menu_ext ss_cleardata',
+			    			//icon    : '/plugin/fieldcontrol/clear.png', 
 			    			tooltip : 'Clean',
 			    			handler : function(grid, rowIndex, colIndex) {
 								var rec = grid.getStore().getAt(rowIndex);
@@ -2264,17 +2371,17 @@ Ext.onReady(function()
 					viewConfig 		: {
 						forceFit 		: true,
 						scrollOffset 	: 0,
-						emptyText		: 'There are no actions to display'
+						emptyText		: CustomColEmpty
 					},
 					bbar			: new Ext.PagingToolbar({
 						pageSize	: 50,
 						store		: byFields_Action_store,
 						displayInfo	: true,
-						displayMsg	: 'Displaying {0} - {1} of {2}',
-						emptyMsg	: "No actions to display"
+						displayMsg	: lanDisplaying,
+						emptyMsg	: CustomColEmpty2
 					}),
 					tbar 			: [{
-						text		: 'Save Conditions ',
+						text		: lanSaveConditions,
 						cls 		: 'x-btn-text-icon',
 						icon 		: '/images/ok.png',
 						tooltip  	: 'Add drag and drop',
@@ -2485,17 +2592,17 @@ Ext.onReady(function()
 						viewConfig 		: {
 				          forceFit 		: true,
 				          scrollOffset 	: 0,
-				          emptyText		: 'There are no actions to display'
+				          emptyText		: CustomColEmpty
 				       },
 						bbar			: new Ext.PagingToolbar({
 					          pageSize		: 50,
 					          store			: ConcatFields_store,
 					          displayInfo	: true,
-					          displayMsg	: 'Displaying {0} - {1} of {2}',
-					          emptyMsg		: "No actions to display"
+					          displayMsg	: lanDisplaying,
+					          emptyMsg		: CustomColEmpty2
 						}),
 						tbar 			: [{
-							text	: 'New Select Query ',
+							text	: CustomColumnsNew,
 							cls 	: 'x-btn-text-icon',
 							icon 	: '/images/ok.png',
 							tooltip  : 'Add drag and drop',
@@ -2504,7 +2611,7 @@ Ext.onReady(function()
 							}
 						},
 						{
-							text	: 'Edit Select Query ',
+							text	: CustomColumnsEdit,
 							cls 	: 'x-btn-text-icon',
 							icon 	: '/images/edit-table.png',
 							id		: 'editSelectQuery',
@@ -2513,7 +2620,7 @@ Ext.onReady(function()
 								editSelectQuery(ConcatFields_grd);
 					        }		
 						} , {
-							text	: 'Remove  Select Query',
+							text	: CustomColumnsRemove,
 							cls 	: 'x-btn-text-icon',
 							icon 	: '/images/delete-16x16.gif',
 							disabled: true,
@@ -2540,7 +2647,7 @@ Ext.onReady(function()
 					   	closeAction : 'hide',
 			            autoDestroy : true,
 			            maximizable	: true,        
-			            title		: 'Custom Columns ',	          
+			            title		: CustomColumnsTitle,	          
 			            width 		: 800,
 			            height 		: 500,            
 			            modal 		: true,
@@ -2596,10 +2703,10 @@ Ext.onReady(function()
 				viewConfig : {
 		          forceFit : true,
 		          scrollOffset : 0,
-		          emptyText: 'There are no actions to display'
+		          emptyText: CustomColEmpty
 		       },
 		       tbar : [{
-						text: 'Add Parameter',
+						text: CustomColAddParam,
 						cls : 'x-btn-text-icon',
 						icon : '/images/ext/default/tree/drop-add.gif',
 						handler: function(){
@@ -2659,7 +2766,7 @@ Ext.onReady(function()
 				viewConfig 	: {
 		          forceFit 		: true,
 		          scrollOffset 	: 0,
-		          emptyText		: 'There are no actions to display'
+		          emptyText		: CustomColEmpty
 		       	},
 				tbar 		: [{
 						text: 'Delete Parameter',
@@ -2685,7 +2792,7 @@ Ext.onReady(function()
 				items: [
 					{
 							id : 'idParameters',
-							title : 'Parameters Select',
+							title : CustomColParameters,
 							xtype : 'fieldset',
 							//checkboxToggle : true,
 							autoHeight : true,
@@ -2699,7 +2806,7 @@ Ext.onReady(function()
 					} ,  {                                                                                              
 				            xtype: 'textarea',
 				            id:'parametersfield', 
-				            fieldLabel: "Parameters Select", 
+				            fieldLabel: CustomColParameters, 
 				            name: 'parameters', 
 				            width: 350, 
 				            allowBlank: true,
@@ -2707,7 +2814,7 @@ Ext.onReady(function()
 				            hidden: false
 				   } , {
 						id : 'idParametersSelect',
-						title : 'Parameters Select',
+						title : CustomColParameters,
 						xtype : 'fieldset',
 						//checkboxToggle : true,
 						autoHeight : true,
@@ -2722,7 +2829,7 @@ Ext.onReady(function()
 				} , {                                                                                              
 			            	xtype: 'textarea',
 			            	id:'parametersfieldAux', 
-			            	fieldLabel: "Parameters Select", 
+			            	fieldLabel: CustomColParameters, 
 			            	name: 'parametersAux', 
 			            	width: 600, 
 			            	allowBlank: true,
@@ -2733,7 +2840,7 @@ Ext.onReady(function()
 			});		
 			
 		    add_SelectQuery_popup_window = new Ext.Window({
-				title: 'Add Select Query',
+				title: CustomColAdd,
 				id:'add_SelectQuery_popup_window',
 				width: 400,
 				autoHeight: true,
@@ -2745,7 +2852,7 @@ Ext.onReady(function()
 				layout: 'form',
 				items: [add_SelectQuery_popup_form],
 				buttons: [{
-		            text: 'Save',
+		            text: Save,
 		            type: 'submit',
 		            scope: this,
 		            handler: function() {   
@@ -2787,7 +2894,7 @@ Ext.onReady(function()
 							alert("Register parameters select");
 		            }
 		        },{
-		            text: 'Cancel',            
+		            text: Cancel,            
 		            handler: function (){                
 		                Ext.getCmp('add_SelectQuery_popup_window').close();
 		            }
@@ -2839,10 +2946,10 @@ Ext.onReady(function()
 				viewConfig : {
 		          forceFit : true,
 		          scrollOffset : 0,
-		          emptyText: 'There are no actions to display'
+		          emptyText: CustomColEmpty
 		       },
 		       tbar : [{
-						text: 'Add Parameter',
+						text: CustomColAddParam,
 						cls : 'x-btn-text-icon',
 						icon : '/images/ext/default/tree/drop-add.gif',
 						handler: function(){
@@ -2866,7 +2973,7 @@ Ext.onReady(function()
 				items: [
 						    {
 							id : 'idParameters',
-							title : 'Parameters Select',
+							title : CustomColParameters,
 							xtype : 'fieldset',
 							//checkboxToggle : true,
 							autoHeight : true,
@@ -2879,7 +2986,7 @@ Ext.onReady(function()
 					} ,  {                                                                                              
 				            xtype: 'textarea',
 				            id:'parametersfield', 
-				            fieldLabel: "Parameters Select", 
+				            fieldLabel: CustomColParameters,
 				            name: 'parameters', 
 				            width: 350, 
 				            allowBlank: true,
@@ -2888,7 +2995,7 @@ Ext.onReady(function()
 				   } ,  {                                                                                              
 			            	xtype: 'textarea',
 			            	id:'parametersfieldAux', 
-			            	fieldLabel: "Parameters Select", 
+			            	fieldLabel: CustomColParameters, 
 			            	name: 'parametersAux', 
 			            	width: 350, 
 			            	allowBlank: true,
@@ -2899,7 +3006,7 @@ Ext.onReady(function()
 			});		
 			
 		    edit_SelectQuery_popup_window = new Ext.Window({
-				title: 'Edit Select Query',
+				title: CustomColumnsEdit,
 				id:'edit_SelectQuery_popup_window',
 				width: 400,
 				autoHeight: true,
@@ -2911,7 +3018,7 @@ Ext.onReady(function()
 				layout: 'form',
 				items: [edit_SelectQuery_popup_form],
 				buttons: [{
-		            text: 'Save',
+		            text: Save,
 		            type: 'submit',
 		            scope: this,
 		            handler: function() {   
@@ -2932,7 +3039,7 @@ Ext.onReady(function()
 		                        var data = Ext.decode(a.response.responseText);                        
 		                        if(data.success == true){ 
 		                          Ext.MessageBox.show({                            
-		                            msg : 'The data was saved sucessfully!',
+		                            msg : CustomColEmpty,
 		                            buttons : Ext.MessageBox.OK,
 		                            icon : Ext.MessageBox.INFO
 		                          });
@@ -2947,7 +3054,7 @@ Ext.onReady(function()
 		                })
 		            }
 		        },{
-		            text: 'Cancel',            
+		            text: Cancel,            
 		            handler: function (){                
 		                Ext.getCmp('edit_SelectQuery_popup_window').close();
 		            }
@@ -2972,9 +3079,9 @@ Ext.onReady(function()
 		            if (sm.hasSelection()) {
 		            	
 		            	  Ext.Msg.show({
-				                title : 'Remove Select Query of Inbox',
+				                title : lanActionRemTitle,
 				                buttons : Ext.MessageBox.YESNOCANCEL,
-				                msg : 'Remove Select Query of Inbox : ' + rowModel.data.QUERY_SELECT + ' ?',
+				                msg : lanActionRemTitle+' : ' + rowModel.data.QUERY_SELECT + ' ?',
 				                fn : function(btn) {
 				                  if (btn == 'yes') {
 				                      var ID = rowModel.data.ID;
@@ -2989,7 +3096,7 @@ Ext.onReady(function()
 						                        var url = data.success; 
 						                          if (url == true) {
 						                            Ext.MessageBox.show({                            
-							                            msg : 'The data was removed sucessfully!',
+							                            msg : MsgRemove,
 							                            buttons : Ext.MessageBox.OK,
 							                            icon : Ext.MessageBox.INFO
 							                         });    
@@ -3003,7 +3110,7 @@ Ext.onReady(function()
 						                          var url = data.success; 
 						                          if (url == true) {
 						                            Ext.MessageBox.show({                            
-							                            msg : 'The data was removed sucessfully!',
+							                            msg : MsgRemove,
 							                            buttons : Ext.MessageBox.OK,
 							                            icon : Ext.MessageBox.INFO
 							                         });    
@@ -3269,14 +3376,14 @@ Ext.onReady(function()
 					viewConfig 		: {
 						forceFit 		: true,
 						scrollOffset 	: 0,
-						emptyText		: 'There are no actions to display'
+						emptyText		: CustomColEmpty
 					},
 					bbar			: new Ext.PagingToolbar({
 						pageSize	: 50,
 						store		: configUser_where_store,
 						displayInfo	: true,
-						displayMsg	: 'Displaying {0} - {1} of {2}',
-						emptyMsg	: "No actions to display"
+						displayMsg	: lanDisplaying,
+						emptyMsg	: CustomColEmpty2
 					}),
 					tbar 			: [{
 						text		: 'Save Configuration ',
@@ -3290,7 +3397,7 @@ Ext.onReady(function()
 					plugins         : [checkColumnSelectConfigUser]
 				});	
 				var configUser_window = new Ext.Window({
-					title			: 'Config User Where:',	
+					title			: lanConfigUser,	
 			        closeAction 	: 'hide',
 				    autoDestroy 	: true,
 				    maximizable 	: true,     
@@ -3391,7 +3498,7 @@ Ext.onReady(function()
 		       		success: function(r,o){
 		       			Ext.MessageBox.hide();
 	                    Ext.MessageBox.show({                            
-	                         msg : 'The operation completed sucessfully!',
+	                         msg : MsgOperation,
 	                         buttons : Ext.MessageBox.OK,
 	                         icon : Ext.MessageBox.INFO
 	                    }); 
@@ -3399,7 +3506,7 @@ Ext.onReady(function()
 	                    Ext.getCmp('WhereInbox_popup_grid').getStore().reload();	
 		       		},
 		       		failure: function(){
-		       			Ext.MessageBox.alert('Error','The operation was not completed sucessfully!');
+		       			Ext.MessageBox.alert('Error',MsgOpError);
 		       			Ext.MessageBox.hide();
 		       		}
 		     	});

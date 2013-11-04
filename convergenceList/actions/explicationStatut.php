@@ -16,18 +16,19 @@ else
     $items = json_decode($array, true);
     $app_uid = $items[0]['APP_UID'];
 }
+/*
 if (isset($_SESSION['APPLICATION']) && $_SESSION['APPLICATION'] != '') {
     
     $app_uid = $_SESSION['APPLICATION'];
    // $_GET['APP_UID'] = $_SESSION['APPLICATION'];
-}
-
+} */
 $oCase = new Cases ();
 $Fields = $oCase->loadCase($app_uid);
 $libelStatut = 'SELECT TITLE FROM PMT_STATUT WHERE UID=' . intval($Fields['APP_DATA']['STATUT']);
 $libelRes = executeQuery($libelStatut);
-
-switch (strtolower($libelRes[1]['TITLE'])) {
+{
+    switch (strtolower($libelRes[1]['TITLE'])) 
+    {
 
         case 'refusé' :
             if (count(explode('<br/>&nbsp;-&nbsp;', isset($Fields['APP_DATA']['msgRefus']) ? $Fields['APP_DATA']['msgRefus'] : '')) > 2)
@@ -41,7 +42,7 @@ switch (strtolower($libelRes[1]['TITLE'])) {
             $messageInfo .= isset($Fields['APP_DATA']['msgRefus']) ? $Fields['APP_DATA']['msgRefus'] : '';
         break;
 
-        case 'incomplet' :        
+        case 'incomplet' :
             if (count(explode('<br/>&nbsp;-&nbsp;', isset($Fields['APP_DATA']['msgIncomplet']) ? $Fields['APP_DATA']['msgIncomplet'] : '')) > 2)
             {
                 $messageInfo = 'Le dossier est <b>' . strtolower($libelRes[1]['TITLE']) . '</b> car les éléments suivants sont manquants :';
@@ -54,10 +55,16 @@ switch (strtolower($libelRes[1]['TITLE'])) {
             break;
 
         default :
-            $messageInfo = 'Le dossier est en statut <b>'.strtolower($libelRes[1]['TITLE']).'</b>';
+            if (isset($_REQUEST['callback']) && $_REQUEST['callback'] != '')
+            {
+                $messageInfo = call_user_func($_REQUEST['callback'], $Fields['APP_DATA']);
+            }
+            else
+                $messageInfo = 'Le dossier est en statut <b>'.strtolower($libelRes[1]['TITLE']).'</b>';
             break;
         
     }
+}
 
 if (isset($_GET['APP_UID']) && $_GET['APP_UID'] != '')
 {

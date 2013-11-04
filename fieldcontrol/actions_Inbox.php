@@ -1,5 +1,6 @@
 <?php
-
+ini_set ( 'error_reporting', E_ALL );
+ini_set ( 'display_errors', True );
 if (($RBAC_Response=$RBAC->userCanAccess("PM_LOGIN"))!=1) return $RBAC_Response;
 global $RBAC;
 
@@ -38,6 +39,8 @@ $configPage = $c->getConfiguration('usersList', 'pageSize','',$_SESSION['USER_LO
 $Config['pageSize'] = isset($configPage['pageSize']) ? $configPage['pageSize'] : 20;
 
 $oHeadPublisher =& headPublisher::getSingleton();
+$language = SYS_LANG;
+$oHeadPublisher->assign('language', $language);
 $oHeadPublisher->addExtJsScript('fieldcontrol/actionsInbox', false);    //adding a javascript file .js
 $oHeadPublisher->assign('CONFIG', $Config);
 $oHeadPublisher->assign('FORMATS',$c->getFormats());

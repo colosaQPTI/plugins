@@ -8,8 +8,8 @@ class ActionCRM extends Webservices {
 		parent::__construct(); 
 		
 		// INIT
-       	$this->url = "";
-		$this->wsId = "210";
+       	$this->url = "https://extranet.aqoba-preprod.customers.artful.net/api/v09/crm?access_token=99ac21619656c825e788ffb8ac6bfa23f08f4b08";
+        $this->wsId = "210";
 		
 		// GET Bouchon
 		//$bouchonFileName = dirname(__FILE__).'/bouchonActionCRM_2.txt';

@@ -6,7 +6,7 @@ G::loadClass ( 'pmFunctions' );
 G::LoadClass("form");
 
 
-function getProUid($tableName){
+/*function getProUid($tableName){
     $sSQL ="SELECT * FROM ADDITIONAL_TABLES WHERE ADD_TAB_NAME ='$tableName'";
     $aResult= executeQuery($sSQL);
     $proUid = '0';
@@ -109,8 +109,8 @@ function getDataCSV($firstLineCsvAs = 'on'){
     $data = $csv->data;
     $_SESSION['REQ_DATA_CSV'] = $data;
     return $data;
-}
-function getConfigCSV($data,$idInbox){
+}*/
+/*function getConfigCSV($data,$idInbox){
 	
 	$rolUser= getRolUserImport();
 	$query = "SELECT * FROM PMT_CONFIG_CSV_IMPORT WHERE ROL_CODE = '".$rolUser."' AND ID_INBOX = '".$idInbox."'";
@@ -1230,7 +1230,7 @@ function importCreateCaseEdit($jsonMatchFields,$uidTask, $tableName,$firstLineHe
     unset($_SESSION['REQ_DATA_CSV']);
     return $totalCases;
 }
-
+/*
 function saveFieldsCSV($idInbox, $fieldsImport,$firstLineHeader) {
 	$items = json_decode($fieldsImport,true);
 	$rolUser= getRolUserImport();
@@ -1262,7 +1262,7 @@ function resetFieldsCSV($idInbox) {
    return $bRes;
     
 }
-
+*/
 try {
   $sOption = $_REQUEST["option"];
   switch ($sOption) {

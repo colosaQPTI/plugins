@@ -3,6 +3,7 @@
     G::LoadClass('configuration');
     G::loadClass('pmFunctions');    
     $oHeadPublisher   =& headPublisher::getSingleton();    
+    $oHeadPublisher->assign('language', SYS_LANG);
     $oHeadPublisher->addExtJsScript(PATH_PLUGINS.SYS_COLLECTION.'/groupesRoles', false, true);    
     G::RenderPage('publish', 'extJs');
     

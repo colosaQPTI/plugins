@@ -1,10 +1,22 @@
 <?php
-define('LimousinPort','8084');
-define('port_ftp','21');
-define('username_ftp','ftpttest');
-define('pwd_ftp','ftptest');
-define('serveur_ftp','172.17.20.29');
+
+//extranet
+define('LimousinPort', '8084');
+//define('HostName', 'belim.adequation.com');
+define('HostName', '172.17.20.29:8084');
 define('gpIdPartenaire', '89c7034503fb5da547bd3f684d50fa82');
+define('gpIdCarteActive', '222');
+//sftp
+define('port_ftp', '22');
+define('username_ftp', 'ad_belim');
+define('pwd_ftp', 'QsS5oboj7Jj5BJ4TRE');
+define('serveur_ftp', '217.108.231.49');
+define('protocol_transfert', 'sftp');
+//WebService
+//define('wsHote', 'https://www.gaiacardsystem.com/api/v09/');
+define('wsHote_Url', 'https://extranet.aqoba-preprod.customers.artful.net/api/v09/');
+define('wsToken_param', '?access_token=99ac21619656c825e788ffb8ac6bfa23f08f4b08');
+define('wsPrestaId', '00028');
 G::LoadClass("plugin");
 
 class limousinProjectPlugin extends PMPlugin
@@ -32,9 +44,7 @@ class limousinProjectPlugin extends PMPlugin
   {
     $this->setCompanyLogo("/plugin/limousinProject/limousinProject.png");
     $this->registerPmFunction();
-    $this->redirectLogin("PROCESSMAKER_LIMOUSINPROJECT", "users/users_List");
-    
-    
+    $this->redirectLogin("PROCESSMAKER_LIMOUSINPROJECT", "users/users_List");  
   }
 
   public function install()

@@ -1,0 +1,1 @@
+<response><head><wsId>211</wsId></head><body><arguments><partenaire>…</partenaire><porteurId>…</porteurId></arguments></body><status><success>…</success></status></response>

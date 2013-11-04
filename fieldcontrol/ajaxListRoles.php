@@ -40,7 +40,7 @@ if (isset ( $_POST ['idInbox'] ) && $_POST ['idInbox'] != '')
     		    ADD_TAB_NAME AS NAME
     		    FROM PMT_INBOX_FIELDS
 				INNER JOIN ADDITIONAL_TABLES ON (PMT_INBOX_FIELDS.ID_TABLE = ADDITIONAL_TABLES.ADD_TAB_NAME AND ADDITIONAL_TABLES.PRO_UID != '' )
-				WHERE PMT_INBOX_FIELDS.ID_INBOX = '".$_POST['idInbox']."' AND ROL_CODE  = '" . $_GET ['rolID'] . "' 
+				WHERE PMT_INBOX_FIELDS.ID_INBOX = '".$_POST['idInbox']."' AND ROL_CODE  = '" . $_GET ['rolID'] . "'
 					  AND ALIAS_TABLE = ID_TABLE AND ID_TABLE = '".$dataSelect[1]['ID_TABLE']."'
 				GROUP BY ADD_TAB_UID";
 	 }
@@ -64,7 +64,7 @@ if (isset ( $_POST ['idInbox'] ) && $_POST ['idInbox'] != '')
         foreach($fields as $index)
         {
 		    $query = "SELECT JOIN_QUERY FROM PMT_INBOX_JOIN 
-				  WHERE JOIN_ROL_CODE  = '" . $_GET ['rolID'] . "'  AND JOIN_ID_INBOX = '".$_POST['idInbox']."'  ";
+				  	  WHERE JOIN_ROL_CODE  = '" . $_GET ['rolID'] . "'  AND JOIN_ID_INBOX = '".$_POST['idInbox']."'  ";
 
 		    $newOptions = executeQuery ( $query );
 		    $innerJoin = isset ( $newOptions [1]['JOIN_QUERY'] ) ? $newOptions [1]['JOIN_QUERY'] : '';
@@ -89,11 +89,10 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 {
     $total = 0;
 	if( (isset($_REQUEST ['inner']) && $_REQUEST ['inner'] != '') || (isset($_REQUEST ['swinner']) && $_REQUEST ['swinner'] == 1) )
-		$innerJoin = $_REQUEST ['inner'];
+		$innerJoin = isset($_REQUEST ['inner']) ? $_REQUEST ['inner'] : '';
 	else 
 	{
 		$query = "SELECT JOIN_QUERY FROM PMT_INBOX_JOIN 
-
 				  WHERE JOIN_ROL_CODE  = '" . $_GET ['rolID'] . "' AND JOIN_ID_INBOX = '".$_REQUEST['idInboxData']."' ";
 
 		$newOptions = executeQuery ( $query );
@@ -108,9 +107,9 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 	$table =  $_REQUEST ['idTable'];
 
 	$sQueryT = " SELECT *
-  						 FROM ".$table." 
-  						 " . $innerJoin . " 
-    		   	";
+  				 FROM ".$table." 
+  				 " . $innerJoin . " 
+    		   ";
 	try{
 		
     	$DBConnectionUID = 'workflow';
@@ -132,8 +131,6 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
         		$aTables[] = trim($data['table']);
     		}
 
-    		//G::pr($aTables); die;
-
 			$tableNames=array();
     		$tableNames[]=  array('OLD_NAME' => $table , 'ORIG_NAME' => $table );
     		$tableOldLast = $table;
@@ -145,8 +142,6 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
         		if($aTables[$i] != $table)
         			$tableNames[]=  array('OLD_NAME' => $aTables[$i] , 'ORIG_NAME' => $origTableName);
     		}
-
-    //G::pr($tableNames);
 
     		$i = 0;
 			while ($i < mysql_num_fields($selectT)) 
@@ -162,7 +157,7 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
       					$tableShow = $row['ORIG_NAME'];
       				else
       					$tableShow = $row['OLD_NAME'];
-      				//echo ('register'.$nameTable.'  '. $tableShow.'<br>');
+      				
 					if($nameTable == $tableShow || $nameTable == $row['OLD_NAME'])
 					{
 						$arrayTotalFields[] = Array(
@@ -207,7 +202,7 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 
 			$queryColor = "SELECT COLOR_CODE FROM PMT_INBOX_FIELDS_COLOR WHERE COLOR_UID = ". $iColor ." ";
 			$color = executeQuery($queryColor);	
-			$valor = Array();
+			$value = Array();
 			$swPos = 0;
 			$iTotal = 1;
 			$swColorCon = 0;
@@ -221,7 +216,6 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 	
 			$total = sizeof($arrayTotalFields);
 	
- 			//G::pr($arrayTotalFields);
 			foreach($arrayTotalFields as $index )
 			{
 				$query = "SELECT * FROM PMT_INBOX_FIELDS 
@@ -232,49 +226,49 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 				if (sizeof ( $newOptions )) 
 				{
 			
-					$valor ['INCLUDE_OPTION'] = true;
+					$value ['INCLUDE_OPTION'] = true;
 					if (isset ( $newOptions [1] ['DESCRIPTION'] ) && $newOptions [1] ['DESCRIPTION'] != '')
-						$valor ['FLD_DESCRIPTION'] = $newOptions [1] ['DESCRIPTION'];
+						$value ['FLD_DESCRIPTION'] = $newOptions [1] ['DESCRIPTION'];
 				
 					if (isset ( $newOptions [1] ['JOIN_QUERY'] ) && $newOptions [1] ['JOIN_QUERY'] != '')
-						$valor ['INNER_JOIN'] = $newOptions [1] ['JOIN_QUERY'];
+						$value ['INNER_JOIN'] = $newOptions [1] ['JOIN_QUERY'];
 				
 					if (isset ( $newOptions [1] ['POSITION'] ) && $newOptions [1] ['POSITION'] != '')	
-						$valor ['POSITION'] = $newOptions [1] ['POSITION'];	
+						$value ['POSITION'] = $newOptions [1] ['POSITION'];	
 				
 					if (isset ( $newOptions [1] ['FIELD_REPLACE'] ) && $newOptions [1] ['FIELD_REPLACE'] != '')	
-						$valor ['FIELD_REPLACE'] = $newOptions [1] ['FIELD_REPLACE'];
+						$value ['FIELD_REPLACE'] = $newOptions [1] ['FIELD_REPLACE'];
 				
 					if(isset ( $newOptions [1] ['ID_INBOX'] ) && $newOptions [1] ['ID_INBOX'] != '')
-						$valor['ID_INBOX'] = $newOptions[1]['ID_INBOX'];	
+						$value['ID_INBOX'] = $newOptions[1]['ID_INBOX'];	
 				
 					if (isset ( $newOptions [1] ['OPTION_QUERY_FUNCTION'] ) && $newOptions [1] ['OPTION_QUERY_FUNCTION'] != '')
-						$valor['SELECT_OPTION'] = $newOptions [1] ['OPTION_QUERY_FUNCTION'];
+						$value['SELECT_OPTION'] = $newOptions [1] ['OPTION_QUERY_FUNCTION'];
 				
 					if (isset ( $newOptions [1] ['FUNCTIONS'] ) && $newOptions [1] ['FUNCTIONS'] != '')
-						$valor['FUNCTIONS'] = $newOptions [1] ['FUNCTIONS'];
+						$value['FUNCTIONS'] = $newOptions [1] ['FUNCTIONS'];
 
 					if (isset ( $newOptions [1] ['PARAMETERS'] ) && $newOptions [1] ['PARAMETERS'] != '')
-						$valor['PARAMETERS'] = $newOptions [1] ['PARAMETERS'];
+						$value['PARAMETERS'] = $newOptions [1] ['PARAMETERS'];
 
 					if (isset ( $newOptions [1] ['HIDDEN_FIELD'] ) && $newOptions [1] ['HIDDEN_FIELD'] == 1)
-						$valor['HIDDEN_FIELD'] = true;
+						$value['HIDDEN_FIELD'] = true;
 					else 
-						$valor['HIDDEN_FIELD'] = false;
+						$value['HIDDEN_FIELD'] = false;
 
 					if (isset ( $newOptions [1] ['INCLUDE_FILTER'] ) && $newOptions [1] ['INCLUDE_FILTER'] == 1)
-						$valor['INCLUDE_FILTER'] = true;
+						$value['INCLUDE_FILTER'] = true;
 					else 
-						$valor['INCLUDE_FILTER'] = false;
+						$value['INCLUDE_FILTER'] = false;
 
 					if (isset ( $newOptions [1] ['ORDER_BY'] ) && $newOptions [1] ['ORDER_BY']  != '')
-						$valor['ORDER_BY'] = $newOptions [1] ['ORDER_BY'];
+						$value['ORDER_BY'] = $newOptions [1] ['ORDER_BY'];
 					else 
-						$valor['ORDER_BY'] = '';
+						$value['ORDER_BY'] = '';
 
-					$valor['ADD_TAB_NAME'] = $index['ADD_TAB_UID'];
+					$value['ADD_TAB_NAME'] = $index['ADD_TAB_UID'];
 
-					$valor['ALIAS_TABLE'] = $index['ALIAS_TABLE'];
+					$value['ALIAS_TABLE'] = $index['ALIAS_TABLE'];
 
 					$swPos = 1;		
 
@@ -282,26 +276,26 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 				else 
 				{
 					$posField++;
-					$valor ['INCLUDE_OPTION'] = false;
-					$valor ['INCLUDE_FILTER'] = false;
-					$valor ['HIDDEN_FIELD'] = false;
-					$valor ['FLD_DESCRIPTION'] = $index['FLD_UID'];
-					$valor ['INNER_JOIN'] = '';
-					$valor ['POSITION'] = $posField;
-					$valor ['FIELD_REPLACE'] = '';
-					$valor ['ID_INBOX'] = '';
-					$valor ['SELECT_OPTION'] = '';
-					$valor ['FUNCTIONS'] = '';
-					$valor ['PARAMETERS'] = '';
-					$valor['ORDER_BY'] = '';
-					$valor['ADD_TAB_NAME'] = $index['ADD_TAB_UID'];
-					$valor['ALIAS_TABLE'] = $index['ALIAS_TABLE'];
+					$value ['INCLUDE_OPTION'] = false;
+					$value ['INCLUDE_FILTER'] = false;
+					$value ['HIDDEN_FIELD'] = false;
+					$value ['FLD_DESCRIPTION'] = $index['FLD_UID'];
+					$value ['INNER_JOIN'] = '';
+					$value ['POSITION'] = $posField;
+					$value ['FIELD_REPLACE'] = '';
+					$value ['ID_INBOX'] = '';
+					$value ['SELECT_OPTION'] = '';
+					$value ['FUNCTIONS'] = '';
+					$value ['PARAMETERS'] = '';
+					$value['ORDER_BY'] = '';
+					$value['ADD_TAB_NAME'] = $index['ADD_TAB_UID'];
+					$value['ALIAS_TABLE'] = $index['ALIAS_TABLE'];
 				}
 
-				$valor ['ROL_CODE'] = $_GET ['rolID'];
-				$valor ['FIELD_NAME'] = $index['FLD_UID'];
-				$valor ['FLD_UID'] = $index['FLD_UID'];
-				$valor ['COLOR'] = isset ( $color[1]['COLOR_CODE'] ) ? $color[1]['COLOR_CODE'] : '';
+				$value ['ROL_CODE'] = $_GET ['rolID'];
+				$value ['FIELD_NAME'] = $index['FLD_UID'];
+				$value ['FLD_UID'] = $index['FLD_UID'];
+				$value ['COLOR'] = isset ( $color[1]['COLOR_CODE'] ) ? $color[1]['COLOR_CODE'] : '';
 
 				if($iTotal != 1)
 					$indexAux = next($arrayTotalFields);
@@ -332,20 +326,20 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 				if($swColorCon == 1)
 					$swColor = 0 ;
 		
-				$array [] = $valor;
+				$array [] = $value;
 
-				$valor ['INCLUDE_OPTION'] = '';
-				$valor ['FLD_DESCRIPTION'] = '';
-				$valor ['INNER_JOIN'] = '';
-				$valor ['POSITION'] = '';
-				$valor ['FIELD_REPLACE'] = '';
-				$valor ['ID_INBOX'] = '';
-				$valor ['SELECT_OPTION'] = '';
-				$valor ['FUNCTIONS'] = '';
-				$valor ['PARAMETERS'] = '';
-				$valor ['ADD_TAB_NAME'] = '';
-				$valor ['ALIAS_TABLE'] = '';
-				$valor++;
+				$value ['INCLUDE_OPTION'] = '';
+				$value ['FLD_DESCRIPTION'] = '';
+				$value ['INNER_JOIN'] = '';
+				$value ['POSITION'] = '';
+				$value ['FIELD_REPLACE'] = '';
+				$value ['ID_INBOX'] = '';
+				$value ['SELECT_OPTION'] = '';
+				$value ['FUNCTIONS'] = '';
+				$value ['PARAMETERS'] = '';
+				$value ['ADD_TAB_NAME'] = '';
+				$value ['ALIAS_TABLE'] = '';
+				$value++;
 				$iTotal++;
 
 			}

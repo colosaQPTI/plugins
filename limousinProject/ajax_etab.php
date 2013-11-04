@@ -22,4 +22,3 @@ class ajax_etab extends WebResource {
 $o = new ajax_etab($_SERVER['REQUEST_URI'], $_POST);
 
 ?>
-

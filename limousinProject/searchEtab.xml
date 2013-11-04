@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <dynaForm type="pagetable" width ="500" rowsPerPage="5"> 
-  <RNE type="text" maxlength="30" validate="Any" required="0" readonly="0" size="10" mode="view" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0" enableHtml="1">
-    <en>Code RNE</en>
-  </RNE>
-  <NOM type="text" maxlength="64" validate="Any" required="0" readonly="0" size="20" mode="view" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0" enableHtml="1">
+  <NOM type="text" maxlength="64" validate="Any" required="0" readonly="0" size="30" mode="view" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0" enableHtml="1">
     <en>Nom</en>
-  </NOM>
-  <ADR1 type="text" maxlength="64" validate="Any" required="0" readonly="0" size="20" mode="view" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0" enableHtml="1">
-    <en>Adresse</en>
-  </ADR1>
+  </NOM>  
   <CP type="text" maxlength="10" validate="Any" required="0" readonly="0" size="7" mode="view" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0" enableHtml="1">
     <en>Code postal</en>
   </CP>

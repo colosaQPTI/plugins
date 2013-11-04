@@ -430,7 +430,35 @@ Ext.onReady(function()
 	    items: contextMenuItems
 	});
 
-	 var searchForm = new Ext.Toolbar({
+	 /*var searchForm = new Ext.Toolbar({
+	    width: '100%',
+	    autoHeight: true,
+	    defaults:{
+	    	style:'padding-left:3px;',
+	    	labelStyle:'font-weight:blod;'
+	    },
+	    items: [	      
+	      actionsMenuI,		
+	      '->',	      
+	      '<b>'+_('ID_SEARCH')+':</b> &nbsp;',
+	      comboFilters,
+	      {xtype: 'tbspacer', width:15},
+	      textSearch,
+	      suggestFilters,
+	      {xtype: 'tbspacer', width:25},
+          btnSearch,
+          '-',
+          btnResetSearch
+	    ]
+	});*/
+	
+	var messagePager = 'No Accounts to show';
+	var messageConfig = '<div align="center"><b> ** Aucun résultat trouvé ** </b></div>';
+	var displayMsg = 'Accounts {0} - {1} Of {2}';
+	
+	if(filterSearch == '1'){
+
+			var searchForm = new Ext.Toolbar({
 	    width: '100%',
 	    autoHeight: true,
 	    defaults:{
@@ -451,7 +479,26 @@ Ext.onReady(function()
           btnResetSearch
 	    ]
 	});
-		
+	 	
+	}
+
+	if(filterSearch == '0'){
+		messagePager = '';
+		messageConfig = '';
+		displayMsg = '';
+		var searchForm = new Ext.Toolbar({
+	    width: '100%',
+	    autoHeight: true,
+	    defaults:{
+	    	style:'padding-left:3px;',
+	    	labelStyle:'font-weight:blod;'
+	    },
+	    items: [	      
+	      actionsMenuI
+	    ]
+	});
+	 	
+	}	
 		
 	var ToolForm = new Ext.FormPanel({
 			//labelAlign : 'top',
@@ -464,7 +511,8 @@ Ext.onReady(function()
 		   // anchorTo: 'center',
 		    border : false,
 		    items : [searchForm]
-		})
+		});
+
 	
 	var gridInboxDinamicStore = new Ext.data.JsonStore({
 	    id:'gridInboxDinamicStore',
@@ -493,8 +541,8 @@ Ext.onReady(function()
         store       : gridInboxDinamicStore, 
         displayInfo : true,
         autoHeight  : true,
-        displayMsg  : 'Accounts {0} - {1} Of {2}',
-        emptyMsg    : 'No Accounts to show',
+        displayMsg  : displayMsg,
+        emptyMsg    : messagePager,
         pageSize: 100
        });
 	
@@ -535,7 +583,7 @@ Ext.onReady(function()
 		viewConfig : {
 			forceFit : true,
 		    scrollOffset : 0,
-		    emptyText: '<div align="center"><b> ** Aucun résultat trouvé ** </b></div>'
+		    emptyText: messageConfig
 		}
 	});
 	
@@ -954,20 +1002,20 @@ Ext.onReady(function()
 										
 										if( j==0 )
 										{
-											parametersAux  = "'" + parameterValue + "'" + condition + "'" + fn.trim() ;
+											parametersAux  = '"' + parameterValue + '"' + condition + '"' + fn.trim() ;
 										}
 										else
 										{
-											parametersAux =  "'" + parameterValue + "'" +condition + "'" + fn.trim() +  "' || " + parametersAux ;
+											parametersAux =  '"' + parameterValue + '"' +condition + '"' + fn.trim() +  '" || ' + parametersAux ;
 										}
 									}
 									
-									var evaluation = "if( " + parametersAux + "') swCondition = 1; else swCondition = 0;" ;
+									var evaluation = 'if( ' + parametersAux + '") swCondition = 1; else swCondition = 0;' ;
 									//console.log(evaluation);
 								}
 								else
 								{
-									var evaluation = "if( '" + parameterValue + "'" +condition + "'" + parameters + "') swCondition = 1; else swCondition = 0;" ;
+									var evaluation = 'if( "' + parameterValue + '"' +condition + '"' + parameters + '") swCondition = 1; else swCondition = 0;' ;
 									//console.log(evaluation);
 								}
                                                                 

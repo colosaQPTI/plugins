@@ -150,8 +150,13 @@ if(sizeof($inbox)){
 		    }
 	    }
 
+		global $RBAC;
+		$filterSearch = '1';
+		if($RBAC->userCanAccess("PM_FILTER_CUSTOMINBOX") != 1){
+			$filterSearch = '0';
+		}		
 		##### 
-		
+		$oHeadPublisher->assign ( 'filterSearch', $filterSearch );		
 		$oHeadPublisher->assign ( 'tableDef', $array );
 		$oHeadPublisher->assign ( 'table', $table );
 		$oHeadPublisher->assign ( 'nameInbox', $description );

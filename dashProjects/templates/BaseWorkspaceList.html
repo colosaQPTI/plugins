@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>CUSTOM REPORT</title>
+
+    <link type="text/css" href="{styleCssPath}jquery-ui-1.8.17.custom.css" rel="stylesheet" />
+    <link type="text/css" href="{styleCssPath}demo_table_jui.css" rel="stylesheet" />
+    <link type="text/css" href="{styleCssPath}dataTablesCustom.css" rel="stylesheet" />
+    <link type="text/css" href="{styleCssPath}style.css" rel="stylesheet" />
+        
+    <!--[if IE]>
+    <link type="text/css" href="{styleCssPath}dataTablesCustom.ie.css" rel="stylesheet" />
+    <![endif]-->
+    
+    <script type="text/javascript" src="{scriptjsPath}jquery-latest.js"></script>
+    <script type="text/javascript" src="{scriptjsPath}jquery.tooltip.js"></script>
+    <script type="text/javascript" src="{scriptjsPath}jquery.dataTables.js"></script>
+    <script type="text/javascript" src="{scriptjsPath}jquery.dataTables.columnFilter.js"></script>
+    <style type="text/css">
+        .ui-state-default{
+          font-size: 80%;
+        }
+        
+        .dataTables_length {
+          width: 12.5em;
+        }
+        
+        .dataTables_filter {
+          width: 20.5em;
+        }
+        
+        .dataTables_info {
+          width: 26em;
+        }
+
+        .dataTables_paginate {
+          width: 5em;
+        }
+        
+        .ex_highlight #example tbody tr.even:hover, #example tbody tr.even td.highlighted {
+          background: #E0EAEF;
+        }
+
+        .ex_highlight #example tbody tr.odd:hover, #example tbody tr.odd td.highlighted {
+          background: #E0EAEF;
+        }
+
+        .ex_highlight_row #example tr.even:hover {
+          background: #E0EAEF;
+        }
+
+        .ex_highlight_row #example tr.even:hover td.sorting_1 {
+          background: #DDFF75;
+        }
+
+        .ex_highlight_row #example tr.even:hover td.sorting_2 {
+          background: #E7FF9E;
+        }
+
+        .ex_highlight_row #example tr.even:hover td.sorting_3 {
+          background: #E2FF89;
+        }
+
+        .ex_highlight_row #example tr.odd:hover {
+          background: #E0EAEF;
+        }
+
+        .ex_highlight_row #example tr.odd:hover td.sorting_1 {
+          background: #D6FF5C;
+        }
+
+        .ex_highlight_row #example tr.odd:hover td.sorting_2 {
+          background: #E0FF84;
+        }
+
+        .ex_highlight_row #example tr.odd:hover td.sorting_3 {
+          background: #DBFF70;
+        }
+    </style>
+    
+    
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var oTable = $('#example').dataTable({
+
+          "bSortClasses": false,
+          "bJQueryUI": true,
+          
+        "sScrollX": "500px", //width
+        "sScrollY": "100px", //height                    
+          
+           "aaSorting": [[0, "desc"]]
+        });                
+      });
+    </script>
+    </script>
+    </head>
+    <body id="dt_example" style="margin: 0; padding: 0; overflow: hidden;" class="ex_highlight">            
+        <div id="demo">
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+    <thead>
+        {columnQ}
+    </thead>
+    <tbody>
+        {tableQ}
+    </tbody>   
+</table>
+            </div>            
+    </body>
+</html>

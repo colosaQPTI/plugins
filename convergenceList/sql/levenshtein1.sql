@@ -1,4 +1,4 @@
-use wf_CheqLivreApp;
+use wf_limousin;
 
 DELIMITER //
 CREATE FUNCTION LEVENSHTEIN (s1 VARCHAR(255), s2 VARCHAR(255))

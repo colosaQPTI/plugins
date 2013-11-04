@@ -15,7 +15,7 @@ foreach($items as $item){
 		//on regarde si on a pas modifier l'adresse entre temps
 		//si statut produit et si date modif adresse > date de la production
 		$newAdresse = 0;
-        if (!empty($_REQUEST['callback']))
+		if (!empty($_REQUEST['callback']))
         {
             $newAdresse = call_user_func($_REQUEST['callback'], $item);
         }
@@ -29,7 +29,7 @@ foreach($items as $item){
                 $query2 = 'SELECT count(*) as NB FROM PMT_HISTORY_LOG WHERE HLOG_APP_UID="' . $item['APP_UID'] . '" AND HLOG_DATECREATED > "' . $result[1]['HLOG_DATECREATED'] . '" AND HLOG_ACTION="Modification de l\'adresse"';
                 $result2 = executeQuery($query2);
 
-                if ($result2[1]['NB'] > 0)
+    			if ($result2[1]['NB'] > 0)
                     $newAdresse = 1;
                 else
                     $newAdresse = 0;

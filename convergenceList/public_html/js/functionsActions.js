@@ -85,7 +85,7 @@ function redirect(idInbox){
 
 function windowTabs(idField,urlData,appNumber)
 {               
-        var adaptiveHeight = getDocHeight() - 50;
+    var adaptiveHeight = getDocHeight() - 50;
         window.swFrame= ''; 
         var win2 = new Ext.Window({
             id:'win2',
@@ -188,11 +188,11 @@ function editFormsWithTag(appUid,tag){
     windowTabs(appUid,urlData,appNumb);
 }
 
-function classerNPAI(annuleFlag, callback) {
+function classerNPAI(annuleFlagg, callback) {
 
-    if (!annuleFlag) { annuleFlag = 0; } 
+    if (!annuleFlagg) { annuleFlagg = 0; } 
     if (!callback) {
-        callback = '';
+      callback = '';
     }
 
     idField = myApp.addTab_inside();                    
@@ -211,7 +211,7 @@ function classerNPAI(annuleFlag, callback) {
            url : urlData,
            params : {
             array  : idField,
-            todo: annuleFlag,
+            todo: annuleFlagg,
             callback: callback
            },
            success: function (result, request) {
@@ -241,7 +241,7 @@ function classerNPAI(annuleFlag, callback) {
            }
          });
 }
-function exportInbox(){
+function exportInbox() {
 
     IdInbox = myApp.getIdInbox();    
     idField = myApp.addTab_inside();
@@ -277,8 +277,10 @@ function exportInboxNpai(npaiOrAdr, fileType, callback) {
     post(urlData, {array: idField, sFieldValue: sFieldValue, sFieldName: sFieldName, type: npaiOrAdr, ext: fileType, IdInbox: IdInbox, callback: callback});
 }
 
-function explicationStatut(appUid){
+function explicationStatut(appUid, callback) {
 
+    if (!callback)
+        callback = '';
     idField = myApp.addTab_inside();                    
     urlData = "../convergenceList/actions/explicationStatut.php";
     
@@ -294,7 +296,9 @@ function explicationStatut(appUid){
     Ext.Ajax.request({
            url : urlData,
            params : {
-             array  : idField
+             array: idField,
+             callback: callback,
+             app_uid: appUid
            },
            success: function (result, request) {
              var response = Ext.util.JSON.decode(result.responseText);
@@ -942,6 +946,72 @@ function Forcerlademande(){
            }
          });
 }
+
+function cancelVoucher() {
+    changed = changeEtatStatutConfirm('Etes-vous sur de vouloir annuler ce bon de réduction ?', 11, function(){
+        idField = myApp.addTab_inside();
+        urlData = "../convergenceList/actions/cancelVoucher.php?array=" + idField + "&statut=" + statut;
+        Ext.MessageBox.show({
+            msg: 'Mise à jour des données, veuillez patienter...',
+            progressText: 'En cours...',
+            width: 300,
+            wait: true,
+            waitConfig: {
+                interval: 200
+            }
+        });
+        Ext.Ajax.request({
+            url: urlData,
+            params: {
+                array: idField,
+                statut: statut
+            },
+            success: function(result, request) {
+                var response = Ext.util.JSON.decode(result.responseText);
+                if (response.success) {
+                    Ext.MessageBox.hide();
+                    alert(response.messageinfo);
+                    Ext.MessageBox.show({
+                        msg: response.messageinfo,
+                        progressText: 'En cours...',
+                        width: 300,
+                        wait: true,
+                        waitConfig: {
+                            interval: 200
+                        }
+                    });
+                }
+                else {
+                    Ext.MessageBox.hide();
+                    PMExt.warning(_('ID_WARNING'), response.message);
+                }
+                Ext.getCmp('gridNewTab').store.reload();
+            },
+            failure: function(result, request) {
+                Ext.MessageBox.hide();
+                Ext.getCmp('gridNewTab').store.reload();
+            }
+        });
+    });
+}
+
+function changeEtatStatutConfirm(message, statut, callback) {
+    Ext.MessageBox.show({
+        title:'Confirmation',
+        msg: message,
+        width:300,
+        buttons:Ext.MessageBox.YESNO,
+        fn:function(btn) {
+            if(btn == 'yes') {
+                changeEtatStatut(statut);
+                if(callback) {
+                    callback();
+                }
+            }
+        }
+    });
+}
+
 function changeEtatStatut(statut) {
 
     idField = myApp.addTab_inside();
@@ -980,13 +1050,12 @@ function changeEtatStatut(statut) {
     });
 }
 
-function Voirlecourrier(){
+function Voirlecourrier(doc_uid_list) {
 
     /*Gary: I added this this was not working*/
-    
     idField = myApp.addTab_inside();                    
     urlData = "../convergenceList/actions/exportCourrier.php";    
-    post(urlData, {idFile : idField});
+    post(urlData, {idFile: idField, doc_uid_list: doc_uid_list});
     
     /*
     idField = myApp.addTab_inside();              
@@ -1196,6 +1265,7 @@ function VoirLesDemandesProd(app_uid){
                 
             },
             dataIndex : 'NUM_DOSSIER_COMPLEMENT',
+
             hidden: false
         };        
         _dmdProdColumns.push(column);
@@ -1666,7 +1736,7 @@ function ActioncreateNewCase(uidForm)
 
 function actionModifyAdresse(uidForm, app_uid)
 {               
-    urlData = "../convergenceList/actions/actionModifyAdresse?task=" + uidForm + "&uid=" + app_uid;
+        urlData = "../convergenceList/actions/actionModifyAdresse?task=" + uidForm + "&uid=" + app_uid;
         var adaptiveHeight = getDocHeight() - 50;
         
         var win2 = new Ext.Window({
@@ -2502,7 +2572,7 @@ function importCSV (_uidTask){
                             }
                    
                             var storeMatchData = new Ext.data.JsonStore({
-                                url           : pathPluginActionsPhp + '?option=getDataMatch&' + '&tableName=' + table +'&idInbox=' +_dblIdInbox,
+                                url           : pathPluginActionsPhp + '?option=getDataMatch&' + '&tableName=' + table +'&idInbox=' +_dblIdInbox +'&firstLineHeader=' +_isCheckedFirstLineAs,
                                 root          : 'data',
                                 totalProperty : 'total', 
                                 remoteSort    : true,
@@ -2513,7 +2583,7 @@ function importCSV (_uidTask){
                             Ext.Ajax.request({
                               url: pathPluginActionsPhp,
                               method: "POST",
-                              params: {'option': 'getDataMatch', 'tableName': table, 'idInbox' : _dblIdInbox },           
+                              params: {'option': 'getDataMatch', 'tableName': table, 'idInbox' : _dblIdInbox ,'firstLineHeader' : _isCheckedFirstLineAs },
                               success:function (result, request) {
                                 var resp = Ext.util.JSON.decode(result.responseText);
                                 if(typeof(resp.success)!= 'undefined' && resp.success === true){
@@ -2597,7 +2667,18 @@ function importCSV (_uidTask){
                                     fields: ["ID", "NAME"],
                                     data: [["String", "Chaine"],
                                         ["Integer", "Entier"],
-                                        ["Date", "Date"],
+                                                ["Ymd", "Date AAAAMMJJ"],
+                                                ["Y.m.d", "Date AAAA.MM.JJ"],
+                                                ["Y-m-d", "Date AAAA-MM-JJ"],
+                                                ["dmY", "Date JJMMAAAA"],
+                                                ["d.m.Y", "Date JJ.MM.AAAA"],
+                                                ["d-m-Y", "Date JJ-MM-AAAA"],
+                                                ["ymd", "Date AAMMJJ"],
+                                                ["y.m.d", "Date AA.MM.JJ"],
+                                                ["y-m-d", "Date AA-MM-JJ"],
+                                                ["dmy", "Date JJMMAA"],
+                                                ["d.m.y", "Date JJ.MM.AA"],
+                                                ["d-m-y", "Date JJ-MM-AA"],
                                         ["Decimal", "Décimal"],
                                         ["mail", "E-mail"],
                                         ["Telephone", "Téléphone"],
@@ -2715,7 +2796,8 @@ function importCSV (_uidTask){
                                                 option      : 'importCreateCase',
                                                 firstLineHeader : _isCheckedFirstLineAs,
                                                 radioOption : _isCheckedOption,
-                                                dataEditDelete : _jsonFieldsDeleteEdit
+                                                dataEditDelete : _jsonFieldsDeleteEdit,
+                                                idInbox     : _dblIdInbox
                                             },
                                             url : pathPluginActionsPhp,
                                             success : function(result, request) {
@@ -4367,7 +4449,7 @@ function actionAddComment(app_uid) {
         name: 'caseNoteText',
         width: 400,
         grow: false,
-        height: 250,
+        height: 200,
         growMin: 40,
         growMax: 80,
         maxLengthText: 500,
@@ -4385,9 +4467,9 @@ function actionAddComment(app_uid) {
     var w = new Ext.Window(
    {
         title: 'Ajouter votre commentaire pour ce dossier',
-        bodyStyle: 'padding: 10px; background-color: #F7D358',
-        width: 650,
-        height: 400,
+        bodyStyle: 'background-color: #f2f2f2',
+        width: 600,
+        height: 310,
         modal: true,
         autoScroll: true,
         maximizable: true,
@@ -4443,8 +4525,9 @@ function actionAddComment(app_uid) {
                                 var response = Ext.util.JSON.decode(result.responseText);
                         if (response.success)
                         {
+                            //textField1.reset();
                             Ext.MessageBox.hide();
-                            w.hide();
+                            w.close();
 
                                 }
                                 else {
@@ -4455,6 +4538,7 @@ function actionAddComment(app_uid) {
                             },
                     failure: function(result, request)
                     {
+                        //textField1.reset();
                                 Ext.MessageBox.hide();
                             }
                         });
@@ -4682,4 +4766,201 @@ function listeChequierDemande(num_dossier)
     winTitre.show();
     //winTitre.maximize();
     winTitre.toFront();
+}
+
+function listeCarteProduite(app_uid)
+{
+    var adaptiveHeight = getDocHeight() - 50;
+
+    var _dblColumns = new Array();
+    var _dblFields = new Array();
+    var storeCarte;
+    var _CLOSE = 'Fermer';
+    var _NO_PROD = 'Aucune carte produite';
+    var _WINTITLE_DOUBLON = "Liste des cartes produites";
+
+    column = {id: 'DMDAPPUID', header: 'demande ID', width: 20, dataIndex: 'DMDAPPUID', hidden: true};
+    _dblColumns.push(column);
+    _dblFields.push({name: 'DMDAPPUID'});
+
+    /*
+     column = {id: 'UID', header: '#', width: 20, dataIndex: 'UID', hidden: true};
+     _dblColumns.push(column);
+     _dblFields.push({name: 'APP_UID'});
+     */
+
+    column = {
+        id: 'PORT_ID',
+        header: 'N&deg; Porteur Id',
+        width: 120,
+        dataIndex: 'PORT_ID',
+        renderer: function(value, meta, record) {
+            var dmdID = record.data.DMDAPPUID;
+            if (value != null)
+                return '<a href="#" onclick="viewForms(\'' + dmdID + '\',1)">' + value + '</a>';
+            else
+                return '';
+        },
+        hidden: false
+    };
+    _dblColumns.push(column);
+    _dblFields.push({name: 'PORT_ID'});
+
+    column = {
+        id: 'CARTE_NUM',
+        header: 'N&deg; de carte',
+        width: 120, //30,req
+        dataIndex: 'CARTE_NUM'
+
+    };
+    _dblColumns.push(column);
+    _dblFields.push({name: 'CARTE_NUM'});
+
+    column = {
+        id: 'NOM',
+        header: 'Nom',
+        width: 120, //30,req
+        dataIndex: 'NOM'
+
+    };
+    _dblColumns.push(column);
+    _dblFields.push({name: 'NOM'});
+
+    column = {
+        id: 'PRENOM',
+        header: 'Pr&eacute;nom',
+        width: 120,
+        dataIndex: 'PRENOM'
+    };
+    _dblColumns.push(column);
+    _dblFields.push({name: 'PRENOM'});
+
+    column = {
+        id: 'CARTE_STATUT',
+        header: 'Statut',
+        width: 120, //30,req
+        dataIndex: 'CARTE_STATUT'
+
+    };
+    _dblColumns.push(column);
+    _dblFields.push({name: 'CARTE_STATUT'});
+
+    column = {
+        id: 'CARTE_TYPE',
+        header: 'Type de carte',
+        width: 120, //30,req
+        dataIndex: 'CARTE_TYPE'
+
+    };
+    _dblColumns.push(column);
+    _dblFields.push({name: 'CARTE_TYPE'});
+
+    column = {
+        id: 'PND',
+        header: 'NPAI ?',
+        width: 100,
+        renderer: function(value) {
+
+            if (value == 1)
+                value = 'Oui';
+            else
+                value = 'Non'
+
+            return value;
+        },
+        dataIndex: 'PND'
+
+    };
+    _dblColumns.push(column);
+    _dblFields.push({name: 'PND'});
+
+    storeCarte = new Ext.data.JsonStore({
+        url: '../convergenceList/actions/listeCarte.php?app_uid=' + app_uid,
+        root: 'data',
+        totalProperty: 'total',
+        autoWidth: true,
+        fields: _dblFields
+    });
+    storeCarte.load();
+
+    var cmCarte = new Ext.grid.ColumnModel({
+        defaults: {
+            width: 20,
+            sortable: true
+        },
+        columns: _dblColumns
+    });
+    cmCarte.defaultSortable = true;
+
+    var gridCarte = new Ext.grid.GridPanel({
+        store: storeCarte,
+        cm: cmCarte,
+        stripeRows: true,
+        columnLines: true,
+        autoScroll: true,
+        autoWidth: true,
+        stateful: true,
+        id: 'gridCarte',
+        layout: 'fit',
+        viewConfig: {
+            forceFit: false,
+            emptyText: (_('NO_PROD'))
+        },
+        /*bbar: new Ext.PagingToolbar({
+         pageSize: 300,
+         store: storeCarte,
+         displayInfo: true,
+         displayMsg: _('ID_DISPLAY_ITEMS') + ' &nbsp; ',
+         emptyMsg: _('ID_DISPLAY_EMPTY')
+         }),*/
+        listeners: {
+            render: function(grid) {
+
+            },
+            afterrender: function() {
+
+            },
+            cellcontextmenu: function(grid, rowIndex, cellIndex, event) {
+
+
+            }
+        },
+        tbar: [{
+                text: _CLOSE,
+                iconCls: 'button_menu_ext ss_sprite ss_accept',
+                handler: function() {
+                    winTitre.close();
+                }
+            }]
+    });
+    ///////////// end grid
+    winTitre = new Ext.Window({
+        closeAction: 'hide',
+        autoDestroy: true,
+        maximizable: true,
+        id: 'winDoublon',
+        title: _WINTITLE_DOUBLON,
+        width: 900,
+        height: 400,
+        modal: true,
+        closable: true,
+        constrain: true,
+        autoScroll: true,
+        layout: 'fit',
+        items: gridCarte
+    });
+
+    winTitre.show();
+    //winTitre.maximize();
+    winTitre.toFront();
+}
+
+function message(mess)
+{   
+    Ext.Msg.alert('Confirmed', mess, function(btn, text){
+        if (btn == 'ok'){
+            Ext.getCmp('win2').hide();
+        }
+    });
+    
 }

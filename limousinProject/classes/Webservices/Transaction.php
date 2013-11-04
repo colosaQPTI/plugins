@@ -17,11 +17,11 @@ class Transaction extends Webservices {
 		
 		// GET Bouchon
 		//$bouchonFileName = dirname(__FILE__).'/bouchonVersementFailure.txt';
-		$bouchonFileName = dirname(__FILE__).'/bouchonVersementSuccess.txt';
-        $handle = fopen($bouchonFileName, "r");
-		while (!feof($handle)) { 
-			$this->bouchonWs .= fgets($handle, 4096); 
-		}
+		// $bouchonFileName = dirname(__FILE__).'/bouchonVersementSuccess.txt';
+        // $handle = fopen($bouchonFileName, "r");
+		// while (!feof($handle)) { 
+			// $this->bouchonWs .= fgets($handle, 4096); 
+		// }
 		
 	} 
     
@@ -38,9 +38,10 @@ class Transaction extends Webservices {
       
 		// CALL Ws
 		$res = $this->_call();		        
-		
-		// RETURN
-		return $res->status->success;
+		//var_dump($res->status->success);
+        //die;
+        // RETURN
+        return $res->status->success;
 
     } 
 	

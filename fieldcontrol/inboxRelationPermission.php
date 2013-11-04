@@ -38,7 +38,8 @@ $oHeadPublisher->assign('rolID', $rolID);
 $oHeadPublisher->assign('ROLES', $roles);
 
 $oHeadPublisher->assign('SW_INBOX', $swInbox);
-
+$language = SYS_LANG;
+$oHeadPublisher->assign('language', $language);
 $oHeadPublisher->addExtJsScript('fieldcontrol/inboxRelationPermission', false);    //adding a javascript file .js
 
 G::RenderPage('publish', 'extJs');

@@ -41,256 +41,157 @@ var ID_INBOX;
 
 
 Ext.onReady(function(){
-  Ext.QuickTips.init();
+       
+	var lanRemInbox = 'Remove relation Inbox';
+	var lanActions = 'Actions'
+	var lanWhereQuery = 'Where Query';
+	var lanSave ="Save";
+	var lanCancel ="Cancel";
+	var lanDisplaying = 'Displaying {0} - {1} of {2}';
+	var lanDisplayInbox = 'No Inbox to show';
+	var lanRelInbox = 'Relation Inbox Group';
+	var lanSelectPlease = 'Select Items please';
+	var lanMsgOperation = 'The operation completed sucessfully!';
+	var lanMsgOpError = 'The operation was not completed sucessfully!';
+	var lanCustomColEmpty = 'There are no actions to display';
+	var lanCustomColAddParam = 'Add Parameter';
+	var lanActionNewInbox = 'New actions of inbox';
+	var lanActionParamSent = 'Parameters sent function';
+	var lanActionParamSent2 = 'Parameters Sent of Function';
+	var ActionAdd = 'Add actions of inbox';
+	var ActionAdd2 = 'Add Actions to Inbox';
+	var CustomColEmpty2 = 'No actions to display';
+	
+	
+	var lanMsgSave = "The data was saved sucessfully!";
+	var lanNewAction ="New Action of Inbox";
+	var lanParamHas = "The function has no parameters";
+	var lanEditAction = 'Edit Actions of Inbox';
+	var lanEditAction2 = 'Edit actions to Inbox';
+	
+	
+	var lanRemAction = 'Edit Actions of Inbox';
+	var lanMsgRemove = "The data was removed sucessfully!";
+	var lanSelectVendor ="You must select a Vendor to Remove.";
+	var lanSorry ="Sorry...";
+	var lanEnabledShow ="Enabled show inbox";
+	var lanMsgConfirm= "Do you want to remove this relation inbox? ";
+	var ActionRemove = 'Remove actions to inbox';
+	var ActionSave = 'Save actions';
+	
+	
+	
+	// Variables for language
+	var CustomColumnsTitle = 'Custom Columns';
+	var CustomColumnsNew = 'New Select Query';
+	var CustomColumnsEdit = 'Edit Select Query';
+	var CustomColumnsRemove = 'Remove Select Query';
+	var CustomColAdd = 'Add Select Query';
+	var CustomColParameters = 'Parameters Select';
+	
+	
+	
+	
+	
+	var Action = 'Actions';
+	var ActionEdit = 'Edit actions to inbox';
+	
+	var ActionFields = 'By fields';
+	
+	
+	var ActionAddInbox = 'Add actions of inbox';
+	
 
-  pageSize = parseInt(10);
+	
+	var ActionRemInbox = 'Remove actions of inbox';
+	var ActionEditInbox ="Edit Actions of Inbox";
+	var ActionInboxTitle="Action Inbox";
+	
 
-  deleteButton = new Ext.Action({
-        text     : 'Remove Relation Inbox',
-        iconCls  : 'button_menu_ext ss_sprite  ss_delete',
-        handler  : DeleteButtonAction,
-        disabled : true
-    });
+	var MsgSelectItem='Select Items please';
+	var lanSaveConditions='Save Conditions';
 
-  
-  ActionButton = new Ext.Action({
-      text     : 'Actions',
-      iconCls  : 'button_menu_ext ss_sprite  ss_action',
-      tooltip  : 'Management actions that will have the inbox',
-      handler  : Fn_LoadActionsInbox,
-      disabled : true
-  });
-
-  whereButton = new Ext.Action({
-      text     : 'Where Query',
-      iconCls  : 'button_menu_ext ss_sprite  ss_action',
-      tooltip  : 'Add the where statements to the general query',
-      handler  : Fn_LoadWhereInbox,
-      disabled : true
-  });
-  
-  saveButton = new Ext.Action({
-      text     : 'Save',
-      iconCls  : 'button_menu_ext ss_sprite  ss_save', 
-      tooltip  : 'Add drag and drop',
-      handler  : Fn_SaveDragAndDrop,
-      disabled : false
-  });
-  
-  var sw_checked = true;
-  
-  if(SW_INBOX == 1)
-  	sw_checked = true;
-  else
-  	sw_checked = false;
-  
-  var checkboxTool = {
-                    xtype: 'checkbox',
-                    name: 'enabled_inbox_rol',
-                    boxLabel: 'Enabled Show Inbox',
-                    id : 'enabled_inbox_rol',
-                    checked: sw_checked
-                    };
-    	
+	var lanActionRemTitle ='Remove Select Query of Inbox';
+	var lanActionDelPar = "Delete Parameter";
+	
+	
+	if(language == 'fr')
+	{
+	        lanRemInbox = 'Supprimer relation Inbox';
+		lanActions = 'Actions';
+		lanWhereQuery = 'Where Query';
+		lanSave="Sauver";
+		lanCancel ="Annuler";
+		lanDisplaying = 'Affichage {0} - {1} sur {2}';
+		lanDisplayInbox="Aucune Inbox pour montrer";
+		lanRelInbox = 'Relation Inbox Groupe';
+		lanSelectPlease = 'Sélectionnez \u00E9l\u00E9ments veuillez';
+		lanMsgOperation="L'op\u00E9ration s'est termin\u00E9e avec succ\u00E8s!";
+	        lanMsgOpError="L'op\u00E9ration n'a pas été compl\u00E9t\u00E9e avec succ\u00E8s!";
+		lanCustomColEmpty = "Il n'y a aucune action \u00E0 afficher";
+		lanCustomColAddParam = 'Ajouter un param\u00E8tre';
+		lanActionNewInbox = "Nouvelle action de inbox";
+		lanActionParamSent = "Param\u00E8tres envoy\u00E9s fonction";
+		lanActionParamSent2 = "Param\u00E8tres envoy\u00E9s de la fonction";
+		ActionAdd= "Ajouter actions de Inbox";
+		ActionAdd2="Ajouter actions au Inbox";
+		lanMsgSave="Les donn\u00E9es ont \u00E9t\u00E9 enregistr\u00E9es avec succ\u00E8s!";
+		lanNewAction ="Nouvelle action de Inbox";
+		lanParamHas = "La fonction n'a pas de param\u00E8tres";
+		lanEditAction = 'Editer Actions de Inbox';
+		lanEditAction2 = 'Editer actions au Inbox';
+		lanRemAction = 'Supprimer Actions de Inbox';
+		lanMsgRemove="Les donn\u00E9es ont \u00E9t\u00E9 supprim\u00E9es avec succ\u00E8s!";
+		lanSelectVendor ="Vous devez s\u00E9lectionner un fournisseur pour le retirer.";
+	        lanSorry="D\u00E9sol\u00E9...";
+	        lanEnabledShow ="Show Enabled inbox";
+		lanMsgConfirm= "Voulez-vous supprimer ce relation inbox? ";
+	        ActionRemove= "Supprimer actions au Inbox";
+	        ActionSave= "Sauver actions";
+	        CustomColEmpty2 = 'Aucune action \u00E0 afficher';
+	    
+		CustomName = 'Colonne Personnalis\u00E9e';
+		titleGrid = 'Inbox Liste des Colonnes:';
+		select = 'S\u00E9lectionner';
+		CustomColumnsTitle= 'Colonnes personnalis\u00E9es';
+		CustomColumnsNew= 'Nouveau Select Query';
+		CustomColumnsEdit= 'Edition Select Query';
+		CustomColumnsRemove= 'Supprimer Select Query';
+	        CustomColAdd = 'Ajouter Select Query';
+		CustomColParameters = 'Param\u00E8tres Select';
+		
+		
+		
+		
+		ActionEdit = "Editer actions de Inbox";
+		
+		
+		ActionFields = "Par champs";
+		
+		
+		ActionAddInbox="Ajouter action de inbox";
+		
+		
+		ActionRemInbox= "Supprimer action de inbox";
+		
+		ActionEditInbox ="Editer actions de Inbox";
+		ActionInboxTitle ="Action Inbox";
+		
+		
+		MsgSelectItem="S\u00E9lectionnez les Articles veuillez";
+		lanSaveConditions ="Sauver conditions";
+		
+		lanActionRemTitle = "Supprimer Select Query de Inbox";
+		lanActionDelPar = "Supprimer Param\u00E8tre";
+		
+	}
     
-    contextMenu = new Ext.menu.Menu({
-        items : [deleteButton,'-',ActionButton,'-',saveButton]
-    });
     
-  smodel = new Ext.grid.RowSelectionModel({
-    singleSelect : true,
-    listeners    :{
-      rowselect: function(sm){        
-        deleteButton.enable();
-        ActionButton.enable();
-        whereButton.enable();
-      },
-      rowdeselect: function(sm){        
-        deleteButton.disable();
-        ActionButton.disable();
-        whereButton.disable();
-      }
-    }
-  });
-
- 
-  store = new Ext.data.GroupingStore( {
-	    proxy       : new Ext.data.HttpProxy({
-	      url       : 'inboxRelation_Ajax?action=RelationList&rolID='+rolID
-	    }),
-	    reader : new Ext.data.JsonReader( {
-	      root: 'data',
-	      fields : [
-	                {name : 'ID'},
-	                {name : 'ID_INBOX'},
-	                {name : 'INBOX_DESCRIPTION'}
-	                ]
-	    })
-	  });
-  
- 
-
-  cmodel = new Ext.grid.ColumnModel({
-    defaults: {
-      width: 50,
-      sortable: true
-    },
-    viewConfig: {
-      cls:"x-grid-empty",
-      emptyText: (TRANSLATIONS.ID_NO_RECORDS_FOUND)
-    }
-    ,
-    columns: [
-              {id:'ID', dataIndex: 'ID', hidden:true, hideable:false},
-              {header: 'INBOX', dataIndex: 'ID_INBOX', width: 90, align:'left'},
-              {header: 'DESCRIPTION', dataIndex: 'INBOX_DESCRIPTION', width: 175, align:'left'}
-              ]
-  });
-
-  storePageSize = new Ext.data.SimpleStore({
-    fields   : ['size'],
-    data     : [['20'],['30'],['40'],['50'],['100']],
-    autoLoad : true
-  });
-
-  comboPageSize = new Ext.form.ComboBox({
-    typeAhead     : false,
-    mode          : 'local',
-    triggerAction : 'all',
-    store         : storePageSize,
-    valueField    : 'size',
-    displayField  : 'size',
-    width         : 50,
-    editable      : false,
-    listeners     :{
-      select: function(c,d,i){
-        UpdatePageConfig(d.data['size']);
-        bbarpaging.pageSize = parseInt(d.data['size']);
-        bbarpaging.moveFirst();
-      }
-    }
-  });
-
-  comboPageSize.setValue(pageSize);
-
-  bbarpaging = new Ext.PagingToolbar({
-      store       : store, // <--grid and PagingToolbar using same store (required)
-      displayInfo : true,
-      autoHeight  : true,
-      displayMsg  : 'Displaying Inbox {0} - {1} Of {2}',
-      emptyMsg    : 'No Inbox to show',
-      pageSize    : pageSize,
-      items       : ['-',_('ID_PAGE_SIZE')+':',comboPageSize]
-  }); 
-
-  infoGrid = new Ext.grid.GridPanel({
-    region             : 'center',
-    layout             : 'fit',
-    id                 : 'infoGrid',
-    ddGroup		   	   :'gridDD',
-	enableDragDrop 	   : true,
-    height             : 100,
-    autoWidth          : true,
-    stateful           : true,
-    stateId            : 'grid',
-    enableColumnResize : true,
-    enableHdMenu       : true,
-    frame              : false,
-    columnLines        : false,
-    viewConfig         : {
-      forceFit :true
-    },
-    title     : 'Relation Inbox Group',
-    store     : store,
-    cm        : cmodel,
-    sm        : smodel,
-    tbar      : [deleteButton,'-',ActionButton,  '-',saveButton,'-',checkboxTool],
-    bbar      : bbarpaging,
-    listeners : {
-    	"render": {
-  		scope: this,
-  		fn: function(grid) {
-			var ddrow = new Ext.dd.DropTarget(grid.container, {
-				ddGroup : 'gridDD',
-				copy:false,
-				notifyDrop : function(dd, e, data){
-					var ds = grid.store;
-					var sm = infoGrid.getSelectionModel();
-                    var rows = sm.getSelections();
-                    if(dd.getDragData(e)) {
-                    	var cindex=dd.getDragData(e).rowIndex;
-                        if(typeof(cindex) != "undefined") {
-                        	for(i = 0; i <  rows.length; i++) {
-                        		ds.remove(ds.getById(rows[i].id));
-                            }
-                            ds.insert(cindex,data.selections);
-                            sm.clearSelections();
-                         }
-                    }
-				}
-         }) 
-		//store.load();
-      }
-   }
-    },
-    view: new Ext.grid.GroupingView({
-      forceFit     :true,
-      groupTextTpl : '{text}'
-    })
-  });
-
-  infoGrid.on('rowcontextmenu',
-      function (grid, rowIndex, evt) {
-    var sm = grid.getSelectionModel();
-    sm.selectRow(rowIndex, sm.isSelected(rowIndex));
-  },
-  this
-  );
-
-  infoGrid.on('contextmenu', function(evt){evt.preventDefault();}, this);
-  infoGrid.addListener('rowcontextmenu',onMessageContextMenu, this);
-  infoGrid.store.load();
-
-//back roles
-	BackToRoles = function(){
-		location.href = 'groupsRoles';
-	}; 
-	
-	backButton = new Ext.Action({
-		text: _('ID_BACK'),
-		iconCls: 'button_menu_ext ss_sprite ss_arrow_redo',
-		handler: BackToRoles
-	});
-	
-	northPanel = new Ext.Panel({
-		region: 'north',
-		xtype: 'panel',
-		tbar: ['<b>'+_('ID_ROLE') + ' : ' + rolID +'</b>',{xtype: 'tbfill'},backButton]
-	});
-  
-	var inboxPanel = new Ext.Panel({
-		auotWidth    : true,
-		height       : 550,
-		layout       : 'fit',
-		autoScroll	 : true,
-		items        : [
-		       infoGrid
-		]
-	});
-	
-	tabsPanelInbox = new Ext.Panel({
-     	region: 'center',
-  	activeTab: 0,
-  	items:[inboxPanel]
-  });
-	
-	var viewport = new Ext.Viewport({
-		layout : 'border',
-		items  : [northPanel, tabsPanelInbox]
-	});
-
-});
-
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    
 //Funtion Handles Context Menu Opening
 onMessageContextMenu = function (grid, rowIndex, e) {
   e.stopEvent();
@@ -326,7 +227,7 @@ onMessageContextMenu = function (grid, rowIndex, e) {
 		}
 		else
 		{
-			alert('Select Items please');
+			alert(lanSelectPlease);
 		}
 	}
 
@@ -351,10 +252,10 @@ onMessageContextMenu = function (grid, rowIndex, e) {
 	        success: function(r,o){
 	          		Ext.MessageBox.hide();
 	          	          
-	          PMExt.notify("Drag And Drop","The operation completed succesfully!");
+	          PMExt.notify("Drag And Drop",lanMsgOperation);
 	        },
 	        failure: function(){
-	        	Ext.MessageBox.alert('Error','The operation was not completed sucessfully!');
+	        	Ext.MessageBox.alert('Error',lanMsgOpError);
 	        	Ext.MessageBox.hide();
 	        }
 	      });
@@ -407,10 +308,10 @@ function Fn_LoadActionsInbox(){
 				viewConfig : {
 		          forceFit : true,
 		          scrollOffset : 0,
-		          emptyText: 'There are no actions to display'
+		          emptyText: lanCustomColEmpty
 		       },
 				tbar : [{
-						text: 'Add Parameter',
+						text: lanCustomColAddParam,
 						cls : 'x-btn-text-icon',
 						icon : '/images/ext/default/tree/drop-add.gif',
 						handler: function(){
@@ -435,7 +336,7 @@ function Fn_LoadActionsInbox(){
 			  	
 					var add_ActionInbox_popup_field =  new Ext.form.ComboBox({
 			        id : 'add_ActionInbox_popup_field',
-			        fieldLabel: 'New Action of Inbox',
+			        fieldLabel: lanActionNewInbox,
 			        name: 'ACTION_ID',
 			        maxLength: 45,
 					allowBlank: false,
@@ -470,7 +371,7 @@ function Fn_LoadActionsInbox(){
 				items: [add_ActionInbox_popup_field,
 						    {
 							id : 'idParameters',
-							title : 'Parameters Sent Function',
+							title : lanActionParamSent,
 							xtype : 'fieldset',
 							checkboxToggle : true,
 							autoHeight : true,
@@ -487,7 +388,7 @@ function Fn_LoadActionsInbox(){
 								items : [  {                                                                                              
 						            xtype: 'textfield',
 						            id:'helpparametersfield', 
-						        	fieldLabel: "Parameters Sent of Function", 
+						        	fieldLabel: lanActionParamSent2, 
 						        	name: 'helpparams', 
 						        	width: 150,
 						        	height: 50,
@@ -499,7 +400,7 @@ function Fn_LoadActionsInbox(){
 					} ,  {                                                                                              
 				            xtype: 'textarea',
 				            id:'parametersfield', 
-				        	  fieldLabel: "Parameters Sent Function", 
+				        	  fieldLabel: lanActionParamSent, 
 				        	  name: 'parameters', 
 				        	  width: 250, 
 				        	  allowBlank: true,
@@ -510,7 +411,7 @@ function Fn_LoadActionsInbox(){
 				});		
 				
 				add_ActionInbox_popup_window = new Ext.Window({
-				title: 'Add Actions of Inbox',
+				title: ActionAdd,
 				id:'add_ActionInbox_popup_window',
 				width: 380,
 				autoHeight: true,
@@ -522,7 +423,7 @@ function Fn_LoadActionsInbox(){
 				layout: 'form',
 				items: [add_ActionInbox_popup_form],
 				buttons: [{
-		            text: 'Save',
+		            text: lanSave,
 		            type: 'submit',
 		            scope: this,
 		            handler: function() {   
@@ -547,7 +448,7 @@ function Fn_LoadActionsInbox(){
 		                        var data = Ext.decode(a.response.responseText);                        
 		                        if(data.success == true){ 
 		                          Ext.MessageBox.show({                            
-		                            msg : 'The data was saved sucessfully!',
+		                            msg : lanMsgSave,
 		                            buttons : Ext.MessageBox.OK,
 		                            icon : Ext.MessageBox.INFO
 		                          });
@@ -561,7 +462,7 @@ function Fn_LoadActionsInbox(){
 		                })
 		            }
 		        },{
-		            text: 'Cancel',            
+		            text: lanCancel,            
 		            handler: function (){                
 		                Ext.getCmp('add_ActionInbox_popup_window').close();
 		            }
@@ -591,7 +492,7 @@ function Fn_LoadActionsInbox(){
 			  
 					var edit_ActionInbox_popup_field =  new Ext.form.ComboBox({
 			        id : 'comboEditAction',
-			        fieldLabel: 'New Action of Inbox',
+			        fieldLabel: lanNewAction,
 			        name: 'ACTION_ID',
 			        maxLength: 45,
 					allowBlank: false,
@@ -611,7 +512,7 @@ function Fn_LoadActionsInbox(){
 								Ext.getCmp('helpId').setValue(parameters);
 							}
 							else
-								Ext.getCmp('helpId').setValue('The function has no parameters');
+								Ext.getCmp('helpId').setValue(lanParamHas);
 				       }
 		        	}
 			        	
@@ -655,10 +556,10 @@ function Fn_LoadActionsInbox(){
 						viewConfig : {
 				          forceFit : true,
 				          scrollOffset : 0,
-				          emptyText: 'There are no actions to display'
+				          emptyText: lanCustomColEmpty
 				       },
 						tbar : [{
-								text: 'Add Parameter',
+								text: lanCustomColAddParam,
 								cls : 'x-btn-text-icon',
 								icon : '/images/ext/default/tree/drop-add.gif',
 								handler: function(){
@@ -674,7 +575,7 @@ function Fn_LoadActionsInbox(){
 				items: [edit_ActionInbox_popup_field,
 						    {
 							id : 'idParameters',
-							title : 'Parameters Sent Function',
+							title : lanActionParamSent,
 							xtype : 'fieldset',
 							checkboxToggle : true,
 							autoHeight : true,
@@ -691,7 +592,7 @@ function Fn_LoadActionsInbox(){
 								items : [  {                                                                                              
 						            xtype: 'textfield',
 						            id:'helpId', 
-						        	fieldLabel: "Parameters Sent of Function", 
+						        	fieldLabel: lanActionParamSent2, 
 						        	name: 'helpparams', 
 						        	width: 150,
 						        	height: 50,
@@ -703,7 +604,7 @@ function Fn_LoadActionsInbox(){
 					} ,  {                                                                                              
 				            xtype: 'textarea',
 				            id:'parametersfield', 
-				        	  fieldLabel: "Parameters Sent Function", 
+				        	  fieldLabel: lanActionParamSent, 
 				        	  name: 'parameters', 
 				        	  width: 250, 
 				        	  allowBlank: true,
@@ -714,7 +615,7 @@ function Fn_LoadActionsInbox(){
 				});		
 				
 				edit_ActionInbox_popup_window = new Ext.Window({
-				title: 'Edit Actions of Inbox',
+				title: lanEditAction,
 				id:'edit_ActionInbox_popup_window',
 				width: 380,
 				autoHeight: true,
@@ -726,7 +627,7 @@ function Fn_LoadActionsInbox(){
 				layout: 'form',
 				items: [edit_ActionInbox_popup_form],
 				buttons: [{
-		            text: 'Save',
+		            text: lanSave,
 		            type: 'submit',
 		            scope: this,
 		            handler: function() {   
@@ -755,7 +656,7 @@ function Fn_LoadActionsInbox(){
 	                        var data = Ext.decode(a.response.responseText);                        
 	                        if(data.success == true){ 
 	                          Ext.MessageBox.show({                            
-	                            msg : 'The data was saved sucessfully!',
+	                            msg : lanMsgSave,
 	                            buttons : Ext.MessageBox.OK,
 	                            icon : Ext.MessageBox.INFO
 	                          });
@@ -769,7 +670,7 @@ function Fn_LoadActionsInbox(){
 	                })
 		            }
 		        },{
-		            text: 'Cancel',            
+		            text: lanCancel,            
 		            handler: function (){                
 		                Ext.getCmp('edit_ActionInbox_popup_window').close();
 		            }
@@ -813,9 +714,9 @@ function Fn_LoadActionsInbox(){
 		            if (sm.hasSelection()) {
 		            	
 		            	  Ext.Msg.show({
-				                title : 'Remove Action of Inbox',
+				                title : lanRemAction,
 				                buttons : Ext.MessageBox.YESNOCANCEL,
-				                msg : 'Remove Action of Inbox : ' + rowModel.data.NAME + ' ?',
+				                msg : lanRemAction+' : ' + rowModel.data.NAME + ' ?',
 				                fn : function(btn) {
 				                  if (btn == 'yes') {
 				                      var ID = rowModel.data.ID;
@@ -830,7 +731,7 @@ function Fn_LoadActionsInbox(){
 						                        var url = data.success; 
 						                          if (url == true) {
 						                            Ext.MessageBox.show({                            
-							                            msg : 'The data was removed sucessfully!',
+							                            msg : lanMsgRemove,
 							                            buttons : Ext.MessageBox.OK,
 							                            icon : Ext.MessageBox.INFO
 							                         });    
@@ -844,7 +745,7 @@ function Fn_LoadActionsInbox(){
 						                          var url = data.success; 
 						                          if (url == true) {
 						                            Ext.MessageBox.show({                            
-							                            msg : 'The data was removed sucessfully!',
+							                            msg : lanMsgRemove,
 							                            buttons : Ext.MessageBox.OK,
 							                            icon : Ext.MessageBox.INFO
 							                         });    
@@ -864,7 +765,7 @@ function Fn_LoadActionsInbox(){
 			    }
 			
 		}else {
-				Ext.MessageBox.alert('Sorry...','You must select a Vendor to Remove.');
+				Ext.MessageBox.alert(lanSorry,lanSelectVendor);
 			}
 		 }
 	
@@ -913,7 +814,7 @@ function Fn_LoadActionsInbox(){
   			}
   			else
   			{
-  				alert('Select Items please');
+  				alert(lanSelectPlease);
   			}
   		}
   		
@@ -939,13 +840,13 @@ function Fn_LoadActionsInbox(){
 		  		        //var url = data.success; 
 		                //if (url == true) {
 		                    Ext.MessageBox.show({                            
-		                         msg : 'The operation completed sucessfully!',
+		                         msg : lanMsgOperation,
 		                         buttons : Ext.MessageBox.OK,
 		                         icon : Ext.MessageBox.INFO
 		                }); 
   		         },
   		        failure: function(){
-  		        	Ext.MessageBox.alert('Error','The operation was not completed sucessfully!');
+  		        	Ext.MessageBox.alert('Error',lanMsgOpError);
   		        	Ext.MessageBox.hide();
   		        }
   		      });
@@ -990,38 +891,38 @@ function Fn_LoadActionsInbox(){
 				viewConfig 		: {
 		          forceFit 		: true,
 		          scrollOffset 	: 0,
-		          emptyText		: 'There are no actions to display'
+		          emptyText		: lanCustomColEmpty
 		       },
 				bbar			: new Ext.PagingToolbar({
 			          pageSize: 50,
 			          store: ActionInbox_popup_store,
 			          displayInfo: true,
-			          displayMsg: 'Displaying {0} - {1} of {2}',
-			          emptyMsg: "No actions to display"
+			          displayMsg: lanDisplaying,
+			          emptyMsg: CustomColEmpty2
 				}),
 				tbar 			: [{
-						text: 'Add Actions to Inbox',
+						text: ActionAdd2,
 						cls : 'x-btn-text-icon',
 						icon : '/images/ext/default/tree/drop-add.gif',
 						handler: function(){
 									add_ActionInbox_popup();
 							}
 						}, {
-							text: 'Edit Actions to Inbox',
+							text: lanEditAction2,
 							cls : 'x-btn-text-icon',
 							icon : '/images/edit-table.png',
 							handler: function() {
 								edit_ActionInbox_popup();
 					        	}		
 						} , {
-							text: 'Remove Actions to Inbox',
+							text: ActionRemove,
 							cls : 'x-btn-text-icon',
 							icon : '/images/delete-16x16.gif',
 							handler: function(){
 										remove_ActionInbox_popup();
 							}
 						} , {
-							text: 'Save Actions ',
+							text: ActionSave,
 							cls : 'x-btn-text-icon',
 							icon : '/images/ok.png',
 							tooltip  : 'Add drag and drop',
@@ -1238,7 +1139,7 @@ function Fn_LoadWhereInbox(){
 		pageSize: 50,
 		store: WhereInbox_popup_store,
 		displayInfo: true,
-		displayMsg: 'Displaying {0} - {1} of {2}',
+		displayMsg: lanDisplaying,
 		emptyMsg: "No where queries to display"
 		});
 
@@ -1329,7 +1230,7 @@ CloseWindow = function(){
 };
 //Delete Button Action
 DeleteButtonAction = function(){  
-  Ext.Msg.confirm(_('ID_CONFIRM'), "Do you want to remove this relation inbox? ",
+  Ext.Msg.confirm(_('ID_CONFIRM'), lanMsgConfirm,
 
     function(btn, text){
     if (btn=="yes"){
@@ -1375,3 +1276,268 @@ UpdatePageConfig = function(pageSize){
 reloadGrid = function(){
 	Ext.getCmp('infoGrid').getStore().reload();
 }
+    
+    
+    
+    
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////
+    ////////////////////////
+    ////////////////////////
+    
+    
+    
+    
+    
+  Ext.QuickTips.init();
+
+  pageSize = parseInt(10);
+
+  deleteButton = new Ext.Action({
+        text     : lanRemInbox,
+        iconCls  : 'button_menu_ext ss_sprite  ss_delete',
+        handler  : DeleteButtonAction,
+        disabled : true
+    });
+
+  
+  ActionButton = new Ext.Action({
+      text     : lanActions,
+      iconCls  : 'button_menu_ext ss_sprite  ss_action',
+      tooltip  : 'Management actions that will have the inbox',
+      handler  : Fn_LoadActionsInbox,
+      disabled : true
+  });
+
+  whereButton = new Ext.Action({
+      text     : lanWhereQuery,
+      iconCls  : 'button_menu_ext ss_sprite  ss_action',
+      tooltip  : 'Add the where statements to the general query',
+      handler  : Fn_LoadWhereInbox,
+      disabled : true
+  });
+  
+  saveButton = new Ext.Action({
+      text     : lanSave,
+      iconCls  : 'button_menu_ext ss_sprite  ss_save', 
+      tooltip  : 'Add drag and drop',
+      handler  : Fn_SaveDragAndDrop,
+      disabled : false
+  });
+  
+  var sw_checked = true;
+  
+  if(SW_INBOX == 1)
+  	sw_checked = true;
+  else
+  	sw_checked = false;
+  
+  var checkboxTool = {
+                    xtype: 'checkbox',
+                    name: 'enabled_inbox_rol',
+                    boxLabel: lanEnabledShow,
+                    id : 'enabled_inbox_rol',
+                    checked: sw_checked
+                    };
+    	
+    
+    contextMenu = new Ext.menu.Menu({
+        items : [deleteButton,'-',ActionButton,'-',saveButton]
+    });
+    
+  smodel = new Ext.grid.RowSelectionModel({
+    singleSelect : true,
+    listeners    :{
+      rowselect: function(sm){        
+        deleteButton.enable();
+        ActionButton.enable();
+        whereButton.enable();
+      },
+      rowdeselect: function(sm){        
+        deleteButton.disable();
+        ActionButton.disable();
+        whereButton.disable();
+      }
+    }
+  });
+
+ 
+  store = new Ext.data.GroupingStore( {
+	    proxy       : new Ext.data.HttpProxy({
+	      url       : 'inboxRelation_Ajax?action=RelationList&rolID='+rolID
+	    }),
+	    reader : new Ext.data.JsonReader( {
+	      root: 'data',
+	      fields : [
+	                {name : 'ID'},
+	                {name : 'ID_INBOX'},
+	                {name : 'INBOX_DESCRIPTION'}
+	                ]
+	    })
+	  });
+  
+ 
+
+  cmodel = new Ext.grid.ColumnModel({
+    defaults: {
+      width: 50,
+      sortable: true
+    },
+    viewConfig: {
+      cls:"x-grid-empty",
+      emptyText: (TRANSLATIONS.ID_NO_RECORDS_FOUND)
+    }
+    ,
+    columns: [
+              {id:'ID', dataIndex: 'ID', hidden:true, hideable:false},
+              {header: 'INBOX', dataIndex: 'ID_INBOX', width: 90, align:'left'},
+              {header: 'DESCRIPTION', dataIndex: 'INBOX_DESCRIPTION', width: 175, align:'left'}
+              ]
+  });
+
+  storePageSize = new Ext.data.SimpleStore({
+    fields   : ['size'],
+    data     : [['20'],['30'],['40'],['50'],['100']],
+    autoLoad : true
+  });
+
+  comboPageSize = new Ext.form.ComboBox({
+    typeAhead     : false,
+    mode          : 'local',
+    triggerAction : 'all',
+    store         : storePageSize,
+    valueField    : 'size',
+    displayField  : 'size',
+    width         : 50,
+    editable      : false,
+    listeners     :{
+      select: function(c,d,i){
+        UpdatePageConfig(d.data['size']);
+        bbarpaging.pageSize = parseInt(d.data['size']);
+        bbarpaging.moveFirst();
+      }
+    }
+  });
+
+  comboPageSize.setValue(pageSize);
+
+  bbarpaging = new Ext.PagingToolbar({
+      store       : store, // <--grid and PagingToolbar using same store (required)
+      displayInfo : true,
+      autoHeight  : true,
+      displayMsg  : lanDisplaying,
+      emptyMsg    : lanDisplayInbox,
+      pageSize    : pageSize,
+      items       : ['-',_('ID_PAGE_SIZE')+':',comboPageSize]
+  }); 
+
+  infoGrid = new Ext.grid.GridPanel({
+    region             : 'center',
+    layout             : 'fit',
+    id                 : 'infoGrid',
+    ddGroup		   	   :'gridDD',
+	enableDragDrop 	   : true,
+    height             : 100,
+    autoWidth          : true,
+    stateful           : true,
+    stateId            : 'grid',
+    enableColumnResize : true,
+    enableHdMenu       : true,
+    frame              : false,
+    columnLines        : false,
+    viewConfig         : {
+      forceFit :true
+    },
+    title     : lanRelInbox,
+    store     : store,
+    cm        : cmodel,
+    sm        : smodel,
+    tbar      : [deleteButton,'-',ActionButton,  '-',saveButton,'-',checkboxTool],
+    bbar      : bbarpaging,
+    listeners : {
+    	"render": {
+  		scope: this,
+  		fn: function(grid) {
+			var ddrow = new Ext.dd.DropTarget(grid.container, {
+				ddGroup : 'gridDD',
+				copy:false,
+				notifyDrop : function(dd, e, data){
+					var ds = grid.store;
+					var sm = infoGrid.getSelectionModel();
+                    var rows = sm.getSelections();
+                    if(dd.getDragData(e)) {
+                    	var cindex=dd.getDragData(e).rowIndex;
+                        if(typeof(cindex) != "undefined") {
+                        	for(i = 0; i <  rows.length; i++) {
+                        		ds.remove(ds.getById(rows[i].id));
+                            }
+                            ds.insert(cindex,data.selections);
+                            sm.clearSelections();
+                         }
+                    }
+				}
+         }) 
+		//store.load();
+      }
+   }
+    },
+    view: new Ext.grid.GroupingView({
+      forceFit     :true,
+      groupTextTpl : '{text}'
+    })
+  });
+
+  infoGrid.on('rowcontextmenu',
+      function (grid, rowIndex, evt) {
+    var sm = grid.getSelectionModel();
+    sm.selectRow(rowIndex, sm.isSelected(rowIndex));
+  },
+  this
+  );
+
+  infoGrid.on('contextmenu', function(evt){evt.preventDefault();}, this);
+  infoGrid.addListener('rowcontextmenu',onMessageContextMenu, this);
+  infoGrid.store.load();
+
+//back roles
+	BackToRoles = function(){
+		location.href = 'groupsRoles';
+	}; 
+	
+	backButton = new Ext.Action({
+		text: _('ID_BACK'),
+		iconCls: 'button_menu_ext ss_sprite ss_arrow_redo',
+		handler: BackToRoles
+	});
+	
+	northPanel = new Ext.Panel({
+		region: 'north',
+		xtype: 'panel',
+		tbar: ['<b>'+_('ID_ROLE') + ' : ' + rolID +'</b>',{xtype: 'tbfill'},backButton]
+	});
+  
+	var inboxPanel = new Ext.Panel({
+		auotWidth    : true,
+		height       : 550,
+		layout       : 'fit',
+		autoScroll	 : true,
+		items        : [
+		       infoGrid
+		]
+	});
+	
+	tabsPanelInbox = new Ext.Panel({
+     	region: 'center',
+  	activeTab: 0,
+  	items:[inboxPanel]
+  });
+	
+	var viewport = new Ext.Viewport({
+		layout : 'border',
+		items  : [northPanel, tabsPanelInbox]
+	});
+
+});
+
+

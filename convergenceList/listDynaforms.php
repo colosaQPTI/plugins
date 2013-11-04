@@ -88,7 +88,7 @@ foreach ($select as $row)
     }
     if($bAccessStep)
     	$newSelect[]= $row;
-    }
+}
      unset($aFields);
      $select = $newSelect;
  //    G::pr($select); //die;

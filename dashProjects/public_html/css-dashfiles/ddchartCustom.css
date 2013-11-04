@@ -1,0 +1,96 @@
+.ddchart-ui-widget-content, .ddchart-x-axis-title { margin-top: 0.55em; border: 1px solid #2E7190; padding-bottom: 0.25em; background: #FCFDFD; color: #222222; }
+.ddchart-ui-state-default, .ddchart-ui-widget-content .ddchart-ui-state-default { border: 1px solid #2E7190; background: #2E7190; font-weight: bold; color: #FFFFFF; }
+.ddchart-ui-state-hover, .ddchart-ui-widget-content .ddchart-ui-state-hover, .ui-state-focus, .ddchart-ui-widget-content .ui-state-focus { border: 1px solid #7698A9; background: #5BB25E; font-weight: bold; color: #026890; }
+.ddchart-ui-state-active, .ddchart-ui-widget-content .ddchart-ui-state-active { border: 1px solid #04456C; background: #04456C; font-weight: bold; color: #FFFFFF; }
+.ddchart-ui-state-highlight, .ddchart-ui-widget-content .ddchart-ui-state-highlight { border: 1px solid #FCD113; background: #F8DA4E; color: #915608; }
+
+.ddchart-x-axis-wrapper { height: 2em; }
+.ddchart-x-axis-wrapper-sub { height: 1.5em; }
+.ddchart-x-axis-label { height: 1.15em; top: 1.15em; }
+
+.ddchart-ui-widget-content, .ddchart-x-axis-wrapper-sub, .ddchart-y-axis, .ddchart-x-axis-title { font-size: 58%; }
+
+.ddchart-x-axis-wrapper, .ddchart-chart-wrapper { left: 14%; margin-left: 1px; width: 85%; }
+.ddchart-y-axis-wrapper { left: 4%; width: 10%; }
+.ddchart-y-axis-wrapper, .ddchart-y-axis-label { height: 90%; }
+
+.ddchart-y-axis-label { position: absolute; top: -2px; left: 0%; border: 1px solid #2E7190; width: 4%; background: #FFFFFF; }
+.ddchart-y-axis-label div { color: #222222; text-align: center; font-size: 59%; font-weight: bold; }
+
+.ddchart-zoom { position: absolute; top: 90%; left: 0%; width: 14%; height: 10%; text-align: center; }
+.ddchart-zoom a { display: block; padding: 0.25em 0; }
+.ddchart-zoom a:hover { background: #F8DA4E; }
+.ddchart-zoom img { border: 0; }
+
+
+
+
+
+/*Theme1*/
+/*
+.ddchart-ui-widget-content, .ddchart-x-axis-title { border-color: #3E6F8D; background: #FCFDFD; color: #222222; }
+.ddchart-ui-state-default, .ddchart-ui-widget-content .ddchart-ui-state-default { border-color: #3E6F8D; background: #3E6F8D; color: #FFFFFF; }
+.ddchart-ui-state-hover, .ddchart-ui-widget-content .ddchart-ui-state-hover, .ui-state-focus, .ddchart-ui-widget-content .ui-state-focus { border-color: #537772; background: #88ACA7; color: #026890; }
+.ddchart-ui-state-active, .ddchart-ui-widget-content .ddchart-ui-state-active { border-color: #3E6F8D #3E6F8D #2B4B60 #2B4B60; background: #2B4B60; color: #FFFFFF; }
+.ddchart-ui-state-highlight, .ddchart-ui-widget-content .ddchart-ui-state-highlight { border-color: #FCD113; background: #F8DA4E; color: #915608; }
+
+.ddchart-y-axis-label { border-color: #3E6F8D; background: #FFFFFF; }
+.ddchart-y-axis-label div { color: #222222; }
+
+.ddchart-zoom a:hover { background: #F8DA4E; }
+*/
+
+/*Theme2*/
+/*
+.ddchart-ui-widget-content, .ddchart-x-axis-title { border-color: #8C4B2B; background: #FCFDFD; color: #222222; }
+.ddchart-ui-state-default, .ddchart-ui-widget-content .ddchart-ui-state-default { border-color: #8C4B2B; background: #8C4B2B; color: #FFFFFF; }
+.ddchart-ui-state-hover, .ddchart-ui-widget-content .ddchart-ui-state-hover, .ui-state-focus, .ddchart-ui-widget-content .ui-state-focus { border-color: #414141; background: #A8AAAD; color: #026890; }
+.ddchart-ui-state-active, .ddchart-ui-widget-content .ddchart-ui-state-active { border-color: #8C4B2B #8C4B2B #C57E3F #C57E3F; background: #C57E3F; color: #FFFFFF; }
+.ddchart-ui-state-highlight, .ddchart-ui-widget-content .ddchart-ui-state-highlight { border-color: #FCD113; background: #F8DA4E; color: #915608; }
+
+.ddchart-y-axis-label { border-color: #8C4B2B; background: #FFFFFF; }
+.ddchart-y-axis-label div { color: #222222; }
+
+.ddchart-zoom a:hover { background: #F8DA4E; }
+*/
+
+/*Theme3*/
+/*
+.ddchart-ui-widget-content, .ddchart-x-axis-title { border-color: #393A35; background: #FCFDFD; color: #222222; }
+.ddchart-ui-state-default, .ddchart-ui-widget-content .ddchart-ui-state-default { border-color: #393A35; background: #393A35; color: #FFFFFF; }
+.ddchart-ui-state-hover, .ddchart-ui-widget-content .ddchart-ui-state-hover, .ui-state-focus, .ddchart-ui-widget-content .ui-state-focus { border-color: #AB6510; background: #EC9933; color: #026890; }
+.ddchart-ui-state-active, .ddchart-ui-widget-content .ddchart-ui-state-active { border-color: #393A35 #393A35 #878681 #878681; background: #878681; color: #FFFFFF; }
+.ddchart-ui-state-highlight, .ddchart-ui-widget-content .ddchart-ui-state-highlight { border-color: #FCD113; background: #F8DA4E; color: #915608; }
+
+.ddchart-y-axis-label { border-color: #393A35; background: #FFFFFF; }
+.ddchart-y-axis-label div { color: #222222; }
+
+.ddchart-zoom a:hover { background: #F8DA4E; }
+*/
+
+/*Theme4*/
+/*
+.ddchart-ui-widget-content, .ddchart-x-axis-title { border-color: #EAA228; background: #FCFDFD; color: #222222; }
+.ddchart-ui-state-default, .ddchart-ui-widget-content .ddchart-ui-state-default { border-color: #EAA228; background: #EAA228; color: #222222; }
+.ddchart-ui-state-hover, .ddchart-ui-widget-content .ddchart-ui-state-hover, .ui-state-focus, .ddchart-ui-widget-content .ui-state-focus { border-color: #39624D; background: #579575; color: #026890; }
+.ddchart-ui-state-active, .ddchart-ui-widget-content .ddchart-ui-state-active { border-color: #EAA228 #EAA228 #C5B47F #C5B47F; background: #C5B47F; color: #222222; }
+.ddchart-ui-state-highlight, .ddchart-ui-widget-content .ddchart-ui-state-highlight { border-color: #FCD113; background: #F8DA4E; color: #915608; }
+
+.ddchart-y-axis-label { border-color: #EAA228; background: #FFFFFF; }
+.ddchart-y-axis-label div { color: #222222; }
+
+.ddchart-zoom a:hover { background: #F8DA4E; }
+*/
+
+/*Theme5*/
+.ddchart-ui-widget-content, .ddchart-x-axis-title { border-color: #C5B47F; background: #FCFDFD; color: #222222; }
+.ddchart-ui-state-default, .ddchart-ui-widget-content .ddchart-ui-state-default { border-color: #C5B47F; background: #C5B47F; color: #222222; font-weight: normal; }
+.ddchart-ui-state-hover, .ddchart-ui-widget-content .ddchart-ui-state-hover, .ui-state-focus, .ddchart-ui-widget-content .ui-state-focus { border-color: #AA7111; background: #EAA228; color: #026890; }
+.ddchart-ui-state-active, .ddchart-ui-widget-content .ddchart-ui-state-active { border-color: #C5B47F #C5B47F #4CA6C4 #4CA6C4; background: #4CA6C4; color: #222222; font-weight: normal; }
+.ddchart-ui-state-highlight, .ddchart-ui-widget-content .ddchart-ui-state-highlight { border-color: #FCD113; background: #F8DA4E; color: #915608; }
+
+.ddchart-y-axis-label { border-color: #C5B47F; background: #FFFFFF; }
+.ddchart-y-axis-label div { color: #222222; }
+
+.ddchart-zoom a:hover { background: #F8DA4E; }
+

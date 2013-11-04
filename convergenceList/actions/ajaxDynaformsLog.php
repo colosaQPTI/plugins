@@ -51,7 +51,10 @@
 
         if (count($all) > 0) {
             //version FRED
-            $sQuery="SELECT HLOG.*, HLOG_UID, CONCAT(U.USR_FIRSTNAME,' ',U.USR_LASTNAME)AS USERCREATOR, S.TITLE AS HLOG_STATUS 
+            $sQuery="SELECT HLOG.HLOG_UID,HLOG.HLOG_APP_UID,HLOG.HLOG_USER_UID,
+                            DATE_FORMAT(HLOG.HLOG_DATECREATED, '%d-%m-%Y %H:%i:%s') AS HLOG_DATECREATED,HLOG.HLOG_VERSION,HLOG.HLOG_CHILD_APP_UID,
+                            HLOG.HLOG_ACTION,HLOG.HLOG_STATUS, HLOG_UID, 
+                            CONCAT(U.USR_FIRSTNAME,' ',U.USR_LASTNAME)AS USERCREATOR, S.TITLE AS HLOG_STATUS                     
                     FROM PMT_HISTORY_LOG  AS HLOG
                     INNER JOIN USERS AS U ON (U.USR_UID = HLOG.HLOG_USER_UID)
                     INNER JOIN PMT_STATUT AS S ON (S.UID = HLOG.HLOG_STATUS)

@@ -61,7 +61,11 @@ var deleteRol;
 
 Ext.onReady(function(){
   Ext.QuickTips.init();
-
+  var fieldName = 'Fields Selected';
+  if(language == 'fr')
+  {
+	  fieldName = 'Champs s\u00E9lectionn\u00E9s';
+  }
   pageSize = parseInt(10);
 
     newButton = new Ext.Action({
@@ -99,7 +103,7 @@ Ext.onReady(function(){
     });
   
     inboxFieldsButton = new Ext.Action({
-	    text     : 'Fields Selected',
+	    text     : fieldName,
 	    iconCls  : 'button_menu_ext ss_key_add2',
 	    handler  : inboxFieldsAction,
 	    disabled : true

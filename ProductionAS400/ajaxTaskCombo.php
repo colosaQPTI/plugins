@@ -17,7 +17,7 @@ if(isset($_GET['Type']) && $_GET['Type'] == 'TaskCombo'){
 	$sQuery = "     SELECT T.TAS_UID as ID, C.CON_VALUE AS NAME
    					FROM TASK T
    					INNER JOIN CONTENT C ON (C.CON_ID = T.TAS_UID)
-   					WHERE C.CON_CATEGORY = 'TAS_TITLE'       
+   					WHERE C.CON_CATEGORY = 'TAS_TITLE' AND CON_LANG = '".SYS_LANG."'     
    					GROUP BY  TAS_UID                                                                               
                   ";
 	

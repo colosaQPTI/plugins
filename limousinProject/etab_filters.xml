@@ -3,10 +3,7 @@
 <TITLE_SEARCH type="title" enablehtml="0" btn_cancel="Cancel">
   <en>Recherche :</en>
 </TITLE_SEARCH>
- <RNE type="text" maxlength="64" validate="Any" required="0" readonly="0" size="15" mode="edit" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0">    
-    <en> Numéro RNE: </en>
- </RNE>
- <ETAB_NAME_POPUP type="text" maxlength="64" validate="Any" required="0" readonly="0" size="15" mode="edit" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0">
+ <ETAB_NAME_POPUP type="text" maxlength="64" validate="Any" required="0" readonly="0" size="30" mode="edit" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0">
     <en>Nom de l'établissement : </en>
  </ETAB_NAME_POPUP>
  <!--<RAISON type="text" maxlength="64" validate="Any" required="0" readonly="0" size="15" mode="edit" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0">
@@ -16,7 +13,7 @@
     <en>Ville : </en>
  </VILLE>
 <!--<LIST_USERS type="grid" xmlgrid="convExamples/users" addrow="0" deleterow="0" btn_cancel="Cancel"/>-->
-<SEARCH type="button" btn_cancel="Cancel" onclick="Srne= document.getElementById('form[RNE]').value;Snom= document.getElementById('form[ETAB_NAME_POPUP]').value; Sville= document.getElementById('form[VILLE]').value; loadResultSearch(Srne,Snom,Sville);">
+<SEARCH type="button" btn_cancel="Cancel" onclick="Snom= document.getElementById('form[ETAB_NAME_POPUP]').value; Sville= document.getElementById('form[VILLE]').value; loadResultSearch(Snom,Sville);">
   <en>Rechercher</en>
 </SEARCH>
 <CLEAR type="button" btn_cancel="Cancel" onclick="clearFilters();">

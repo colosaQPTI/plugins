@@ -12,12 +12,18 @@ var canEdit = true;
 var flagPoliciesPassword = false;
 var flagValidateUsername = false;
 var onlyPassword = false;
+
 //var rendeToPage='document.body';
 
 global.IC_UID        = '';
 global.IS_UID        = '';
 global.USR_FIRSTNAME = '';
 global.aux           = '';
+global.usrLastnameAnt = '';
+global.usrFirstnameAnt = '';
+global.usrLastnameNew = '';
+global.usrFirstnameNew = '';
+global.usrUid = '';
 
 Ext.onReady(function () {
   Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
@@ -57,19 +63,60 @@ Ext.onReady(function () {
   var informationFields = new Ext.form.FieldSet({
     title : _('ID_PERSONAL_INFORMATION'),
     items : [
-      {
-        id         : 'USR_FIRSTNAME',
-        fieldLabel : _('ID_FIRSTNAME'),
-        xtype      : 'textfield',
-        width      : 260,
-        allowBlank : false
-      },
+
       {
         id         : 'USR_LASTNAME',
         fieldLabel : _('ID_LASTNAME'),
         xtype      : 'textfield',
         width      : 260,
-        allowBlank : false
+        allowBlank : false,
+        hidden     : false,
+        enableKeyEvents: true, 
+        listeners: {
+          blur : function(ob)
+          {
+              checkLastName();
+          },
+          keyup: function(val, e){
+                        result = val.getValue();
+                        text = Ext.util.Format.uppercase(result);
+                        val.setValue(text);
+                        checkLastName();
+          } , 
+          keypress: function(val, e){
+                        result = val.getValue();
+                        text = Ext.util.Format.uppercase(result);
+                        val.setValue(text);
+                        checkFirstName();
+          }
+        }
+      },
+      {
+        id         : 'USR_FIRSTNAME',
+        fieldLabel : _('ID_FIRSTNAME'),
+        xtype      : 'textfield',
+        width      : 260,
+        hidden     : false,
+        allowBlank : false,
+        enableKeyEvents: true, 
+        listeners: {
+          blur : function(ob)
+          {
+            checkFirstName();
+          },
+          keyup: function(val, e){
+                        result = val.getValue();
+                        text = Ext.util.Format.uppercase(result);
+                        result.removeAccents();
+                        val.setValue(text);
+          } , 
+          keypress: function(val, e){
+                        result = val.getValue();
+                        text = Ext.util.Format.uppercase(result);
+                        result.removeAccents();
+                        val.setValue(text);
+          }
+        }
       },
       {
         id         : 'USR_USERNAME',
@@ -91,6 +138,7 @@ Ext.onReady(function () {
         fieldLabel : _('ID_EMAIL'),
         vtype      : 'email',
         xtype      : 'textfield',
+        hidden     : true,
         width      : 260,
         allowBlank : false
       }]
@@ -103,6 +151,7 @@ Ext.onReady(function () {
         id         : 'USR_NEW_PASS',
         fieldLabel : _('ID_NEW_PASSWORD'),
         xtype      : 'textfield',
+        helpText   : 'This is your first name dummy!',
         inputType  : 'password',
         width      : 260,
         allowBlank : allowBlackStatus,
@@ -136,7 +185,79 @@ Ext.onReady(function () {
                   flagPoliciesPassword = false;
                 }
 
+               // ************** validate password ***************
+               var styleMessageGreen  ='<span style="color: green; font: 9px tahoma,arial,helvetica,sans-serif;"><img width="13" height="13" border="0" src="/images/dialog-ok-apply.png">';
+               var styleMessageYellow  ='<span style="color: #FE9A2E; font: 9px tahoma,arial,helvetica,sans-serif;"><img width="13" height="13" border="0" src="/images/dialog-ok-apply.png">';
+               var styleMessageRed = '<span style="color: red; font: 9px tahoma,arial,helvetica,sans-serif;"><img width="13" height="13" border="0" src="/images/delete.png">';
+               var endStyle = '</span>';
+               
+               // ************** end validate password ************
+               var expreg = /(?=^.{7,20}$)((?=.*[A-Za-z0-9])(?=.*[A-Z])(?=.*[0-9])(?=.*[a-z]))^.*/;
+                
                 Ext.getCmp('passwordReview').setText(resp.DESCRIPTION, false);
+                Ext.getCmp('passwordReview').setVisible(false);
+
+                //if(passwordText.length > 7)
+                //{  
+                if ((passwordText.match(expreg))) 
+                 {
+
+                    //Ext.getCmp("USR_CNF_PASS").getValue ;
+                    //document.getElementById('form[__CONFIRM_PASSWORD__]').readOnly = false;
+                    var simple = 'Faible s\u00E9curit\u00E9';
+                    var medium = 'S\u00E9curit\u00E9 moyenne';
+                    var complex = 'Haute s\u00E9curit\u00E9';
+                    var rpta = passwordLevel(passwordText);
+
+                    var message = '';
+                    //document.getElementById('message').style.display = '';
+                    if(rpta < 30)
+                    {
+                      message = styleMessageRed + simple + endStyle;
+                      textColor = '#FA5858';
+                    }
+                    else
+                    {
+                      if(rpta < 60)
+                      {
+                        message = styleMessageYellow + medium + endStyle;
+                        textColor = '#B18904';
+                      }
+                      else
+                      {
+                        message = styleMessageGreen + complex + endStyle;
+                        textColor  = '#8BD672';
+                      }
+                    }
+                    
+                    Ext.getCmp('complexityReview').setText(message, false);
+                    Ext.getCmp('complexityReview').setVisible(true);
+                }
+                else
+                {
+                  var messageError = styleMessageRed+"Merci de respecter le format du mot de passe"+endStyle;
+                  if(passwordText != "")
+                  {
+                   Ext.getCmp('complexityReview').setText("", false);
+                   Ext.getCmp('complexityReview').setVisible(false);
+                   Ext.getCmp('passwordReview').setText(messageError, false);
+                   Ext.getCmp('passwordReview').setVisible(true);
+
+                  return false; 
+                  }
+                  else
+                  {
+                     Ext.getCmp('complexityReview').setText("", false);
+                     Ext.getCmp('complexityReview').setVisible(false);
+                     Ext.getCmp('passwordReview').setText("", false);
+                     Ext.getCmp('passwordReview').setVisible(false);  
+                     Ext.getCmp('passwordConfirm').setText("");  
+                     Ext.getCmp('passwordConfirm').setVisible(false);                  
+                  }  
+                   
+                }
+                
+                
                 Ext.getCmp('saveB').enable();
                 Ext.getCmp('cancelB').enable();
               },
@@ -153,7 +274,7 @@ Ext.onReady(function () {
               }
             });
 
-            Ext.getCmp('passwordReview').setVisible(true);
+            
 
             if (Ext.getCmp('USR_CNF_PASS').getValue() != '') {
               userExecuteEvent(document.getElementById('USR_CNF_PASS'), 'blur');
@@ -166,6 +287,13 @@ Ext.onReady(function () {
         xtype: 'label',
         fieldLabel: ' ',
         id:'passwordReview',
+        width: 300,
+        labelSeparator: ''
+      },
+      {
+        xtype: 'label',
+        fieldLabel: ' ',
+        id:'complexityReview',
         width: 300,
         labelSeparator: ''
       },
@@ -183,14 +311,32 @@ Ext.onReady(function () {
             var passwordConfirm = this.getValue();
 
             if (passwordText != passwordConfirm) {
+
               var spanErrorConfirm  = '<span style="color: red; font: 9px tahoma,arial,helvetica,sans-serif;">';
               var imageErrorConfirm = '<img width="13" height="13" border="0" src="/images/delete.png">';
-              var labelErrorConfirm = _('ID_NEW_PASS_SAME_OLD_PASS');
-
+             // var labelErrorConfirm = _('ID_NEW_PASS_SAME_OLD_PASS');
+              var labelErrorConfirm = "Le mot de passe confirmé est différent de celui saisi initialement.";
               Ext.getCmp('passwordConfirm').setText(spanErrorConfirm + imageErrorConfirm + labelErrorConfirm + '</span>', false);
-              Ext.getCmp('passwordConfirm').setVisible(true);
+              if(passwordText != "")
+                Ext.getCmp('passwordConfirm').setVisible(true);
+              else
+              {
+                Ext.getCmp('passwordConfirm').setText("");  
+                Ext.getCmp('passwordConfirm').setVisible(false);
+              }
+              this.setValue("");
+              Ext.getCmp('saveB').disable();
             } else {
-              Ext.getCmp('passwordConfirm').setVisible(false);
+              
+              if(this.getValue() !="")
+              {
+                Ext.getCmp('saveB').enable();
+                var messageConf = "mot de passe confirmé";
+                var styleMessageGreen  ='<span style="color: green; font: 9px tahoma,arial,helvetica,sans-serif;"><img width="13" height="13" border="0" src="/images/dialog-ok-apply.png">';
+                Ext.getCmp('passwordConfirm').setText(styleMessageGreen + messageConf + '</span>', false);
+                Ext.getCmp('passwordConfirm').setVisible(true);
+              //Ext.getCmp('passwordConfirm').setVisible(false);
+              }
             }
           }
         }
@@ -229,7 +375,7 @@ Ext.onReady(function () {
     ],
     buttons : [
       {
-        text   : _('ID_SAVE'),
+        text   : 'Enregister',
         id     : 'saveB',
         handler: saveUser
       },
@@ -252,9 +398,9 @@ Ext.onReady(function () {
     ]
   });
 
-  if (onlyPassword == true)
+  /*if (onlyPassword == true)
     frmDetails.remove(informationFields);
-  
+  */
   informationFields2 = new Ext.form.FieldSet({
     title : _('ID_PERSONAL_INFORMATION'),
     items : [
@@ -341,6 +487,7 @@ Ext.onReady(function () {
   Ext.getCmp('passwordReview').setVisible(false);
   Ext.getCmp('passwordConfirm').setVisible(false);
   Ext.getCmp('usernameReview').setVisible(false);
+  Ext.getCmp('complexityReview').setVisible(false);
 
   var spanAjax  = '<span style="font: 9px tahoma,arial,helvetica,sans-serif;">';
   var imageAjax = '<img width="13" height="13" border="0" src="/images/ajax-loader.gif">';
@@ -352,6 +499,24 @@ Ext.onReady(function () {
 
   Ext.getCmp('usernameReview').setText(spanAjax + imageAjax + labelAjax + '</span>', false);
 });
+
+  function passwordLevel (p){
+  l = 0;
+  v1 = 'aeiou1234567890';
+  v2 = 'AEIOUbcdfghjklmnpqrst';
+  v3 = 'vxyzBCDFGHJKLMNPQRST';
+  v4 = 'VXYZ$@#';
+  for (i = 0; i < p.length; i++){
+    if (v1.indexOf(p[i]) != -1) l += 1;
+    else if (v2.indexOf(p[i]) != -1) l += 2;
+    else if (v3.indexOf(p[i]) != -1) l += 3;
+    else if (v4.indexOf(p[i]) != -1) l += 4;
+    else l += 5;
+  }
+  l *= 3;
+  if(l > 100)l = 100;
+  return l;
+}
 
 function defineUserPanel()
 {
@@ -394,16 +559,18 @@ function saveUser()
 
   if (!flagPoliciesPassword) {
     if (Ext.getCmp('USR_NEW_PASS').getValue() == '') {
-      Ext.Msg.alert( _('ID_ERROR'), _('ID_PASSWD_REQUIRED'));
+      //Ext.Msg.alert( _('ID_ERROR'), "_('ID_PASSWD_REQUIRED')");
     } else {
       Ext.Msg.alert( _('ID_ERROR'), Ext.getCmp('passwordReview').html);
     }
-    return false;
+    //return false;
   }
 
   var newPass  = frmDetails.getForm().findField('USR_NEW_PASS').getValue();
   var confPass = frmDetails.getForm().findField('USR_CNF_PASS').getValue();
 
+  usrFirstnameNew = frmDetails.getForm().findField('USR_FIRSTNAME').getValue();
+  usrLastnameNew = frmDetails.getForm().findField('USR_LASTNAME').getValue();
   if (confPass === newPass) {
     Ext.getCmp('frmDetails').getForm().submit({
       url    : 'myProfile_Ajax',
@@ -411,6 +578,7 @@ function saveUser()
         action   : 'saveUser',
         USR_UID  : USR_UID,
         USR_CITY : global.IS_UID
+
       },
       waitMsg : _('ID_SAVING'),
       timeout : 36000,
@@ -427,15 +595,16 @@ function saveUser()
     		  frmDetails.render(document.body);
     		  //frmDetails.show();
     	  }
+        document.location.href = document.location.href;
         /*if (!infoMode) {
           location.href = 'users_List';
         } else {
          location.href = '../users/myInfo?type=reload';
         }*/
-
+        loadUserData();
       },
       failure : function (obj, resp) {
-    	 // console.log(resp.result);
+    	  
         if (typeof resp.result  == "undefined")
         {
           Ext.Msg.alert(_('ID_ERROR'), _('ID_SOME_FIELDS_REQUIRED'));
@@ -455,9 +624,53 @@ function saveUser()
         }
       }
     });
+
+    // SAVE USER IN CASES
+    urlData = "../fieldcontrol/myProfileUpdateCases.php";
+      /*Ext.MessageBox.show({
+              msg : 'Chargement, Veuillez patienter ...',
+              progressText : 'Chargement ...',
+              width : 300,
+              wait : true,
+              waitConfig : {
+                interval : 200
+              }
+        });*/
+    Ext.Ajax.request({
+           url : urlData,
+           params : {
+             USR_LASTNAMEORIG : usrLastnameAnt,
+             USR_FIRSTNAMEORIG : usrFirstnameAnt,
+             USR_LASTNAMENEW : usrLastnameNew,
+             USR_FIRSTNAMENEW : usrFirstnameNew,
+             USR_UID : USR_UID
+           },
+           success: function (result, request) {
+             /*var response = Ext.util.JSON.decode(result.responseText);
+             if (response.success) {
+                Ext.MessageBox.hide();
+               //alert(response.message);*/
+             //}
+             //else {
+                /*Ext.MessageBox.hide();
+               PMExt.warning(_('ID_WARNING'), response.message);*/
+            },
+           failure: function (result, request) {
+            //Ext.MessageBox.hide();
+           }
+         });
+
   }
   else {
-    Ext.Msg.alert(_('ID_ERROR'), _('ID_PASSWORDS_DONT_MATCH'));
+    var messageErrorMatch = "Veuilliez saisir la confirmation de votre mot de passe";
+    //Ext.Msg.show(messageErrorMatch);
+    Ext.MessageBox.show({
+                  title: 'Error',
+                  msg: 'Veuilliez saisir la confirmation de votre mot de passe',
+                  buttons: Ext.MessageBox.OK,
+                  animEl: 'mb9',
+                  icon: Ext.MessageBox.ERROR
+                });
   }
 }
 
@@ -479,7 +692,10 @@ function loadUserData()
         },
         waitMsg: _("ID_UPLOADING_PROCESS_FILE"),
         success: function (r, o) {
+            Ext.getCmp("USR_USERNAME").setValue("");          
             var data = Ext.util.JSON.decode(r.responseText);
+            usrLastnameAnt = data.user.USR_LASTNAME;
+            usrFirstnameAnt = data.user.USR_FIRSTNAME;
 
             Ext.getCmp("frmDetails").getForm().setValues({
                 USR_FIRSTNAME : data.user.USR_FIRSTNAME,
@@ -496,7 +712,6 @@ function loadUserData()
             } else {
                 //
             }
-
 
             previousUsername = Ext.getCmp("USR_USERNAME").getValue();
         },
@@ -521,3 +736,82 @@ function userExecuteEvent(element, event)
         return !element.dispatchEvent(evt);
     }
 }
+
+String.prototype.removeAccents = function ()
+{
+  var __r = 
+  {
+    'À':'A','Á':'A','Â':'A','Ã':'A','Ä':'A','Å':'A','Æ':'E',
+
+    'È':'E','É':'E','Ê':'E','Ë':'E',
+
+    'Ì':'I','Í':'I','Î':'I',
+
+    'Ò':'O','Ó':'O','Ô':'O','Ö':'O',
+
+    'Ù':'U','Ú':'U','Û':'U','Ü':'U',
+
+    'Ñ':'N'
+  };
+  
+  return this.replace(/[ÀÁÂÃÄÅÆÈÉÊËÌÍÎÒÓÔÖÙÚÛÜÑ]/gi, function(m)
+  {
+    var ret = __r[m.toUpperCase()];
+    if (m === m.toLowerCase())
+      ret = ret.toLowerCase();
+    return ret;
+  });
+
+};
+
+function disableCtrlKeyCombination(evt)
+{
+  var e = window.event || evt;
+  if (e.ctrlKey) { 
+      switch(e.keyCode) { 
+        case 67: //Ctrl-C -- copy --- 
+        case 86: //Ctrl-V -- paste --- 
+        case 88: //Ctrl-X -- cut --- 
+        e.keyCode = 0; 
+        return false; 
+
+        default: 
+        break; 
+    }
+  }
+}
+
+var checkLastName = function() {
+  var usrLastname = Ext.getCmp("frmDetails").getForm().getFieldValues().USR_LASTNAME;
+  var retUsrLast = usrLastname.removeAccents();
+  Ext.getCmp("frmDetails").getForm().setValues({
+                USR_LASTNAME : retUsrLast
+    });
+
+};
+
+var checkFirstName = function() {
+  var usrFirstname = Ext.getCmp("frmDetails").getForm().getFieldValues().USR_FIRSTNAME;
+  
+  var retUsrFirst = usrFirstname.removeAccents();
+  Ext.getCmp("frmDetails").getForm().setValues({
+                USR_FIRSTNAME : retUsrFirst
+    }); 
+};
+
+Ext.intercept(Ext.form.Field.prototype, 'initComponent', function() {
+  var fl = this.fieldLabel, h = this.helpText;
+  //console.log(this);
+   /*var spanAjax = '<span style="font: 9px tahoma,arial,helvetica,sans-serif;">';
+            var imageAjax = '<img width="13" height="13" border="0" src="/images/ajax-loader.gif">';
+            var labelAjax = _('ID_PASSWORD_TESTING');
+  */            
+  /*if (h && h !== '' && fl) {
+    var spanHelp = '<span style="color:blue;"  ext:qtip="'+h+'">';
+    var imgHelp = '<img width="13" height="13" src="/images/dialog-ok-apply.png"></span> ';
+    this.fieldLabel = fl+spanHelp+'<img width="13" height="13" src="/images/dialog-ok-apply.png">?</span> ';
+  }*/
+});
+
+document.onkeydown = disableCtrlKeyCombination;
+document.oncontextmenu=new Function("return false");
