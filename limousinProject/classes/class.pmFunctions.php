@@ -109,6 +109,134 @@ function convergence_getMsgErreur($app_id) {
     return $refus;
 }
 
+
+function limousinProject_getGroupIdByRole($role) {
+    $returnValue = false;
+    $qGpId = ' SELECT *  FROM `CONTENT` WHERE `CON_VALUE` LIKE "' . $role . '" AND CON_CATEGORY = "GRP_TITLE"';
+    $rGpId = executeQuery($qGpId);
+    if (!empty($rGpId[1]['CON_ID']))
+    {
+     $returnValue = $rGpId[1]['CON_ID'];
+    }
+
+    return $returnValue;
+}
+
+function limousinProject_blocageCarte($porteurId, $statut, $role_user = 'Bénéficiaires') {
+    $return = TRUE;
+    if (!empty($porteurId))
+    {
+        // on regarde si le porteurid fourni est correct et on remonte le cas echeant les infos de la demande
+        $exist = limousinProject_getCartePorteurId($porteurId);
+        if (!empty($exist) && ($exist['USER_ID'] == $_SESSION['USER_LOGGED'] || $role_user != 'Bénéficiaires'))
+        {
+            //on appel le WS d'activation de la carte, on ajoute un groupe utilsateur carte active dans le fe_user Typo3
+            //et mise a jour de la table des carte PMT_CHEQUES comme quoi elle est activée
+            $groupeId = limousinProject_getGroupIdByRole($role_user);
+            $active = limousinProject_getBlocage($porteurId,$groupeId);
+            if (!empty($active->CODE) && $active->CODE == 'OK')
+            {
+               // pas d'erreur c'est lessieur ?
+            }
+            else
+            {
+                if (!empty($active->Description))
+                {
+                    // Erreur lors de l'updateUsergroup dans Typo3
+                    $erreur = $active->Description;
+                    $return = 'erreur';
+                }
+                else
+                {
+                    // On récupére le label de l'erreur lors de l'appel ws activation carte
+                    $erreur = limousinProject_getErrorAqoba($active->code, 'WS211') . " (code $active->code du WS211)";
+                    $return = FALSE;
+                }
+            }
+        }
+        else
+        {
+            $return = FALSE;
+            if (empty($exist))
+                $erreur = 'Carte non produite.';
+            else
+                $erreur = 'PorteurId ' . $porteurId . ' incorrect.';
+        }
+    }
+    else
+    {
+        $return = FALSE;
+        if ($statut != 1)
+            $erreur = 'Blocage annulée par le ' . $role_user;
+        else
+            $erreur = 'PorteurId incorrect.';
+    }
+    // Dans le cas où $return == 'erreur', alors la carte est bloqué, mais avec quand même des erreurs à signaler, donc on rentre dans les 2 conditions suivantes
+    if ($return !== FALSE)
+    {
+        insertHistoryLogPlugin($exist['APPLICATION'], $_SESSION['USER_LOGGED'], date('Y-m-d H:i:s'), '0', '', "Carte bloquée par le $role_user", $exist['STATUT']);
+    }
+    if ($return !== TRUE)
+    {
+        if (empty($exist))
+        {
+            $arrayDemandeInfos = array();
+            if ($role_user == 'Bénéficiaires')
+                $queryDemande = "SELECT APP_UID FROM PMT_DEMANDES WHERE USER_ID = '" . $_SESSION['USER_LOGGED'] . "' AND STATUT <> 0 AND STATUT <> 999";
+            else // cas où l'activation de carte est faite par un gestionnaire ou autre, et que le porteur id n'est pas valide
+                $queryDemande = "SELECT APP_UID FROM PMT_DEMANDES WHERE CARTE_PORTEUR_ID = '" . $porteurId . "' AND STATUT <> 0 AND STATUT <> 999";
+            $resultAppUid = executeQuery($queryDemande);
+            if (sizeof($resultAppUid) == 1)
+            {
+                $appUid = $resultAppUid[1]['APP_UID'];
+                $exist = convergence_getAllAppData($appUid, 1);
+            }
+        }
+        if (!empty($exist))
+            insertHistoryLogPlugin($exist['APPLICATION'], $_SESSION['USER_LOGGED'], date('Y-m-d H:i:s'), '0', '', "Erreur lors du blocage de la carte : " . $erreur, $exist['STATUT']);
+    }
+    return $return;
+}
+
+}
+
+function limousinProject_getBlocage($porteurId, $groupeId ) {
+
+    // INIT Ws 211    
+    $result = null;
+    $v = new Activation();
+
+    // SET Params
+    $v->partenaire = wsPrestaId;
+    $v->porteurId = $porteurId;
+    
+
+    /* Mode Test On */
+    //$v->porteurId = 30280055364;
+    //$s->porteurId = 30280000023;
+    /* Mode Test Off */
+    // CALL Ws
+    try
+    {
+        $v->call();
+    // Si la carte est bien activée, on met à jour la table des cartes PMT_CHEQUES
+        $query = 'update PMT_CHEQUES SET CARTE_STATUT = "Bloquée" where CARTE_PORTEUR_ID= "' . mysql_escape_string($porteurId) . '"';
+        $resQuery = executeQuery($query);
+        // Puis on change le usergroup dans Typo3 en Carte activé
+        $data = limousinProject_getDemandeFromPorteurID($porteurId);
+        $userInfo = userInfo($data['USER_ID']);
+        $result = limousinProject_updateUsergroupTypo($userInfo, $porteurId, $groupeId);
+    }
+    catch (Exception $e)
+    {
+        $result = $v->errors;
+    }
+    // RETURN
+    return $result;
+}
+
+
+
 function limousinProject_generatePorteurID($num_dossier) {
     
     /* Les 4 premiers caractères seront : 3028
