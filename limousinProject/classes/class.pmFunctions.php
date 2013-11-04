@@ -198,7 +198,7 @@ function limousinProject_blocageCarte($porteurId, $statut, $role_user = 'Bénéf
     return $return;
 }
 
-}
+
 
 function limousinProject_getBlocage($porteurId, $groupeId ) {
 

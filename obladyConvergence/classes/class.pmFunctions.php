@@ -1929,18 +1929,13 @@ function convergence_justeOneDemande($user, $porcess_id) {
     return 1;
 }
 
-// Récupère le champs UID généré par l'auto-incrémentation pour le conserver lors d'une édition
-function convergence_keepAutoIncrement($app_uid, $table, $field = 'UID') {
-    $q = 'select ' . strtoupper($field) . ' as uid from ' . strtoupper($table) . ' where APP_UID = "' . $app_uid . '"';
-    $r = executeQuery($q);    
-    //TODO voir avec Gary pour avoir des champs auto incrémenté
-    if (empty($r[1]['uid']))
-    {
-        $qUid = 'select max(PARTENAIRE_UID)+1 as uid from PMT_PRESTATAIRE';
-        $rUid = executeQuery($qUid);
-        $r[1]['uid'] = $rUid[1]['uid'];
-    }
-    return $r[1]['uid'];
+// Récupère le champs UID généré par l'auto-incrémentation pour le conserver lors d'une édition ou de le générer
+function convergence_keepAutoIncrement($table, $field, $value) {
+    $qInsert = 'INSERT INTO ' . strtoupper($table) . ' (' . strtoupper($field) . ') VALUES (' . $value . ')';
+    $rInsert = executeQuery($qInsert);
+    $q = 'SELECT UID FROM ' . strtoupper($table) . ' WHERE ' . strtoupper($field) . ' = "' . $value . '"';
+    $r = executeQuery($q);
+    return $r[1]['UID'];
 }
 
 ## disable user conection web services
@@ -3276,7 +3271,7 @@ function importCreateCaseEdit($jsonMatchFields,$uidTask, $tableName,$firstLineHe
         $totalCases++;
     }
 
-    genDataReport($tableName);
+   //genDataReport($tableName); 
     
     # create file tmp
     createFileTmpCSV($csv,$csv_file);   

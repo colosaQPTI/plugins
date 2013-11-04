@@ -1,6 +1,6 @@
 <?php
 G::LoadClass ('pmFunctions');
-$POST['PARTENAIRE_UID']='';
+$POST['THEMATIQUE']='';
 $POST['PRESTA_NAME']='';
 $POST['VILLE']='';
 $POST['CODE_OPER']='';
@@ -11,9 +11,17 @@ $sWhere = ' WHERE STATUT=1 AND upper(TYPE_PRESTA) like "PRIVATIF" ';
     $sWhere .= 'AND CODE_OPER_ELIGIBLE = '.$_POST['codeOper'].' ';
     $POST['CODE_OPER']=$_POST['codeOper'];
 }*/
-if(isset($_POST['partenaireUid']) && $_POST['partenaireUid'] !=""){
-    $sWhere .= "AND PARTENAIRE_UID LIKE '%".$_POST['partenaireUid']."%' ";
-    $POST['PARTENAIRE_UID']=$_POST['partenaireUid'];
+if(isset($_POST['thematique']) && $_POST['thematique'] !=""){
+    switch($_POST['thematique'])
+    {
+        case '165' : $sWhere .= "AND TH_CINE like '1' "; break;
+        case '166' : $sWhere .= "AND TH_SPECTACLE like '1' "; break;
+        case '167' : $sWhere .= "AND TH_ACHAT like '1' "; break;
+        case '168' : $sWhere .= "AND TH_ARTS like '1' "; break;
+        case '169' : $sWhere .= "AND TH_SPORT like '1' "; break;
+        case '170' : $sWhere .= "AND (TH_ADH_ART like '1' OR TH_ADH_SPORT = '1') "; break;
+    }
+    $POST['THEMATIQUE']=$_POST['thematique'];
 }
 if(isset($_POST['raisonsociale']) && $_POST['raisonsociale'] !=""){
     $sWhere .= "AND RAISONSOCIALE LIKE '%".mysql_escape_string($_POST['raisonsociale'])."%' ";

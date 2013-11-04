@@ -948,9 +948,7 @@ function Forcerlademande(){
 }
 
 function cancelVoucher() {
-    var changed = 0;
-    changed = changeEtatStatutConfirm('Etes-vous sur de vouloir annuler ce bon de réduction ?', 11);
-    if(changed == 1) {
+    changed = changeEtatStatutConfirm('Etes-vous sur de vouloir annuler ce bon de réduction ?', 11, function(){
         idField = myApp.addTab_inside();
         urlData = "../convergenceList/actions/cancelVoucher.php?array=" + idField + "&statut=" + statut;
         Ext.MessageBox.show({
@@ -994,11 +992,10 @@ function cancelVoucher() {
                 Ext.getCmp('gridNewTab').store.reload();
             }
         });
-    }
+    });
 }
 
-function changeEtatStatutConfirm(message, statut) {
-    var changed = 0;
+function changeEtatStatutConfirm(message, statut, callback) {
     Ext.MessageBox.show({
         title:'Confirmation',
         msg: message,
@@ -1007,11 +1004,12 @@ function changeEtatStatutConfirm(message, statut) {
         fn:function(btn) {
             if(btn == 'yes') {
                 changeEtatStatut(statut);
-                changed = 1;
+                if(callback) {
+                    callback();
+                }
             }
         }
     });
-    return changed;
 }
 
 function changeEtatStatut(statut) {
@@ -1267,6 +1265,7 @@ function VoirLesDemandesProd(app_uid){
                 
             },
             dataIndex : 'NUM_DOSSIER_COMPLEMENT',
+
             hidden: false
         };        
         _dmdProdColumns.push(column);
