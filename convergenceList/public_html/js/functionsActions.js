@@ -161,12 +161,14 @@ function windowTabs(idField,urlData,appNumber)
         });
 }
 
-function viewForms(appUid,accessComment){
+function viewForms(appUid, accessComment, accessStatus){
     if (!accessComment)
         accessComment = 0;
+    if (!accessStatus)
+        accessStatus = 0;
     
     var adaptiveHeight = getDocHeight() - 50;
-    urlData = "../convergenceList/DynaformsListener.php?actionType=view&appUid=" + appUid + "&adaptiveHeight="+adaptiveHeight +"&accessComment="+accessComment;             
+    urlData = "../convergenceList/DynaformsListener.php?actionType=view&appUid=" + appUid + "&adaptiveHeight="+adaptiveHeight +"&accessComment="+accessComment+"&accessStatus="+accessStatus;             
     appNumb = '2';
     windowTabs(appUid,urlData,appNumb);
 }
@@ -947,10 +949,98 @@ function Forcerlademande(){
          });
 }
 
+function askConfirm(question, callback) {
+    Ext.MessageBox.show({
+        title:'Confirmation',
+        msg: question,
+        width:300,
+        buttons:Ext.MessageBox.YESNO,
+        fn:function(btn) {
+            if(btn == 'yes')
+            {
+                if(callback)
+                {
+                    callback();
+                }
+                             
+            }
+        }
+    });
+}
+function blocageCarte(porteurId) {
+  
+       askConfirm('Etes-vous sur de vouloir bloquer cette carte ?', function(){
+        Ext.MessageBox.show({
+            msg: 'Mise à jour des données, veuillez patienter...',
+            progressText: 'En cours...',
+            width: 300,
+            wait: true,
+            waitConfig: {
+                interval: 200
+            }
+        });
+       Ext.Ajax.request({
+            url: "../convergenceList/actions/blocageCarte.php",
+            params: {
+                porteur_id: porteurId
+            },
+            success: function(result) {
+                var response = Ext.util.JSON.decode(result.responseText);
+                if (response.success) {
+                    Ext.MessageBox.hide();
+                    Ext.getCmp('gridNewTab').store.reload();   
+                }
+                else {
+                    Ext.MessageBox.hide();
+                    PMExt.warning(_('ID_WARNING'), response.message);
+                }
+            },
+            failure: function() {
+                Ext.MessageBox.hide();
+            }
+        });
+       
+   });
+    
+}
+function deblocageCarte(porteurId) {
+   askConfirm('Etes-vous sur de vouloir débloquer cette carte ?', function(){
+        Ext.MessageBox.show({
+            msg: 'Mise à jour des données, veuillez patienter...',
+            progressText: 'En cours...',
+            width: 300,
+            wait: true,
+            waitConfig: {
+                interval: 200
+            }
+        });
+       Ext.Ajax.request({
+            url: "../convergenceList/actions/deblocageCarte.php",
+            params: {
+                porteur_id: porteurId
+            },
+            success: function(result) {
+                var response = Ext.util.JSON.decode(result.responseText);
+                if (response.success) {
+                    Ext.MessageBox.hide();
+                    Ext.getCmp('gridNewTab').store.reload();   
+                }
+                else {
+                    Ext.MessageBox.hide();
+                    PMExt.warning(_('ID_WARNING'), response.messageinfo);
+                }
+            },
+            failure: function() {
+                Ext.MessageBox.hide();
+            }
+        });
+       
+   });
+}
 function cancelVoucher() {
-    changed = changeEtatStatutConfirm('Etes-vous sur de vouloir annuler ce bon de réduction ?', 11, function(){
+    changed = changeEtatStatutConfirm('Etes-vous sur de vouloir annuler ce bon de réduction ?', 'Votre bon de réduction a bien été annulé.', 11, function(){
         idField = myApp.addTab_inside();
-        urlData = "../convergenceList/actions/cancelVoucher.php?array=" + idField + "&statut=" + statut;
+        urlData = "../convergenceList/actions/cancelVoucher.php?array=" + idField;
         Ext.MessageBox.show({
             msg: 'Mise à jour des données, veuillez patienter...',
             progressText: 'En cours...',
@@ -963,57 +1053,45 @@ function cancelVoucher() {
         Ext.Ajax.request({
             url: urlData,
             params: {
-                array: idField,
-                statut: statut
+                array: idField
             },
             success: function(result, request) {
                 var response = Ext.util.JSON.decode(result.responseText);
                 if (response.success) {
                     Ext.MessageBox.hide();
-                    alert(response.messageinfo);
-                    Ext.MessageBox.show({
-                        msg: response.messageinfo,
-                        progressText: 'En cours...',
-                        width: 300,
-                        wait: true,
-                        waitConfig: {
-                            interval: 200
-                        }
-                    });
                 }
                 else {
                     Ext.MessageBox.hide();
                     PMExt.warning(_('ID_WARNING'), response.message);
                 }
-                Ext.getCmp('gridNewTab').store.reload();
             },
             failure: function(result, request) {
                 Ext.MessageBox.hide();
-                Ext.getCmp('gridNewTab').store.reload();
             }
         });
     });
 }
 
-function changeEtatStatutConfirm(message, statut, callback) {
+function changeEtatStatutConfirm(question, messageInfo, statut, callback) {
     Ext.MessageBox.show({
         title:'Confirmation',
-        msg: message,
+        msg: question,
         width:300,
         buttons:Ext.MessageBox.YESNO,
         fn:function(btn) {
-            if(btn == 'yes') {
-                changeEtatStatut(statut);
-                if(callback) {
+            if(btn == 'yes')
+            {
+                if(callback)
+                {
                     callback();
                 }
+                changeEtatStatut(statut, messageInfo);                
             }
         }
     });
 }
 
-function changeEtatStatut(statut) {
-
+function changeEtatStatut(statut, message) {
     idField = myApp.addTab_inside();
     urlData = "../convergenceList/actions/changeEtatStatut.php?array=" + idField + "&statut=" + statut;
     Ext.MessageBox.show({
@@ -1035,7 +1113,7 @@ function changeEtatStatut(statut) {
             var response = Ext.util.JSON.decode(result.responseText);
             if (response.success) {
                 Ext.MessageBox.hide();
-                alert(response.messageinfo);
+                alert(message || response.messageinfo);
             }
             else {
                 Ext.MessageBox.hide();
@@ -1233,6 +1311,8 @@ function reproductionCheque(annuleFlag){
     
     
 }
+
+
 
 function VoirLesDemandesProd(app_uid){
              
@@ -2063,7 +2143,7 @@ function actionRestartCases(){
     urlData = "../convergenceList/actions/actionRestartCases.php";
     PMExt.confirm(_('ID_CONFIRM'),"Do you like to restart all these Cases?", function(){
         Ext.MessageBox.show({
-              msg : 'RedÔøΩmarrage, Veuillez patienter ...',
+              msg : 'Red&eacute;marrage, Veuillez patienter ...',
               progressText : 'Chargement ...',
               width : 300,
               wait : true,
@@ -2100,24 +2180,28 @@ function actionRestartCases(){
 function caseGralInfo(appUid,num_dossier,table){    
     
         if (!table) table = 'PMT_DEMANDES';
-        var adaptiveHeight = getDocHeight() - 50;
+        var adaptiveHeight = getDocHeight() - 70;
     
     //urlData = "../convergenceList/actionGeneralInfo.php?appUid=" + appUid +"&adaptiveHeight="+adaptiveHeight+"&num_dossier="+num_dossier;    
     urlData = "../convergenceList/casesHistoryDynaformPage_Ajax.php?actionAjax=HistoryLog&APP_UID=" + appUid +"&adaptiveHeight="+adaptiveHeight+"&num_dossier="+num_dossier+"&table="+table;    
         
         
         var win2 = new Ext.Window({
-            id:'win2',
-            closable: true,
-            closeAction : 'hide',
-            autoDestroy : true,
-            maximizable: false,
-            title: 'Historique du dossier :',               
+            id       :'win2',
+            width      : 300,
+            layout     : 'fit',
+            autoScroll : true,
+            border     : false,
+            collapsible: true,
+            draggable  : true,
+            resizable  : true,
             modal: true,
             loadMask : true,
+            title: 'Historique du dossier :',   
             items : [{
                 id: 'PanelForms',    
                 xtype:'panel',
+                //frame  : true,
                 items:[{
                     xtype:"tabpanel",
                     id: 'tabPanelcaseGralInfo',                    
@@ -2156,6 +2240,7 @@ function caseGralInfo(appUid,num_dossier,table){
 
         win2.show();
         win2.maximize();
+        win2.doLayout();
         win2.on('hide',function(){            
             Ext.getCmp('gridNewTab').store.reload();
         });
