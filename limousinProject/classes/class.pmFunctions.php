@@ -9,6 +9,7 @@
  */
 require_once("plugins/limousinProject/classes/Webservices/Webservice.php");
 require_once("plugins/limousinProject/classes/Webservices/Autorisation.php");
+require_once("plugins/limousinProject/classes/Webservices/Blocage.php");
 require_once("plugins/limousinProject/classes/Webservices/Transaction.php");
 require_once("plugins/limousinProject/classes/Webservices/ActionCRM.php");
 require_once("plugins/limousinProject/classes/Webservices/Activation.php");
@@ -148,8 +149,8 @@ function limousinProject_blocageCarte($porteurId, $statut, $role_user = 'Bénéf
                 }
                 else
                 {
-                    // On récupére le label de l'erreur lors de l'appel ws activation carte
-                    $erreur = limousinProject_getErrorAqoba($active->code, 'WS211') . " (code $active->code du WS211)";
+                    // On récupére le label de l'erreur lors de l'appel ws blocage carte
+                    $erreur = limousinProject_getErrorAqoba($active->code, 'WS210') . " (code $active->code du WS210)";
                     $return = FALSE;
                 }
             }
@@ -204,17 +205,13 @@ function limousinProject_getBlocage($porteurId, $groupeId ) {
 
     // INIT Ws 211    
     $result = null;
-    $v = new Activation();
+    $v = new Blocage();
 
     // SET Params
     $v->partenaire = wsPrestaId;
     $v->porteurId = $porteurId;
     
 
-    /* Mode Test On */
-    //$v->porteurId = 30280055364;
-    //$s->porteurId = 30280000023;
-    /* Mode Test Off */
     // CALL Ws
     try
     {
@@ -236,6 +233,39 @@ function limousinProject_getBlocage($porteurId, $groupeId ) {
 }
 
 
+function limousinProject_getDeblocage($porteurId ) {
+
+    // INIT Ws 211    
+    $result = null;
+    $v = new Blocage();
+
+    // SET Params
+    $v->partenaire = wsPrestaId;
+    $v->porteurId = $porteurId;// groupe carte Active typo
+    
+
+    // CALL Ws
+    try
+    {
+        $v->call();
+    // Si la carte est bien activée, on met à jour la table des cartes PMT_CHEQUES
+        $query = 'update PMT_CHEQUES SET CARTE_STATUT = "Active" where CARTE_PORTEUR_ID= "' . mysql_escape_string($porteurId) . '"';
+        $resQuery = executeQuery($query);
+        // Puis on change le usergroup dans Typo3 en Carte activé
+        $data = limousinProject_getDemandeFromPorteurID($porteurId);
+        $userInfo = userInfo($data['USER_ID']);
+        $result = limousinProject_updateUsergroupTypo($userInfo, $porteurId, 222);
+    }
+    catch (Exception $e)
+    {
+
+        $result = $v->errors;
+        var_dump($e->getMessage());
+    }
+    // RETURN
+    return $result;
+}
+
 
 function limousinProject_generatePorteurID($num_dossier) {
     
@@ -245,15 +275,18 @@ function limousinProject_generatePorteurID($num_dossier) {
       Ce qui fait que l'exemple du document est faux : 23 mod 9 = 5, et 9-5=4 donc le dernier chiffre doit être 4.
      */
 
+    $query = 'INSERT INTO PMT_PORTEURID NUM_DOSSIER VALUES("%s") ';
+    executeQuery(sprintf($query,$numDossier));
+    $query = 'SELECT ID FROM PMT_PORTEURID WHERE NUM_DOSSIER= "%s"';
+    $result =  executeQuery(sprintf($query,$numDossier));
+
+           
     $prefix = '3028';
-    $temp_num_dossier = str_pad($num_dossier, 6, "0", STR_PAD_LEFT);
-    $somme = array_sum(str_split($prefix . $temp_num_dossier));
-    $cle_modulo = 9 - $somme % 9;
+    $middle = str_pad($result[1]['ID'], 6, "0", STR_PAD_LEFT);
+    $checksum = array_sum(str_split($prefix . $middle));
+    $checksum = 9 - $checksum % 9;
 
-
-    $porteurID = $prefix . $temp_num_dossier . $cle_modulo;
-
-    return $porteurID;
+    return  $prefix . $middle . $checksum;;
 }
 
 function limousinProject_getDemandeFromUserID($userId) {
@@ -301,12 +334,11 @@ function limousinProject_isCarteActive($porteurID) {
 
 function limousinProject_getDateNaissanceFromPorteurID($porteurID) {
     $dateNaissance = '';
-    $arrayData = array();
     $query = "SELECT FI_DATEDENAISSANCE FROM PMT_DEMANDES WHERE STATUT <> 0 AND STATUT <> 999 AND PORTEUR_ID = '".$porteurID."'";
     $result = executeQuery($query);
     if(sizeof($result) == 1)
     {
-        $dateNaissance = $result[1]['FI_DATENAISSANCE'];
+        $dateNaissance = $result[1]['FI_DATEDENAISSANCE'];
     }
     return $dateNaissance;
 }
@@ -1008,10 +1040,23 @@ function limousinProject_activationCarte($porteurId, $statut, $role_user = 'Bén
     else
     {
         $return = FALSE;
-        if ($statut != 1)
-            $erreur = 'Activation annulée par le ' . $role_user;
-        else
-            $erreur = 'PorteurId incorrect.';
+        switch ($statut)
+        {
+            case '2':
+                $erreur = 'Activation annulée par le ' . $role_user;
+                break;
+            case '3':
+                $erreur = 'CGU non accepté par le ' . $role_user;
+                break;
+
+            default:
+                $erreur = 'PorteurId incorrect.';
+                break;
+        }
+//        if ($statut != 1)
+//            $erreur = 'Activation annulée par le ' . $role_user;
+//        else
+//            $erreur = 'PorteurId incorrect.';
     }
     // Dans le cas où $return == 'erreur', alors la carte est activé, mais avec quand même des erreurs à signaler, donc on rentre dans les 2 conditions suivantes
     if ($return !== FALSE)
