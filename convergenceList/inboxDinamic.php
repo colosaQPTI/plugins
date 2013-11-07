@@ -191,6 +191,7 @@ function delete_duplicate($array, $field)
   return $result;
 }
 ?>
+<script type='text/javascript' id='id_js' src='/plugin/limousinProject/varGlobal.js'></script>
 <script type='text/javascript' src='/plugin/obladyConvergence/resize_iframe.js'></script> 
 <script type='text/javascript' src='/plugin/convergenceList/js/functionsActions.js'></script> 
 <script type='text/javascript' src='/extjs/app_main.js'></script>

@@ -1,4 +1,4 @@
-var ORIGIN ='http://'+location.host+':8084/';
+var ORIGIN = swHostName;
 //var ORIGIN ='http://localhost:8081';
 
 function sendHeight(){

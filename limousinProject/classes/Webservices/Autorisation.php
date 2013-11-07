@@ -10,8 +10,9 @@ class Autorisation extends Webservices {
 		parent::__construct(); 
 		
 		// INIT
-       	$this->url = "http://extranet.aqoba-preprod.customers.artful.net/api/v09/autorisation?access_token=99ac21619656c825e788ffb8ac6bfa23f08f4b08";
-		$this->wsId = "306";
+       	//$this->url = "http://extranet.aqoba-preprod.customers.artful.net/api/v09/autorisation?access_token=99ac21619656c825e788ffb8ac6bfa23f08f4b08";
+        $this->url = wsHote_Url . "autorisation" . wsToken_param;
+        $this->wsId = "306";
 		
 		// GET Bouchon
 		// $bouchonFileName = dirname(__FILE__).'/bouchonAutorisation.txt';

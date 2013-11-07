@@ -352,7 +352,7 @@ if($actionAjax== 'historyDynaformGridPreview')
       G::RenderPage('publish', 'blank');
       
 ?>      
-    <link href="/plugin/convergenceList/modal.css" rel="stylesheet" type="text/css" media="screen" /> 
+    <link href="/plugin/convergenceList/modalMessageCase.css" rel="stylesheet" type="text/css" media="screen" /> 
     <style type="text/css">
 #confirmBox {
 	width:30em;

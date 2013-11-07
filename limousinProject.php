@@ -75,5 +75,11 @@ class limousinProjectPlugin extends PMPlugin
   
 }
 
+if(class_exists("headPublisher"))
+{
+    $oHeadPublisher =& headPublisher::getSingleton();
+    $oHeadPublisher->addScriptFile("/plugin/limousinProject/varGlobal.js",1);
+}
+
 $oPluginRegistry = &PMPluginRegistry::getSingleton();
 $oPluginRegistry->registerPlugin("limousinProject", __FILE__);

@@ -2972,7 +2972,7 @@ function importCreateCaseDelete($jsonMatchFields,$uidTask, $tableName,$firstLine
 
 function importCreateCaseEdit($jsonMatchFields,$uidTask, $tableName,$firstLineHeader, $dataDeleteEdit)
 {
-	G::LoadClass('case');
+    G::LoadClass('case');
     $items   = json_decode($jsonMatchFields,true);
     $dataCSV = isset($_SESSION['REQ_DATA_CSV']) ? $_SESSION['REQ_DATA_CSV'] : array();
     $USR_UID = $_SESSION['USER_LOGGED'];
@@ -2984,18 +2984,18 @@ function importCreateCaseEdit($jsonMatchFields,$uidTask, $tableName,$firstLineHe
     $dataCSV = $dataCSVdebug;
     // load Dynaforms of process
     $select = "SELECT DYN_UID, PRO_UID, DYN_TYPE, DYN_FILENAME FROM DYNAFORM WHERE PRO_UID = '".$proUid ."'";
-	$resultDynaform = executeQuery($select);
-	$_dataForms =  dataDynaforms($resultDynaform,$proUid);	
-		
+    $resultDynaform = executeQuery($select);
+    $_dataForms =  dataDynaforms($resultDynaform,$proUid);  
+        
     $select = executeQuery("SELECT MAX(IMPCSV_IDENTIFY) AS IDENTIFY FROM PMT_IMPORT_CSV_DATA WHERE IMPCSV_TABLE_NAME = '$tableName' ");
     $identify = isset($select[1]['IDENTIFY'])? $select[1]['IDENTIFY']:0;
     $identify = $identify + 1;
     $csv_file = $tableName."_".$identify.".csv";  
-	$csv_sep = ",";     
+    $csv_sep = ",";     
     $csv="";  
     $csv_end = "\n";
     $swInsert = 0;
-    genDataReport($tableName);
+    //genDataReport($tableName);
     
     foreach ($dataCSV as $row)
     {
@@ -3209,13 +3209,32 @@ function importCreateCaseEdit($jsonMatchFields,$uidTask, $tableName,$firstLineHe
 
             // end labels
             // update cases
+            $appDataNew = array();
             foreach ($appData as $key => $value)
             {
-                if(!is_array($value))
-                    $appData[$key] = ($value);
+                foreach($items as $row)
+                { 
+                	if($row['FIELD_NAME'] == $key)
+                	{
+            			if(!is_array($value))
+            			{
+            				$appDataNew[$key] = $value;
+            			}
+                		else
+                		{
+                			$appDataNew[$key] = $value;
+                		}
+                	}
+                }
+            	if(!is_array($value))
+            	{
+                	$appData[$key] = $value;
+            	}
                 else
-                    $appData[$key] = $value;
-            } 
+                {
+                	$appData[$key] = $value;
+                }
+            }  
             $query = "SELECT APP_UID FROM $tableName WHERE $whereUpdate ";
             $updateData = executeQuery($query);
             if (sizeof($updateData))
@@ -3224,17 +3243,18 @@ function importCreateCaseEdit($jsonMatchFields,$uidTask, $tableName,$firstLineHe
                 {
                     $oCase = new Cases ();
                     $FieldsCase = $oCase->loadCase($index['APP_UID']);
-                    $appData['VALIDATION'] = '0'; //needed for the process, if not you will have an error.
-                    $appData['FLAG_ACTION'] = 'multipleDerivation';
-                    $appData['EXEC_AUTO_DERIVATE'] = 'NO';
-                    $appData['eligible'] = 0; // only process beneficiary
-                    $appData['FLAG_EDIT'] = 1;
-                    $appData['CurrentUserAutoDerivate'] = $USR_UID;
-                    $appData['SW_CREATE_CASE'] = 1; // needed to create cases. If a loop is generated when you run the trigger
-                    $appData = array_merge($FieldsCase['APP_DATA'], $appData);
-                    $FieldsCase['APP_DATA'] = $appData;
+                    $appDataNew['VALIDATION'] = '0'; //needed for the process, if not you will have an error.
+                    $appDataNew['FLAG_ACTION'] = 'multipleDerivation';
+                    $appDataNew['EXEC_AUTO_DERIVATE'] = 'NO';
+                    $appDataNew['eligible'] = 0; // only process beneficiary
+                    $appDataNew['FLAG_EDIT'] = 1;
+                    $appDataNew['FLAG_UPDATE'] = 1;
+                    $appDataNew['CurrentUserAutoDerivate'] = $USR_UID;  
+                    $appDataNew['SW_CREATE_CASE'] = 1; ; // needed to create cases. If a loop is generated when you run the trigger
+                    $appDataNew = array_merge($FieldsCase['APP_DATA'], $appDataNew);
+                    $FieldsCase['APP_DATA'] = $appDataNew; 
                     $oCase->updateCase($index['APP_UID'], $FieldsCase);
-                    
+                    executeTriggers($proUid,$index['APP_UID'],$USR_UID);
                 }
             }
             else
@@ -3254,25 +3274,20 @@ function importCreateCaseEdit($jsonMatchFields,$uidTask, $tableName,$firstLineHe
                     $FieldsCase = $oCase->loadCase($caseUID);
                     $FieldsCase['APP_DATA']['NUM_DOSSIER'] = $FieldsCase['APP_NUMBER']; 
                     $oCase->updateCase($caseUID, $FieldsCase);
-                	autoDerivate($proUid, $caseUID, $USR_UID);
-                                      
+                    autoDerivate($proUid, $caseUID, $USR_UID);                                      
                     
                     /* Comment by Nico 28/08/2013
                      * Please, don't remove the comment because make some bug on process
                      * or explain to me why you want to put this value 
                      * 
                      */
-                    //$FieldsCase['APP_DATA']['STATUT'] = 1;
-                    //$FieldsCase['APP_DATA']['LOOP'] = '';
-                    
+                   
                 }
             }
         }
         $totalCases++;
     }
 
-   //genDataReport($tableName); 
-    
     # create file tmp
     createFileTmpCSV($csv,$csv_file);   
     # end create file tmp
