@@ -9,6 +9,7 @@ $CURRENTDATETIME=date('Y-m-d H:i:s');
 $ADAPTIVEHEIGHT = $_GET['adaptiveHeight'];
 $APP_UID = $_GET['appUid'];
 $SHOWCOMMENT = $_GET['accessComment'];
+$SHOWSTATUS = $_GET['accessStatus'];
 $FINDEX  ='';
 $PRO_UID ='';
 $TAS_UID ='';
@@ -173,6 +174,7 @@ $oHeadPublisher->assign('CURRENTDATETIME', $CURRENTDATETIME);
 $oHeadPublisher->assign('DYNAFORMSLIST', $DYNAFORMSLIST);
 $oHeadPublisher->assign('ADAPTIVEHEIGHT', $ADAPTIVEHEIGHT);
 $oHeadPublisher->assign('SHOWCOMMENT', $SHOWCOMMENT);
+$oHeadPublisher->assign('SHOWSTATUS', $SHOWSTATUS);
 $oHeadPublisher->assign('DATALABELS', $dataLabels);
 $oHeadPublisher->addExtJsScript('convergenceList/caseHistoryDynaformPage', true );    //adding a javascript file .js
 $oHeadPublisher->addContent    ('convergenceList/caseHistoryDynaformPage'); //adding a html file  .html.      

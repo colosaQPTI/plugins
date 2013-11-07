@@ -267,7 +267,7 @@ function limousinProject_getDeblocage($porteurId ) {
 }
 
 
-function limousinProject_generatePorteurID($num_dossier) {
+function limousinProject_generatePorteurID($numDossier) {
     
     /* Les 4 premiers caractères seront : 3028
       Les 6 autres seront le numéro unique créé par convergence
@@ -275,7 +275,7 @@ function limousinProject_generatePorteurID($num_dossier) {
       Ce qui fait que l'exemple du document est faux : 23 mod 9 = 5, et 9-5=4 donc le dernier chiffre doit être 4.
      */
 
-    $query = 'INSERT INTO PMT_PORTEURID NUM_DOSSIER VALUES("%s") ';
+    $query = 'INSERT INTO PMT_PORTEURID (NUM_DOSSIER) VALUES("%s") ';
     executeQuery(sprintf($query,$numDossier));
     $query = 'SELECT ID FROM PMT_PORTEURID WHERE NUM_DOSSIER= "%s"';
     $result =  executeQuery(sprintf($query,$numDossier));
@@ -286,7 +286,10 @@ function limousinProject_generatePorteurID($num_dossier) {
     $checksum = array_sum(str_split($prefix . $middle));
     $checksum = 9 - $checksum % 9;
 
-    return  $prefix . $middle . $checksum;;
+    $query = 'UPDATE PMT_PORTEURID  SET PORTEUR_ID = %s WHERE ID = %s';
+    executeQuery(sprintf($query,$prefix . $middle . $checksum,$result[1]['ID']));
+    
+    return  $prefix . $middle . $checksum;
 }
 
 function limousinProject_getDemandeFromUserID($userId) {
@@ -1120,6 +1123,38 @@ function limousinProject_getThematiqueFromPartenaire($userId) {
         }
     }   
     return $thematiquesArray;    
+}
+
+function limousinProject_getPartenaireInfoForTicket($userId) {
+    $partenaireInfo = '';
+    $query = "SELECT RAISONSOCIALE, CP, VILLE FROM PMT_PRESTATAIRE WHERE STATUT = 1 AND USER_ID ='".$userId."'";
+    $result = executeQuery($query);
+    if(isset($result))
+    {        
+        $raison = $result[1]['RAISONSOCIALE'];
+        $cp = $result[1]['CP'];
+        $ville = $result[1]['VILLE'];
+        if(isset($raison))
+        {
+            $partenaireInfo .= $raison;
+        }
+        if(isset($cp) && isset($ville))
+        {
+            $partenaireInfo .= '<br/>'.$cp.' '.$ville;
+        }
+    }
+    return $partenaireInfo;    
+}
+
+function limousinProject_getPartenaireIdFromPartenaire($userId) {
+    $partenaireId = '';
+    $query = "SELECT PARTENAIRE_UID FROM PMT_PRESTATAIRE where STATUT=1 AND USER_ID ='".$userId."'";
+    $result = executeQuery($query);
+    if(isset($result))
+    {
+        $partenaireId = $result[1]['PARTENAIRE_UID'];
+    }
+    return $partenaireId;
 }
 
 ?>

@@ -14,7 +14,7 @@ define('serveur_ftp', '217.108.231.49');
 define('protocol_transfert', 'sftp');
 //WebService
 //define('wsHote', 'https://www.gaiacardsystem.com/api/v09/');
-define('wsHote_Url', 'https://extranet.aqoba-preprod.customers.artful.net/api/v09/');
+define('wsHote_Url', 'http://extranet.aqoba-preprod.customers.artful.net/api/v09/');
 define('wsToken_param', '?access_token=99ac21619656c825e788ffb8ac6bfa23f08f4b08');
 define('wsPrestaId', '00028');
 G::LoadClass("plugin");

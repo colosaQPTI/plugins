@@ -110,12 +110,12 @@ Ext.onReady(function(){
 	        dataIndex : 'USERCREATOR'
 	      },{
 	        header : "Date",
-	        width : 20,
+	        width : 15,
 	        sortable : true,
 	        dataIndex : 'HLOG_DATECREATED'
 	      }, {
 	        header : "Etat du dossier",
-	        width : 10,
+	        width : 15,
 	        sortable : true,
 	        dataIndex : 'HLOG_STATUS'
 	      },
@@ -140,7 +140,6 @@ Ext.onReady(function(){
 	    autoFill : true,
 	    nocache : true,
 	    autoWidth : true,
-	    height : 800,
 	    stateful : true,
 	    animCollapse : true,
 	    stateId : 'grid',

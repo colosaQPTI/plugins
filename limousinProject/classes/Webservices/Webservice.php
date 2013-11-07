@@ -28,10 +28,11 @@ class Webservices {
         // curl_setopt($ch,CURLINFO_HEADER_OUT, true);
         curl_setopt($ch,CURLOPT_POSTFIELDS,"$streamContent");
         curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
-        curl_setopt($ch,CURLOPT_SSL_VERIFYPEER, false); 
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 1);
-        curl_setopt($ch,CURLOPT_SSLCERT, "/etc/apache2/ssl/limousin.pem");
-        curl_setopt($ch, CURLOPT_SSLCERTPASSWD, "pempp");        
+// http in preprod and https in prod server
+//        curl_setopt($ch,CURLOPT_SSL_VERIFYPEER, false);
+//        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 1);
+ //       curl_setopt($ch,CURLOPT_SSLCERT, "/etc/httpd/ssl/limousin.pem");
+//        curl_setopt($ch, CURLOPT_SSLCERTPASSWD, "pempp");        
         //curl_setopt($ch,CURLOPT_CERTINFO, true);
         // GET Response
         $response = curl_exec($ch);
@@ -41,6 +42,7 @@ class Webservices {
         try{
         // Check Response
             $response = $this->checkReturn($response);
+
         }
         catch (Exception $e)
         {            
@@ -145,6 +147,7 @@ class Webservices {
         $reponse = new SimpleXMLElement($dom->saveXML());
         //CHECK Return Code
         if(empty($reponse->status)){
+
             throw new Exception('Status introuvable dans la réponse XML', 1);
 
         }elseif(empty($reponse->status->success)){
@@ -154,12 +157,14 @@ class Webservices {
                     $this->errors[] = array("field" => $field['name'],"desc" => $field);*/
 
                 $this->errors = $reponse->status->failure;
+
                 throw new Exception('Status en echec dans la réponse XML.', 1);
 
             }else{
                 throw new Exception('Status inconnu dans la réponse XML', 1);
             }
         }
+
         // RETURN
         return $reponse;        
 

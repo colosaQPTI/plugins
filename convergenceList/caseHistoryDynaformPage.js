@@ -133,17 +133,23 @@ function ajaxPostRequest(url, callback_function, id){
       }      
       
       //ajout des commentaires
-      if (SHOWCOMMENT == 1) {
-    	  fn_add_tab(id_Commentaires,'viewCaseNotes.php?APP_UID='+APP_UID,TabPanel);
-    	    
-    	  fn_add_tab(id_Explicatio_Statut,'actions/explicationStatut.php?APP_UID='+APP_UID+'&ADAPTIVEHEIGHT='+ADAPTIVEHEIGHT,TabPanel);
-      }
+      if (SHOWCOMMENT == 1 && SHOWSTATUS == 1) {
+        fn_add_tab(id_Commentaires,'viewCaseNotes.php?APP_UID='+APP_UID,TabPanel);
+        fn_add_tab(id_Explicatio_Statut,'actions/explicationStatut.php?APP_UID='+APP_UID+'&ADAPTIVEHEIGHT='+ADAPTIVEHEIGHT,TabPanel);
+      } else if (SHOWCOMMENT == 1 && SHOWSTATUS == 0) {
+        fn_add_tab(id_Commentaires,'viewCaseNotes.php?APP_UID='+APP_UID,TabPanel);
+      } else if (SHOWCOMMENT == 0 && SHOWSTATUS == 1) {
+        fn_add_tab(id_Explicatio_Statut,'actions/explicationStatut.php?APP_UID='+APP_UID+'&ADAPTIVEHEIGHT='+ADAPTIVEHEIGHT,TabPanel);
+      };
       // ajout nico pour les statut remboursement
-      if (SHOWCOMMENT == 2) {
-    	  fn_add_tab(id_Commentaires,'viewCaseNotes.php?APP_UID='+APP_UID,TabPanel);
-
-    	  fn_add_tab(id_Explicatio_Statut,'actions/explicationStatutRmb.php?APP_UID='+APP_UID+'&ADAPTIVEHEIGHT='+ADAPTIVEHEIGHT,TabPanel);
-      }
+      if (SHOWCOMMENT == 2 && SHOWSTATUS == 1) {
+        fn_add_tab(id_Commentaires,'viewCaseNotes.php?APP_UID='+APP_UID,TabPanel);
+        fn_add_tab(id_Explicatio_Statut,'actions/explicationStatutRmb.php?APP_UID='+APP_UID+'&ADAPTIVEHEIGHT='+ADAPTIVEHEIGHT,TabPanel);
+      } else if (SHOWCOMMENT == 2 && SHOWSTATUS == 1) {
+        fn_add_tab(id_Commentaires,'viewCaseNotes.php?APP_UID='+APP_UID,TabPanel);
+      } else if (SHOWCOMMENT == 2 && SHOWSTATUS == 1) {
+        fn_add_tab(id_Explicatio_Statut,'actions/explicationStatutRmb.php?APP_UID='+APP_UID+'&ADAPTIVEHEIGHT='+ADAPTIVEHEIGHT,TabPanel);
+      };
       
       TabPanel.setActiveTab(1);
       

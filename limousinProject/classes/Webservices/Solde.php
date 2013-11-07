@@ -10,7 +10,7 @@ class Solde extends Webservices {
 		parent::__construct(); 
 		
 		// INIT
-       	$this->url = "https://extranet.aqoba-preprod.customers.artful.net/api/v09/solde?access_token=99ac21619656c825e788ffb8ac6bfa23f08f4b08";
+       	$this->url = "http://extranet.aqoba-preprod.customers.artful.net/api/v09/solde?access_token=99ac21619656c825e788ffb8ac6bfa23f08f4b08";
         $this->wsId = "304";
 		
 		// GET Bouchon

@@ -11,8 +11,8 @@ class Transaction extends Webservices {
 		parent::__construct(); 
 		
 		// INIT
-       	$this->url = "https://extranet.aqoba-preprod.customers.artful.net/api/v09/versement?access_token=99ac21619656c825e788ffb8ac6bfa23f08f4b08";
-		$this->wsId = "201";
+       	$this->url = "http://extranet.aqoba-preprod.customers.artful.net/api/v09/versement?access_token=99ac21619656c825e788ffb8ac6bfa23f08f4b08";
+        $this->wsId = "201";
 		$this->sousMontant = array();		
 		
 		// GET Bouchon

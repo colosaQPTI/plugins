@@ -90,9 +90,16 @@ function FRegeneratePMCases($caseId) {
 	}
 	// End If the user is different
 
+        //Comment FPETIT
 	$resInfo = PMFDerivateCase($caseId, 1,true, $USR_UID);
-
-	///////////////////////// End Route Again the Case /////////////////////////////////////
+//        $sSQL = "SELECT PRO_UID FROM APPLICATION WHERE APP_UID='$caseId'";
+//    	$aResult = executeQuery($sSQL);
+//    	$proUid = '';
+//    	if (isset($aResult[1]['PRO_UID'])) {
+//            $proUid =$aResult[1]['PRO_UID'];
+//            autoDerivate($proUid,$caseId,$USR_UID);
+//        }
+    ///////////////////////// End Route Again the Case /////////////////////////////////////
 }
 
 function FRegenerateRPT(){
