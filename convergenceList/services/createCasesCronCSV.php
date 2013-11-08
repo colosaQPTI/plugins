@@ -757,7 +757,8 @@
             	    $appData['EXEC_AUTO_DERIVATE'] = 'NO';
             	    $appData['eligible'] = 0; // only process beneficiary
             	    $appData['FLAG_EDIT'] = 1;
-            	    $appData['CurrentUserAutoDerivate'] = $USR_UID;
+                $appDataNew['FLAG_UPDATE'] = 1;
+                $appData['CurrentUserAutoDerivate'] = $USR_UID;
             	    $appData = array_merge($FieldsCase['APP_DATA'],$appData);
             	    $FieldsCase['APP_DATA'] = $appData;
 	        		$oCase->updateCase($index['APP_UID'],$FieldsCase);

@@ -35,10 +35,10 @@ class archivedCasesClassCron
 	 
 	function createCasesCSV()
 	{
-	    $query = "SELECT IMPCSV_IDENTIFY, IMPCSV_TYPE_ACTION, IMPCSV_CONDITION_ACTION, IMPCSV_FIRSTLINEHEADER, IMPCSV_TABLE_NAME, IMPCSV_TAS_UID
+	    $query = "SELECT IMPCSV_IDENTIFY, IMPCSV_TYPE_ACTION, IMPCSV_CONDITION_ACTION, IMPCSV_FIRSTLINEHEADER, IMPCSV_TABLE_NAME, IMPCSV_TAS_UID, IMPCSV_WHERE_ACTION
 		      FROM wf_".$this->workspace.".PMT_IMPORT_CSV_DATA GROUP BY IMPCSV_IDENTIFY ";
 		$data = executeQuery($query);
-		if(sizeof($data))
+        if(sizeof($data))
 		{
             foreach($data as $row)
 		    {
@@ -54,7 +54,7 @@ class archivedCasesClassCron
 		        		);
 		        	$dataImportCSV[] = $record;
 		        }
-		        $USR_UID = '00000000000000000000000000000001';
+                $USR_UID = '00000000000000000000000000000001';
 		        $_SESSION['USER_LOGGED'] = $USR_UID;
 		        $user = userInfo($USR_UID);
 		        $_SESSION['USR_USERNAME'] = $user['username']; 
@@ -63,7 +63,8 @@ class archivedCasesClassCron
 		        $uidTask     = isset($row["IMPCSV_TAS_UID"])? $row["IMPCSV_TAS_UID"]:'';
 		        $tableName   = isset($row["IMPCSV_TABLE_NAME"])? $row["IMPCSV_TABLE_NAME"]:'';
 		        $csvIdentify   = isset($row["IMPCSV_IDENTIFY"])? $row["IMPCSV_IDENTIFY"]:'';
-		        $firstLineHeader   = isset($row["IMPCSV_FIRSTLINEHEADER"])? $row["IMPCSV_FIRSTLINEHEADER"]:'on';
+		        $csvWhereAction = isset($row["IMPCSV_WHERE_ACTION"]) ? $row["IMPCSV_WHERE_ACTION"] : '';
+                $firstLineHeader   = isset($row["IMPCSV_FIRSTLINEHEADER"])? $row["IMPCSV_FIRSTLINEHEADER"]:'on';
 		        $fileCSV     = $tableName.'_'.$row['IMPCSV_IDENTIFY'];
 		        $queryTot = executeQuery("SELECT IMPCSV_TOTCASES FROM wf_".$this->workspace.".PMT_IMPORT_CSV_DATA WHERE IMPCSV_IDENTIFY = '$csvIdentify' AND IMPCSV_TABLE_NAME = '$tableName'");
                 $totCasesCSV = $queryTot[1]['IMPCSV_TOTCASES'];
@@ -80,14 +81,14 @@ class archivedCasesClassCron
 		    		break;
 		    	
 		    	    case "ADD_DELETE": 
-		    		$totalCases = $this->importCreateCaseDeleteCSV($matchFields,$uidTask,$tableName,$firstLineHeader, $informationCSV,$dataDeleteEdit,$csvIdentify,$totCasesCSV);
-		    		$delete = executeQuery("DELETE FROM wf_".$this->workspace.".PMT_IMPORT_CSV_DATA WHERE IMPCSV_IDENTIFY = '$csvIdentify' AND IMPCSV_TABLE_NAME = '$tableName' ");
+		    		$totalCases = $this->importCreateCaseDeleteCSV($matchFields, $uidTask, $tableName, $firstLineHeader, $informationCSV, $dataDeleteEdit, $csvIdentify, $totCasesCSV, $csvWhereAction);
+                        $delete = executeQuery("DELETE FROM wf_".$this->workspace.".PMT_IMPORT_CSV_DATA WHERE IMPCSV_IDENTIFY = '$csvIdentify' AND IMPCSV_TABLE_NAME = '$tableName' ");
 		    		$this->deleteFileCSV($fileCSV);
 		    		break;
 		    		
 		    	    case "ADD_UPDATE": 		    		
-		    		$totalCases = $this->importCreateCaseEditCSV($matchFields,$uidTask,$tableName,$firstLineHeader,$informationCSV, $dataDeleteEdit,$csvIdentify,$totCasesCSV);
-		    		$delete = executeQuery("DELETE FROM wf_".$this->workspace.".PMT_IMPORT_CSV_DATA WHERE IMPCSV_IDENTIFY = '$csvIdentify' AND IMPCSV_TABLE_NAME = '$tableName' ");
+		    		$totalCases = $this->importCreateCaseEditCSV($matchFields, $uidTask, $tableName, $firstLineHeader, $informationCSV, $dataDeleteEdit, $csvIdentify, $totCasesCSV, $csvWhereAction);
+                        $delete = executeQuery("DELETE FROM wf_".$this->workspace.".PMT_IMPORT_CSV_DATA WHERE IMPCSV_IDENTIFY = '$csvIdentify' AND IMPCSV_TABLE_NAME = '$tableName' ");
 		    		$this->deleteFileCSV($fileCSV);
 		    		break;
 		    		
@@ -416,8 +417,7 @@ class archivedCasesClassCron
 		return $totalCases;
 	}
 	    
-	function importCreateCaseEditCSV($jsonMatchFields,$uidTask, $tableName,$firstLineHeader,$informationCSV, $dataDeleteEdit,$csvIdentify,$totCasesCSV)
-	{
+	function importCreateCaseEditCSV($jsonMatchFields, $uidTask, $tableName, $firstLineHeader, $informationCSV, $dataDeleteEdit, $csvIdentify, $totCasesCSV, $csvWhereAction) {
 	    G::LoadClass('case');
 		$items   =$jsonMatchFields; 
 		$dataCSV = isset($informationCSV) ?$informationCSV: array();
@@ -439,8 +439,8 @@ class archivedCasesClassCron
 		$_dataForms =  dataDynaforms($resultDynaform,$proUid);	
 		// end load Dynaforms of process
 		
-		$this->genDataReport($tableName);
-		foreach ($dataCSV as $row) 
+		//$this->genDataReport($tableName); Comment by Nico because doesn't exist
+        foreach ($dataCSV as $row) 
 		{
 		    $appData =  array();
 			foreach ($items as $field) 
@@ -634,8 +634,8 @@ class archivedCasesClassCron
             } 
 		     // update cases 
 			
-		    $query = "SELECT APP_UID FROM wf_".$this->workspace.".$tableName WHERE $whereUpdate "; 
-			$updateData = executeQuery($query);
+		    $query = "SELECT APP_UID FROM wf_" . $this->workspace . ".$tableName WHERE $whereUpdate " . $csvWhereAction;           
+            $updateData = executeQuery($query);
 			if(sizeof($updateData))
 			{  
 				foreach($updateData as $index)
@@ -647,7 +647,8 @@ class archivedCasesClassCron
 			        $appData['EXEC_AUTO_DERIVATE'] = 'NO';
 			        $appData['eligible'] = 0; // only process beneficiary
 			        $appData['FLAG_EDIT'] = 1;
-			        $appData['CurrentUserAutoDerivate'] = $USR_UID;
+			        $appData['FLAG_UPDATE'] = 1;
+                    $appData['CurrentUserAutoDerivate'] = $USR_UID;
 			        $appData = array_merge($FieldsCase['APP_DATA'],$appData);
 			        $FieldsCase['APP_DATA'] = $appData;			        
 					$oCase->updateCase($index['APP_UID'],$FieldsCase);
@@ -698,8 +699,7 @@ class archivedCasesClassCron
 		return $totalCases;
 	 }
 	    
-	function importCreateCaseDeleteCSV($jsonMatchFields,$uidTask, $tableName,$firstLineHeader,$informationCSV, $dataDeleteEdit,$csvIdentify,$totCasesCSV)
-	{
+	function importCreateCaseDeleteCSV($jsonMatchFields, $uidTask, $tableName, $firstLineHeader, $informationCSV, $dataDeleteEdit, $csvIdentify, $totCasesCSV, $csvWhereAction) {
 		
 		G::LoadClass('case');
 		$items   =$jsonMatchFields; 
@@ -913,8 +913,8 @@ class archivedCasesClassCron
 		    // delete cases 		      
 			if($whereDelete != '')
 			{
-			    $this->genDataReport($tableName);
-				$query = "SELECT APP_UID FROM wf_".$this->workspace.".$tableName WHERE $whereDelete AND APP_UID NOT IN ( $idCasesGenerate ) "; //print($query.'  '); 
+			    //$this->genDataReport($tableName);
+                $query = "SELECT APP_UID FROM wf_".$this->workspace.".$tableName WHERE $whereDelete AND APP_UID NOT IN ( $idCasesGenerate ) "; //print($query.'  '); 
 				$deleteData = executeQuery($query);
 				if(sizeof($deleteData))
 				{

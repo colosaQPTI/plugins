@@ -2423,8 +2423,8 @@ function importCreateCase($jsonMatchFields,$uidTask, $tableName,$firstLineHeader
                 $maxId = isset($select[1]['ID_CSV'])? $select[1]['ID_CSV']:0;
                 $maxId = $maxId + 1;
                 foreach ($items as $field)
-                { 
-                    $insert = "INSERT INTO PMT_IMPORT_CSV_DATA 
+                {
+                    $insert = "INSERT INTO PMT_IMPORT_CSV_DATA
                           (IMPCSV_ID, IMPCSV_FIELD_NAME, IMPCSV_VALUE,IMPCSV_TAS_UID, IMPCSV_TABLE_NAME, IMPCSV_FIRSTLINEHEADER, IMPCSV_IDENTIFY, IMPCSV_TYPE_ACTION) VALUES
                           ('$maxId','".$field['FIELD_NAME']."', '".$field['COLUMN_CSV']."', '$uidTask', '$tableName','$firstLineHeader', '$identify', '$typeAction')";
                     executeQuery($insert);
@@ -3001,7 +3001,8 @@ function importCreateCaseEdit($jsonMatchFields,$uidTask, $tableName,$firstLineHe
     {
         $totRow = sizeof($row);
         $totIni = 1;
-        if ($totalCases >= 50)
+        //if ($totalCases >= 50)
+        if (true)
         {
             /* add header on csv temp files for import background */
             if ($firstLineHeader == 'on' && $swInsert == 0)
@@ -3025,9 +3026,9 @@ function importCreateCaseEdit($jsonMatchFields,$uidTask, $tableName,$firstLineHe
                 foreach ($items as $field)
                 {
                     $insert = "INSERT INTO PMT_IMPORT_CSV_DATA
-                               (IMPCSV_ID, IMPCSV_FIELD_NAME, IMPCSV_VALUE,IMPCSV_TAS_UID, IMPCSV_TABLE_NAME, IMPCSV_FIRSTLINEHEADER, IMPCSV_IDENTIFY, IMPCSV_TYPE_ACTION, IMPCSV_CONDITION_ACTION) 
+                               (IMPCSV_ID, IMPCSV_FIELD_NAME, IMPCSV_VALUE,IMPCSV_TAS_UID, IMPCSV_TABLE_NAME, IMPCSV_FIRSTLINEHEADER, IMPCSV_IDENTIFY, IMPCSV_TYPE_ACTION, IMPCSV_CONDITION_ACTION, IMPCSV_WHERE_ACTION)
                                VALUES
-                               ('$maxId','" . $field['FIELD_NAME'] . "', '" . $field['COLUMN_CSV'] . "', '$uidTask', '$tableName','$firstLineHeader', '$identify', 'ADD_UPDATE', '" . mysql_real_escape_string($dataDeleteEdit) . "')";
+                               ('$maxId','" . $field['FIELD_NAME'] . "', '" . $field['COLUMN_CSV'] . "', '$uidTask', '$tableName','$firstLineHeader', '$identify', 'ADD_UPDATE', '" . mysql_real_escape_string($dataDeleteEdit) . "', '" . mysql_escape_string(getSqlWhere($_REQUEST['idInbox'])) . "')";
                     executeQuery($insert);
                     $swInsert = 1;
                     $maxId++;
@@ -3235,7 +3236,7 @@ function importCreateCaseEdit($jsonMatchFields,$uidTask, $tableName,$firstLineHe
                 	$appData[$key] = $value;
                 }
             }  
-            $query = "SELECT APP_UID FROM $tableName WHERE $whereUpdate ";
+            $query = "SELECT APP_UID FROM $tableName WHERE $whereUpdate" . mysql_escape_string(getSqlWhere($_REQUEST['idInbox']));
             $updateData = executeQuery($query);
             if (sizeof($updateData))
             {

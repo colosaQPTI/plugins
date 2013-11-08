@@ -6,7 +6,6 @@ header('Content-Type: text/html; charset=ISO-8859-1');
 G::loadClass ( 'pmFunctions' );
 G::LoadClass ( 'form' );
 //include ("doublonData.php");
-
 try {
   $sOption = $_REQUEST["option"];
     switch ($sOption) {

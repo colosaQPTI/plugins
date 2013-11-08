@@ -504,21 +504,21 @@ function limousinProject_getActivation($porteurId = 0) {
     //$s->porteurId = 30280000023;
     /* Mode Test Off */
     // CALL Ws
-    try
-    {
-        $v->call();
+//    try
+//    {
+//        $v->call();
     // Si la carte est bien activée, on met à jour la table des cartes PMT_CHEQUES
-        $query = 'update PMT_CHEQUES SET CARTE_STATUT = "Active", DATE_ACTIVE = "'.date('Ymd').'" where CARTE_PORTEUR_ID= "' . mysql_escape_string($porteurId) . '"';
+        $query = 'UPDATE PMT_CHEQUES SET CARTE_STATUT = "Active", DATE_ACTIVE = "' . date('Ymd') . '" where CARTE_PORTEUR_ID= "' . mysql_escape_string($porteurId) . '"';
         $resQuery = executeQuery($query);
-        // Puis on change le usergroup dans Typo3 en Carte activé
+    // Puis on change le usergroup dans Typo3 en Carte activé
         $data = limousinProject_getDemandeFromPorteurID($porteurId);
         $userInfo = userInfo($data['USER_ID']);
         $result = limousinProject_updateUsergroupTypo($userInfo, $porteurId, '222');
-    }
-    catch (Exception $e)
-    {
-        $result = $v->errors;
-    }
+    //    }
+//    catch (Exception $e)
+//    {
+//        $result = $v->errors;
+//    }
     // RETURN
     return $result;
 }

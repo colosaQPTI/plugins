@@ -59,7 +59,8 @@ function FRegeneratePMCases($caseId) {
 	$query11="DELETE FROM wf_".SYS_SYS.".APP_CACHE_VIEW WHERE APP_UID='".$caseId."' AND DEL_INDEX <> '1' ";
 	$apps11=executeQuery($query11);
 	$query7 = "UPDATE APP_CACHE_VIEW SET APP_STATUS  = 'DRAFT' WHERE  APP_UID = '".$caseId."' AND DEL_INDEX = '1' ";	
-	$apps1=executeQuery($query7);
+	$apps1=executeQuery($query7);	
+	
 	// End Update the status to DRAFT in this table
 	
 	             
@@ -71,7 +72,7 @@ function FRegeneratePMCases($caseId) {
 	///////////////////////// Route Again the Case /////////////////////////////////////////
 	G::LoadClass("case");
 	$oCase = new Cases ();
-	$newFields = $oCase->loadCase ($caseId);
+	$newFields = $oCase->loadCase ($caseId); 
 
 	$newFields['APP_DATA']['FLG_INITUSERUID'] = $auxUsrUID;
 	$newFields['APP_DATA']['FLG_INITUSERNAME'] = $auxUsruname;
@@ -80,26 +81,34 @@ function FRegeneratePMCases($caseId) {
 		unset($newFields['APP_DATA']['FLAGTYPO3']);
 	}		
 	$USR_UID = $newFields['APP_DATA']['USER_LOGGED'];	
+	
+	$queryDelIndex = "SELECT  MAX(DEL_INDEX) AS DEL_INDEX FROM APP_DELEGATION WHERE APP_UID = '".$caseId."'";
+	$DelIndex = executeQuery($queryDelIndex);  
+	if(isset($DelIndex[1]['DEL_INDEX']) && $DelIndex[1]['DEL_INDEX'] != ''){
+		$queryDel = "SELECT * FROM APP_DELEGATION WHERE APP_UID = '".$caseId."' AND DEL_INDEX = '".$DelIndex[1]['DEL_INDEX']."' ";
+	    $resDel = executeQuery($queryDel);
+	    if(sizeof($resDel)){
+	    	if($resDel[1]['USR_UID'] == "" || $resDel[1]['USR_UID']!= $USR_UID ){
+	        	$queryuPDel = "UPDATE APP_DELEGATION SET USR_UID = '".$USR_UID."' 
+	            WHERE APP_UID = '".$caseId."' AND DEL_INDEX = '".$DelIndex[1]['DEL_INDEX']."' ";
+	            $queryuPDel = executeQuery($queryuPDel);
+	        }	        
+	   }
+	}
+	
 	$oCase->updateCase($caseId, $newFields);
 	
 	// If the user is different
-	if($_SESSION['USER_LOGGED'] != $newFields['APP_DATA']['USER_LOGGED']){
+	/*if($_SESSION['USER_LOGGED'] != $newFields['APP_DATA']['USER_LOGGED']){
 		$arrayUser = userInfo($newFields['APP_DATA']['USER_LOGGED']); 		 
 		$_SESSION['USER_LOGGED'] = $newFields['APP_DATA']['USER_LOGGED'];
     	$_SESSION['USR_USERNAME'] = $arrayUser['username'];
-	}
+	}*/
 	// End If the user is different
 
-        //Comment FPETIT
 	$resInfo = PMFDerivateCase($caseId, 1,true, $USR_UID);
-//        $sSQL = "SELECT PRO_UID FROM APPLICATION WHERE APP_UID='$caseId'";
-//    	$aResult = executeQuery($sSQL);
-//    	$proUid = '';
-//    	if (isset($aResult[1]['PRO_UID'])) {
-//            $proUid =$aResult[1]['PRO_UID'];
-//            autoDerivate($proUid,$caseId,$USR_UID);
-//        }
-    ///////////////////////// End Route Again the Case /////////////////////////////////////
+
+	///////////////////////// End Route Again the Case /////////////////////////////////////
 }
 
 function FRegenerateRPT(){
@@ -129,24 +138,21 @@ function FRegenerateRPT(){
 #####################################################End Functions####################################################
 
 $array=array();
-$array = $_REQUEST['array'];
-$items = json_decode($array,true);
+$array = $_REQUEST['item'];
+$items = $array; 
 $pmTableId = $_REQUEST['pmTableId'];
 $tableType = "Report";
 $tableName = '';
 
-if(count($items)>0){
-	$oCase = new Cases ();
-	foreach($items as $item){
-		$vals = array_keys($item);
-		$APPUID = strstr_array($vals,'APP_UID');	
-		if(isset($item[$APPUID]) && $item[$APPUID] != ''){		
-			FRegeneratePMCases($item[$APPUID]);			
-		}	
-	}
+if($items != ''){
+	$query = "SELECT APP_STATUS FROM APPLICATION WHERE APP_UID = '".$items."' AND APP_STATUS != 'DRAFT' ";
+	$data = executeQuery($query);
+	if(isset($items) && $items != ''  ){		
+		FRegeneratePMCases($items);			
+	}		
 	
 	if($tableType == "Report"){
-		FRegenerateRPT(); // regenerate all RP tables
+		//FRegenerateRPT(); // regenerate all RP tables
 	}
 
 	$messageInfo = "The case was Restarted sucessfully!";

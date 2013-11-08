@@ -2138,43 +2138,57 @@ function actionCompletDelFullCases(){
 }
 
 function actionRestartCases(){
-    
-    arrayAPPUID = myApp.addTab_inside();                    
-    urlData = "../convergenceList/actions/actionRestartCases.php";
+  arrayAPPUID = myApp.addTab_inside();
+    _AppUids = Ext.util.JSON.decode(arrayAPPUID);
+    var tot = _AppUids.length;
+    var i = 0;
     PMExt.confirm(_('ID_CONFIRM'),"Do you like to restart all these Cases?", function(){
-        Ext.MessageBox.show({
-              msg : 'Red&eacute;marrage, Veuillez patienter ...',
-              progressText : 'Chargement ...',
-              width : 300,
-              wait : true,
-              waitConfig : {
-                interval : 200
-              }
-        });
-        Ext.Ajax.request({
-               url : urlData,
-               params : {
-                 array  : arrayAPPUID,
-                 pmTableId  :table              
-               },
-               success: function (result, request) {
-                 var response = Ext.util.JSON.decode(result.responseText);
-                 if (response.success) {
-                    Ext.MessageBox.hide();
-                   alert(response.messageinfo);
-                 }
-                 else {
-                    Ext.MessageBox.hide();
-                   PMExt.warning(_('ID_WARNING'), response.message);
-                 }
-                 Ext.getCmp('gridNewTab').store.reload();               
-               },
-               failure: function (result, request) {
-                Ext.MessageBox.hide();
-                Ext.getCmp('gridNewTab').store.reload();                
-               }
-             });
-    });    
+      Ext.MessageBox.show({
+            msg : 'RedÔøΩmarrage, Veuillez patienter ...',
+            progressText : 'Chargement ...',
+            width : 300,
+            wait : true,
+            waitConfig : {
+              interval : 200
+            }
+      });
+      Ext.each(_AppUids, function(record){
+      urlData = "../convergenceList/actions/actionRestartCases.php";
+           
+      Ext.Ajax.request({
+        url : urlData,
+        params : {
+          item  : record.APP_UID,
+          pmTableId  :table              
+        },
+        success: function (result, request) {
+          var response = Ext.util.JSON.decode(result.responseText);
+          i = i + 1;
+          if (response.success) {
+            if(i == tot)
+            {
+              Ext.MessageBox.hide();
+              alert(response.messageinfo);
+            }
+          }
+          else {
+            Ext.MessageBox.hide();
+            PMExt.warning(_('ID_WARNING'), response.message);
+          }
+          if(i == tot)
+          { 
+            Ext.getCmp('gridNewTab').store.reload();            
+          }           
+        },
+        failure: function (result, request) {
+          Ext.MessageBox.hide();
+          Ext.getCmp('gridNewTab').store.reload();                
+        }
+      });
+      
+     
+      });   
+    });
 }
 
 function caseGralInfo(appUid,num_dossier,table){    
