@@ -1,0 +1,1 @@
+var swHostName ='http://'+location.host+':8084/';
