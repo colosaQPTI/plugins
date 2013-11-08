@@ -1312,8 +1312,6 @@ function reproductionCheque(annuleFlag){
     
 }
 
-
-
 function VoirLesDemandesProd(app_uid){
              
         var adaptiveHeight = getDocHeight() - 50;
@@ -1345,7 +1343,6 @@ function VoirLesDemandesProd(app_uid){
                 
             },
             dataIndex : 'NUM_DOSSIER_COMPLEMENT',
-
             hidden: false
         };        
         _dmdProdColumns.push(column);
@@ -5055,11 +5052,11 @@ function listeCarteProduite(app_uid)
 }
 
 function message(mess)
-{   
-    Ext.Msg.alert('Confirmed', mess, function(btn, text){
-        if (btn == 'ok'){
-            Ext.getCmp('win2').hide();
-        }
-    });
-    
+{
+ Ext.Msg.alert('Confirmed', mess, function(btn, text){
+     if (btn == 'ok'){
+      Ext.getCmp('win2').hide();
+     }
+ });
+ 
 }

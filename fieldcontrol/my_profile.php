@@ -32,6 +32,7 @@
 
     G::RenderPage('publish', 'extJs');
 ?>
+<script type='text/javascript' src='/plugin/limousinProject/varGlobal.js'></script>
 <script type='text/javascript' src='/plugin/obladyConvergence/resize_iframe.js'></script>  
 <meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
 <link href="/plugin/fieldcontrol/icons.css" type="text/css" rel="stylesheet">

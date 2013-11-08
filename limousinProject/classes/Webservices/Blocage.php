@@ -11,7 +11,7 @@ class Blocage extends Webservices {
 		// INIT
        	//$this->url = "http://extranet.aqoba-preprod.customers.artful.net/api/v09/crm?access_token=99ac21619656c825e788ffb8ac6bfa23f08f4b08";
         $this->url = wsHote_Url . "crm" . wsToken_param;
-        $this->wsId = "210";    
+        $this->wsId = "210";
 	} 
     
 	public function call(){	

@@ -641,9 +641,9 @@ function convergence_concatFiles($files, $where_exclude) {
         {
             $app_uid = $f['APP_UID'];
       if(method_exists('G','getPathFromUID')){
-    $app_uid = G::getPathFromUID($f['APP_UID']);
+            $app_uid = G::getPathFromUID($f['APP_UID']);
       }
-   $path = PATH_DOCUMENT .$app_uid. PATH_SEP . 'outdocs' . PATH_SEP . $f['APP_DOC_UID'] . '_' . $f['DOC_VERSION'];
+            $path = PATH_DOCUMENT .$app_uid. PATH_SEP . 'outdocs' . PATH_SEP . $f['APP_DOC_UID'] . '_' . $f['DOC_VERSION'];
             $concatFile[$i++] = $path . '.pdf';
         }
     }
@@ -663,9 +663,9 @@ function convergence_concatFiles($files, $where_exclude) {
         {
             $app_uid = $f['APP_UID'];
       if(method_exists('G','getPathFromUID')){
-    $app_uid = G::getPathFromUID($f['APP_UID']);
+            $app_uid = G::getPathFromUID($f['APP_UID']);
       }
-   $path = PATH_DOCUMENT .$app_uid. PATH_SEP . 'outdocs' . PATH_SEP . $f['APP_DOC_UID'] . '_' . $f['DOC_VERSION'];
+            $path = PATH_DOCUMENT .$app_uid. PATH_SEP . 'outdocs' . PATH_SEP . $f['APP_DOC_UID'] . '_' . $f['DOC_VERSION'];
             $concatFile[$i++] = $path . '.pdf';
         }
     } 
@@ -1418,35 +1418,35 @@ function convergence_checkFieldLog($value, $params, $type) {
                     $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format 'E-mail' attendu";
                 }
                 break;
-            /* case 'Date':  // ^(0[1-9]|1\d|2\d|3[0-1])[\/\.-]?(0[1-9]|1[0-2])[\/\.-]?(\d{4})$
-              if (preg_match('#^(0[1-9]|1\d|2\d|3[0-1])[\/\.-]?(0[1-9]|1[0-2])[\/\.-]?(\d{4})$#', $value, $match) == 1)
-              {
-              if (!checkdate($match[2], $match[1], $match[3]))
-              {
-              $log[] = "la valeur '$value' du champ date '$field' n'existe pas dans le calendrier";
-              }
-              }
-              else
-              {
-              $log[] = "le format date du champ '$field' est invalide";
-              }
-              break;
-              case 'Yesno':
-              if (strtoupper($value) != 'O' && strtoupper($value) != 'N')
-              $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format 'O / N'";
-              break;
-              case 'OuiNon':
-              if (strtolower($value) != 'oui' && strtolower($value) != 'non')
-              $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format 'oui / non'";
-              break;
-              case 'binaire':
-              if ($value != 1 && $value != 0)
-              $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format '1 / 0'";
-              break;
-              case 'AI':
-              if ($value != 'A' && $value != 'I')
-              $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format Actif/Inactif 'A / I'";
-              break; */
+            /*case 'Date':  // ^(0[1-9]|1\d|2\d|3[0-1])[\/\.-]?(0[1-9]|1[0-2])[\/\.-]?(\d{4})$
+                if (preg_match('#^(0[1-9]|1\d|2\d|3[0-1])[\/\.-]?(0[1-9]|1[0-2])[\/\.-]?(\d{4})$#', $value, $match) == 1)
+                {
+                    if (!checkdate($match[2], $match[1], $match[3]))
+                    {
+                        $log[] = "la valeur '$value' du champ date '$field' n'existe pas dans le calendrier";
+                    }
+                }
+                else
+                {
+                    $log[] = "le format date du champ '$field' est invalide";
+                }
+                break;
+            case 'Yesno':
+                if (strtoupper($value) != 'O' && strtoupper($value) != 'N')
+                    $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format 'O / N'";
+                break;
+            case 'OuiNon':
+                if (strtolower($value) != 'oui' && strtolower($value) != 'non')
+                    $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format 'oui / non'";
+                break;
+            case 'binaire':
+                if ($value != 1 && $value != 0)
+                    $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format '1 / 0'";
+                break;
+            case 'AI':
+                if ($value != 'A' && $value != 'I')
+                    $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format Actif/Inactif 'A / I'";
+                break;*/
             case 'NCommande':
                 $val = $value + 0;
                 $val = "$val";
@@ -3001,8 +3001,7 @@ function importCreateCaseEdit($jsonMatchFields,$uidTask, $tableName,$firstLineHe
     {
         $totRow = sizeof($row);
         $totIni = 1;
-        //if ($totalCases >= 50)
-        if (true)
+        if ($totalCases >= 50)
         {
             /* add header on csv temp files for import background */
             if ($firstLineHeader == 'on' && $swInsert == 0)
