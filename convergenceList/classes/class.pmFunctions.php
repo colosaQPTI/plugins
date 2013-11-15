@@ -64,13 +64,13 @@ function autoDerivate($processId,$caseUID,$userId,$controlCron=true){
         
 	foreach ($startTasks as $rowTask)
 	{
-		updateDateAPPDATA($caseUID);
+		$flagAction = updateDateAPPDATA($caseUID);
 		$taskId = $rowTask['TAS_UID'];
 		$currentTask = $taskId;
 		$process = $processId;
 		$appUid = $caseUID;    
 		$task = $taskId;	
-		frderivateCase($processId, $currentTask , $caseUID,$userId,$taskNumber, $userLoggedIni);		//Function for derivate case
+		frderivateCase($processId, $currentTask , $caseUID,$userId,$taskNumber, $userLoggedIni, $flagAction);		//Function for derivate case
 	}
 	if($userLoggedIni !='')
 		$_SESSION['USER_LOGGED'] = $userLoggedIni ; 
@@ -79,7 +79,7 @@ function autoDerivate($processId,$caseUID,$userId,$controlCron=true){
         
 }
 
-function frderivateCase($processId, $currentTask , $fcaseUID,$userId,$taskNumber, $userLoggedIni)
+function frderivateCase($processId, $currentTask , $fcaseUID,$userId,$taskNumber, $userLoggedIni, $flagAction)
 {
 	try 
 	{
@@ -88,24 +88,63 @@ function frderivateCase($processId, $currentTask , $fcaseUID,$userId,$taskNumber
 		{
 	    	$_SESSION['APPLICATION'] = $fcaseUID;
 			$queryDelIndex = "SELECT MAX(DEL_INDEX) AS DEL_INDEX FROM APP_DELEGATION WHERE APP_UID = '".$fcaseUID."'";
-			$DelIndex = executeQuery($queryDelIndex);      
-			$queryNextTask = "SELECT ROU_NEXT_TASK FROM ROUTE WHERE PRO_UID = '".$processId."' AND TAS_UID = '".$currentTask."'";
-			$NextTask = executeQuery($queryNextTask);			
-			$stepsByTask = getStepsByTask($currentTask);//FORM IDS in THE TASK			
-			$caseStepRes = array();
-			
-			foreach ($stepsByTask as $caseStep){
-				$caseStepRes[] = 	 $caseStep->getStepUidObj();
-			}
-			//G::pr($caseStepRes);
-			$totStep = 0;
-			foreach($caseStepRes as $index)
+			$DelIndex = executeQuery($queryDelIndex);
+			$swFLag = 0;
+			if($flagAction == 'actionCreateCase' || $flagAction == 'editForms' || $flagAction == 'actionAjaxRestartCases' || $flagAction == 'actionAjax')
 			{
-				$stepUid = $index;
-				executeTriggersMon($processId, $fcaseUID, $stepUid, 'BEFORE', $currentTask);	//execute trigger before form
-				executeTriggersMon($processId, $fcaseUID, $stepUid, 'AFTER', $currentTask);	//execute trigger after form	
-				$totStep++;
-			} 
+				$queryTask = "SELECT TAS_UID FROM APP_DELEGATION WHERE APP_UID = '".$fcaseUID."' AND DEL_INDEX = '".$DelIndex[1]['DEL_INDEX']."' ";
+				$dataTask = executeQuery($queryTask);
+				if(sizeof($dataTask))
+					$currentTask = $dataTask[1]['TAS_UID'];
+				$swFLag = 1;
+			}
+				
+			$queryNextTask = "SELECT ROU_CONDITION, ROU_NEXT_TASK FROM ROUTE WHERE PRO_UID = '".$processId."' AND TAS_UID = '".$currentTask."'";
+			$NextTask = executeQuery($queryNextTask);
+			if($swFLag == 1 )
+			{
+				foreach($NextTask as $row)
+				{
+					if($row['ROU_CONDITION'] != '')
+					{							
+						$oCase = new Cases ();
+						$AppFields = $oCase->loadCase($fcaseUID);
+                		$oPMScript = new PMScript();
+                		$oPMScript->setFields( $AppFields['APP_DATA'] );
+                		$oPMScript->setScript( $row['ROU_CONDITION'] );
+                		$bContinue = $oPMScript->evaluate();
+						//G::pr('response '.$row['ROU_CONDITION'].'  '.$bContinue);
+       					if($bContinue == 1)
+    						$currentTask = $row['ROU_NEXT_TASK'];
+					}
+					else 
+						$currentTask = $row['ROU_NEXT_TASK'];		 
+    				
+				}
+				
+			}
+			
+			if($currentTask != '-1')
+			{
+				$stepsByTask = getStepsByTask($currentTask);//FORM IDS in THE TASK			
+				$caseStepRes = array();
+			
+				foreach ($stepsByTask as $caseStep){
+					$caseStepRes[] = $caseStep->getStepUidObj();
+				}
+				//G::pr($caseStepRes);
+				$totStep = 0;
+			
+				foreach($caseStepRes as $index)
+				{
+					$stepUid = $index;
+					executeTriggersMon($processId, $fcaseUID, $stepUid, 'BEFORE', $currentTask);	//execute trigger before form
+					executeTriggersMon($processId, $fcaseUID, $stepUid, 'AFTER', $currentTask);	//execute trigger after form	
+					$totStep++;
+				}
+				if($totStep != 0)
+					executeTriggersMon( $processId, $fcaseUID, -1, 'BEFORE', $currentTask );
+			}
 			G::LoadClass( 'wsBase' );
 	    	$ws = new wsBase();
 			if($NextTask[1]['ROU_NEXT_TASK'] == '-1')
@@ -120,7 +159,6 @@ function frderivateCase($processId, $currentTask , $fcaseUID,$userId,$taskNumber
 					executeTriggersMon($processId, $fcaseUID, $stepUid, 'BEFORE', $currentTask);	//execute trigger before form
 					executeTriggersMon($processId, $fcaseUID, $stepUid, 'AFTER', $currentTask);	//execute trigger after form	
 				}							
-				//$control = PMFDerivateCase($fcaseUID, $DelIndex[1]['DEL_INDEX'], $beforeA, $userId);
 				G::LoadClass( 'derivation' );
 				$oDerivation = new Derivation();
 				$aFields['TASK']= $oDerivation->prepareInformation( array ('USER_UID' => $userId,'APP_UID' => $fcaseUID,'DEL_INDEX' => $DelIndex[1]['DEL_INDEX']) );
@@ -149,8 +187,7 @@ function frderivateCase($processId, $currentTask , $fcaseUID,$userId,$taskNumber
 			
 				}
 				try{
-				    //$result = $ws->derivateCase( $userId, $fcaseUID, $DelIndex[1]['DEL_INDEX'], $beforeA ); 
-				     $result = $ws->derivateCase( $userId, $fcaseUID, $DelIndex[1]['DEL_INDEX'], false ); 
+				    $result = $ws->derivateCase( $userId, $fcaseUID, $DelIndex[1]['DEL_INDEX'], false );  
 				}
 				catch (Exception $e) 
 				{
@@ -165,7 +202,6 @@ function frderivateCase($processId, $currentTask , $fcaseUID,$userId,$taskNumber
 			{
 				if($totStep == 0)
 					executeTriggersMon( $processId, $fcaseUID, -1, 'BEFORE', $currentTask );
-				//$control = PMFDerivateCase($fcaseUID, $DelIndex[1]['DEL_INDEX'], false, $userId);
 				G::LoadClass( 'derivation' );
 				$oDerivation = new Derivation();
 				$aFields['TASK']= $oDerivation->prepareInformation( array ('USER_UID' => $userId,'APP_UID' => $fcaseUID,'DEL_INDEX' => $DelIndex[1]['DEL_INDEX']) );
@@ -194,7 +230,7 @@ function frderivateCase($processId, $currentTask , $fcaseUID,$userId,$taskNumber
 			
 				}
 				try{ 
-				    $result = $ws->derivateCase( $userId, $fcaseUID, $DelIndex[1]['DEL_INDEX'], false);
+				    $result = $ws->derivateCase( $userId, $fcaseUID, $DelIndex[1]['DEL_INDEX'], false );
 				}
 				catch (Exception $e) 
 				{
@@ -237,7 +273,7 @@ function executeTriggers($processId,$caseUID,$userId){
 		$userLoggedIni = $_SESSION['USER_LOGGED_INI'];
      
 	foreach($startTasks as $rowTask){
-		updateDateAPPDATA($caseUID);
+		$flagAction = updateDateAPPDATA($caseUID);
 		$taskId = $rowTask['TAS_UID'];
 		$currentTask = $taskId;
 		$process = $processId;
@@ -352,12 +388,17 @@ function frExecuteTriggersCase($processId, $currentTask , $fcaseUID,$userId,$tas
 	
 }
 
-
 function updateDateAPPDATA($application){
  
  $caseInstance = new Cases();
  $caseFields = $caseInstance->loadCase( $application ); 
+ if(isset($caseFields['APP_DATA']['FLAG_ACTION']))
+ 	$flagAction = isset($caseFields['APP_DATA']['FLAG_ACTION']) ? $caseFields['APP_DATA']['FLAG_ACTION']:'';
+ else
+ 	$flagAction = isset($caseFields['APP_DATA']['FLAG_ACTIONTYPO3']) ? $caseFields['APP_DATA']['FLAG_ACTIONTYPO3']:'';
+ 	
  $caseInstance->updateCase($application, $caseFields);
+ return $flagAction;
 }
 
 
@@ -384,11 +425,11 @@ function executeTriggersMon($process, $appUid, $stepUid, $time='BEFORE', $task){
   }else{
   	$obj = 'DYNAFORM';  	
   }
-  $triggers = $oCase->loadTriggers ( $task, $obj, $stepUid, $time );  
- 
+  //G::pr($task.'  '. $obj.'  '. $stepUid.'  '.$time);
+  $triggers = $oCase->loadTriggers ( $task, $obj, $stepUid, $time );
+  //G::pr($triggers);
   $Fields['APP_DATA'] = $oCase->ExecuteTriggers($task, $type , $stepUid, $time, $Fields['APP_DATA'] );  
   $oCase->updateCase($appUid, $Fields);
-  //G::pr($Fields['APP_DATA']);
   return true;
 }
 

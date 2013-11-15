@@ -77,26 +77,51 @@ function FRegeneratePMCases($caseId) {
 	$newFields['APP_DATA']['FLG_INITUSERUID'] = $auxUsrUID;
 	$newFields['APP_DATA']['FLG_INITUSERNAME'] = $auxUsruname;
 	$newFields['APP_DATA']['FLAG_ACTION'] = 'actionAjaxRestartCases';
+	$newFields['APP_DATA']['EXEC_AUTO_DERIVATE'] = 'NO';
 	if(isset($newFields['APP_DATA']['FLAGTYPO3'])){
 		unset($newFields['APP_DATA']['FLAGTYPO3']);
 	}		
-	$USR_UID = $newFields['APP_DATA']['USER_LOGGED'];	
+	$USR_UID = $newFields['APP_DATA']['USER_LOGGED'];
+	$oCase->updateCase($caseId, $newFields);	
 	
 	$queryDelIndex = "SELECT  MAX(DEL_INDEX) AS DEL_INDEX FROM APP_DELEGATION WHERE APP_UID = '".$caseId."'";
 	$DelIndex = executeQuery($queryDelIndex);  
 	if(isset($DelIndex[1]['DEL_INDEX']) && $DelIndex[1]['DEL_INDEX'] != ''){
-		$queryDel = "SELECT * FROM APP_DELEGATION WHERE APP_UID = '".$caseId."' AND DEL_INDEX = '".$DelIndex[1]['DEL_INDEX']."' ";
+		$queryDel = "SELECT USR_UID,PRO_UID FROM APP_DELEGATION WHERE APP_UID = '".$caseId."' AND DEL_INDEX = '".$DelIndex[1]['DEL_INDEX']."' ";
 	    $resDel = executeQuery($queryDel);
 	    if(sizeof($resDel)){
 	    	if($resDel[1]['USR_UID'] == "" || $resDel[1]['USR_UID']!= $USR_UID ){
 	        	$queryuPDel = "UPDATE APP_DELEGATION SET USR_UID = '".$USR_UID."' 
 	            WHERE APP_UID = '".$caseId."' AND DEL_INDEX = '".$DelIndex[1]['DEL_INDEX']."' ";
 	            $queryuPDel = executeQuery($queryuPDel);
-	        }	        
+	        }
+	        $proUid = $resDel[1]['PRO_UID'];
+	        
+	        # execute Triggers task Ini
+		  	$query = "SELECT TAS_UID FROM TASK WHERE TAS_START = 'TRUE' AND PRO_UID = '".$proUid."'";	//query for select all start tasks
+	        $startTasks = executeQuery($query);
+	        foreach($startTasks as $rowTask){
+		        $taskId = $rowTask['TAS_UID'];
+		        $stepsByTask = getStepsByTask($taskId);
+	            foreach ($stepsByTask as $caseStep){
+				    $caseStepRes[] = 	 $caseStep->getStepUidObj();
+			    }
+			    break;
+	        }
+	        
+			$totStep = 0;
+			foreach($caseStepRes as $index)
+			{
+				$stepUid = $index;
+				executeTriggersMon($proUid, $caseId, $stepUid, 'BEFORE', $taskId);	//execute trigger before form
+				executeTriggersMon($proUid, $caseId, $stepUid, 'AFTER', $taskId);	//execute trigger after form	
+				$totStep++;
+			} 
+			# end execute Triggers task Ini
 	   }
 	}
 	
-	$oCase->updateCase($caseId, $newFields);
+	// $oCase->updateCase($caseId, $newFields);
 	
 	// If the user is different
 	/*if($_SESSION['USER_LOGGED'] != $newFields['APP_DATA']['USER_LOGGED']){
@@ -106,7 +131,8 @@ function FRegeneratePMCases($caseId) {
 	}*/
 	// End If the user is different
 
-	$resInfo = PMFDerivateCase($caseId, 1,true, $USR_UID);
+	// $resInfo = PMFDerivateCase($caseId, 1,true, $USR_UID);
+	autoDerivate($proUid,$caseId,$USR_UID);
 
 	///////////////////////// End Route Again the Case /////////////////////////////////////
 }

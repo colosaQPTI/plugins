@@ -1,5 +1,4 @@
 <?php
-
 G::loadClass('pmFunctions');
 G::LoadClass("case");
 
@@ -129,8 +128,5 @@ $rSQL = executeQuery($sSQL);
 /* * *** End generate doc *** */
 $messageInfo .= 'Export terminé.';
 //$infoArray = exportXls($exportTitle, $rSQL, $exportDescription, $path);
-
 exportXls($exportTitle, $rSQL, $exportDescription, $path);
-
-
 ?>

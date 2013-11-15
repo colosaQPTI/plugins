@@ -59,7 +59,7 @@ function deleteDuplicatedCases($appUidElected, $tableName ='') {
 			insertHistoryLogPlugin($appUidElected,$_SESSION['USER_LOGGED'],$CurDateTime,'1',$caseId,'Delete Case');//insertHistoryLogPlugin(father,......child)
 		}	
 	}
-	// genDataReport($tableName);
+	genDataReport($tableName);
 	unset($_SESSION['ELIMINATE_POSSIBLE_CASES']);
 	return $numDeletedCases;
 }
@@ -225,12 +225,6 @@ function getFieldsforConfigDoublon($idInbox,$proUid) {
 			}
 	}
 	if(!(is_array($aResult) && count($aResult)>0)){
-		/*$sSQL="SELECT FLD_UID  AS FIELD_NAME, DESCRIPTION AS FIELD_DESC, POSITION AS FIELD_POSITION 
-				FROM PMT_INBOX_FIELDS
-				WHERE ROL_CODE  = '$rolUser' AND ID_INBOX = '$idInbox' ORDER BY FIELD_POSITION";
-		$aResult= executeQuery($sSQL);	
-		*/
-		#######################
 
 		$oReportTables = new pmTablesProxy();
 	    $aFields['FIELDS'] = array();
@@ -244,12 +238,6 @@ function getFieldsforConfigDoublon($idInbox,$proUid) {
 
 		$_dataFields =  array();
 		$pos = 1;
-		/*foreach ($aResult as $row) {
-			$record = array("FIELD_NAME" => $row['FIELD_NAME'], "FIELD_NAME_UPPER" => strtoupper($row['FIELD_NAME']), "FIELD_DESC" => $row['FIELD_DESC'], "FIELD_INCLUDE" => '0',"FIELD_POSITION" =>$pos,"TYPE" => 'RT');
-			if(isset($aDynFields[$row['FIELD_NAME']])) unset($aDynFields[$row['FIELD_NAME']]);
-			$_dataFields[] = $record;
-			$pos++;
-		}*/
 
 		foreach ($aDynFields as $key => $value) {
 			if($value == 'NUM_DOSSIER')
@@ -331,20 +319,6 @@ function getFieldsforConfigDoublon($idInbox,$proUid) {
 				}
 			}		
 		}
-		/*$_dataFields =  array();
-		
-		foreach ($aResult as $row) {
-			if($row['FIELD_NAME'] == 'NUM_DOSSIER')
-				$row['FIELD_INCLUDE'] = '1';
-				
-			$record = array("FIELD_NAME" => $row['FIELD_NAME'], 
-							"FIELD_NAME_UPPER" => strtoupper($row['FIELD_NAME']), 
-							"FIELD_DESC" => $row['FIELD_DESC'], 
-							"FIELD_INCLUDE" => $row['FIELD_INCLUDE'],
-							"FIELD_POSITION" =>$row['FIELD_POSITION']  ,
-							"TYPE" => '');
-			$_dataFields[] = $record;
-		}*/
 	}
 		$field = 'FIELD_POSITION';
 		$_dataFields = orderMultiDimensionalArray($_dataFields, $field, '');
@@ -532,7 +506,9 @@ function createCase($appUid, $appData,$uidTask,$jsonSelected,$hiddenUids, $idInb
 		}
 		break;
 	}
-	 
+	$newFields = $oCase->loadCase ($caseUID);
+	$newFields['APP_DATA']['APPLICATION'] = $caseUID;
+	$oCase->updateCase($caseUID, $newFields);
 	$totStep = 0;
 	foreach($caseStepRes as $index)
 	{
