@@ -1,25 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dynaForm  width="600" enabletemplate="1">
-<TITLE_SEARCH type="title" enablehtml="0" btn_cancel="Cancel">
-  <en>Recherche :</en>
-</TITLE_SEARCH>
-<THEMATIQUE type="dropdown" maxlength="64" validate="Any" required="0" readonly="0" size="15" mode="edit" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0">
-    <en>Thématique : <option name=""/><option name="165"><![CDATA[Cinéma]]></option><option name="166"><![CDATA[Spectacle Vivant]]></option><option name="167"><![CDATA[Achat de livre et de produits multimédia]]></option><option name="168"><![CDATA[Arts Plastiques]]></option><option name="169"><![CDATA[Manifestation ou évènement sportif]]></option><option name="170"><![CDATA[Adhésion pratique sportive ou artistique]]></option></en>
- </THEMATIQUE>
- <PRESTA_NAME type="text" maxlength="64" validate="Any" required="0" readonly="0" size="15" mode="edit" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0">
-    <en>Raison sociale : </en>
- </PRESTA_NAME>
- <!--<RAISON type="text" maxlength="64" validate="Any" required="0" readonly="0" size="15" mode="edit" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0">
-    <en>Nom : </en>
- </RAISON>-->
- <VILLE type="text" maxlength="64" validate="Any" required="0" readonly="0" size="15" mode="edit" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0">
-    <en>Ville : </en>
- </VILLE>
-<!--<LIST_USERS type="grid" xmlgrid="convExamples/users" addrow="0" deleterow="0" btn_cancel="Cancel"/>-->
-<SEARCH type="button" btn_cancel="Cancel" onclick="$thematique= document.getElementById('form[THEMATIQUE]').value;Snom= document.getElementById('form[PRESTA_NAME]').value; Sville= document.getElementById('form[VILLE]').value; loadResultSearch($thematique,Snom,Sville);">
-  <en>Rechercher</en>
-</SEARCH>
-<CLEAR type="button" btn_cancel="Cancel" onclick="clearFilters();">
-  <en>Vider</en>
-</CLEAR>
+    <TITLE_SEARCH type="title" enablehtml="0" btn_cancel="Cancel">
+        <en>Recherche :</en>
+    </TITLE_SEARCH>
+    <THEMATIQUE type="dropdown" maxlength="64" validate="Any" required="0" readonly="0" size="15" mode="edit" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0">
+        <en>Thématique : <option name=""/>
+            <option name="165"><![CDATA[Cinéma]]></option>
+            <option name="166"><![CDATA[Spectacle Vivant]]></option>
+            <option name="167"><![CDATA[Achat de livre et de produits multimédia]]></option>
+            <option name="168"><![CDATA[Arts Plastiques]]></option>
+            <option name="169"><![CDATA[Manifestation ou évènement sportif]]></option>
+            <option name="170"><![CDATA[Adhésion pratique sportive ou artistique]]></option>
+        </en>
+    </THEMATIQUE>
+    <PRESTA_NAME type="text" maxlength="64" validate="Any" required="0" readonly="0" size="15" mode="edit" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0">
+        <en>Nom du partenaire</en>
+    </PRESTA_NAME>
+    <!--<RAISON type="text" maxlength="64" validate="Any" required="0" readonly="0" size="15" mode="edit" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0">
+       <en>Nom : </en>
+    </RAISON>-->
+    <VILLE type="text" maxlength="64" validate="Any" required="0" readonly="0" size="15" mode="edit" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0">
+        <en>commune</en>
+    </VILLE>
+    <!--<LIST_USERS type="grid" xmlgrid="convExamples/users" addrow="0" deleterow="0" btn_cancel="Cancel"/>-->
+    <SEARCH type="button" btn_cancel="Cancel" onclick="$thematique= document.getElementById('form[THEMATIQUE]').value;Snom= document.getElementById('form[PRESTA_NAME]').value; Sville= document.getElementById('form[VILLE]').value; loadResultSearch($thematique,Snom,Sville);">
+        <en>Rechercher</en>
+    </SEARCH>
+    <CLEAR type="button" btn_cancel="Cancel" onclick="clearFilters();">
+        <en>effacer filtre</en>
+    </CLEAR>
 </dynaForm>

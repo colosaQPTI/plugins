@@ -2368,14 +2368,14 @@ function importCreateCase($jsonMatchFields, $uidTask, $tableName, $firstLineHead
 
                     if (isset($row[$field['COLUMN_CSV']]))
                     {
-                        if ($row[$field['COLUMN_CSV']])
+                        if ($row[$field['COLUMN_CSV']] != '')
                             $appData[$field['FIELD_NAME']] = _convert($row[$field['COLUMN_CSV']]);
                         else
                             $appData[$field['FIELD_NAME']] = '';
                     }
                     else
                     {
-                        if ($field['COLUMN_CSV'])
+                        if ($field['COLUMN_CSV'] != '')
                             $appData[$field['FIELD_NAME']] = _convert($field['COLUMN_CSV']);
                         else
                             $appData[$field['FIELD_NAME']] = '';
@@ -2468,41 +2468,16 @@ function importCreateCase($jsonMatchFields, $uidTask, $tableName, $firstLineHead
                     if ($row['FIELD_DEFAULT_VALUE'] == '')
                         $row['FIELD_DEFAULT_VALUE'] = 0;
 
-                    $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
-                    if ($appData[$row['FIELD_NAME'] . "_label"] == "")
-                    {
-                        $i = $row['FIELD_DEFAULT_VALUE'];
-                        if (count($row['FIELD_SQL_OPTION']))
+                    if($row['FIELD_TYPE'] != 'yesno')
+                    { 
+                        $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
+                        if ($appData[$row['FIELD_NAME'] . "_label"] == "")
                         {
-
-                            $options = $row['FIELD_SQL_OPTION'];
-                            $id = "";
-                            $label = "";
-                            foreach ($options As $row2)
+                            $i = $row['FIELD_DEFAULT_VALUE'];
+                            if (count($row['FIELD_SQL_OPTION']))
                             {
-                                if ($row2['id'] == $i)
-                                {
-                                    $id = $row2['id'];
-                                    $label = $row2['descrip'];
-                                    break;
-                                }
-                            }
 
-                            if ($id == "" && $label == "")
-                            {
-                                $id = $row['FIELD_SQL_OPTION'][0]['id'];
-                                $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
-                            }
-
-                            $record[$row['FIELD_NAME']] = $id;
-                            $record[$row['FIELD_NAME'] . "_label"] = $label;
-                            $appData = array_merge($record, $appData);
-                        }
-                        else
-                        {
-                            if (count($row['FIELD_OPTION']))
-                            {
-                                $options = $row['FIELD_OPTION'];
+                                $options = $row['FIELD_SQL_OPTION'];
                                 $id = "";
                                 $label = "";
                                 foreach ($options As $row2)
@@ -2517,14 +2492,51 @@ function importCreateCase($jsonMatchFields, $uidTask, $tableName, $firstLineHead
 
                                 if ($id == "" && $label == "")
                                 {
-                                    $id = $row['FIELD_OPTION'][0]['id'];
-                                    $label = $row['FIELD_OPTION'][0]['descrip'];
+                                    $id = $row['FIELD_SQL_OPTION'][0]['id'];
+                                    $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
                                 }
 
                                 $record[$row['FIELD_NAME']] = $id;
                                 $record[$row['FIELD_NAME'] . "_label"] = $label;
                                 $appData = array_merge($record, $appData);
                             }
+                            else
+                            {
+                                if (count($row['FIELD_OPTION']))
+                                {
+                                    $options = $row['FIELD_OPTION'];
+                                    $id = "";
+                                    $label = "";
+                                    foreach ($options As $row2)
+                                    {
+                                        if ($row2['id'] == $i)
+                                        {
+                                            $id = $row2['id'];
+                                            $label = $row2['descrip'];
+                                            break;
+                                        }
+                                    }
+
+                                    if ($id == "" && $label == "")
+                                    {
+                                        $id = $row['FIELD_OPTION'][0]['id'];
+                                        $label = $row['FIELD_OPTION'][0]['descrip'];
+                                    }
+
+                                    $record[$row['FIELD_NAME']] = $id;
+                                    $record[$row['FIELD_NAME'] . "_label"] = $label;
+                                    $appData = array_merge($record, $appData);
+                                }
+                            }
+                        }
+                    }
+                    else 
+                    {
+                        $record = Array();
+                        if( $appData[$row['FIELD_NAME']] == '' || $appData[$row['FIELD_NAME']] == ' ' )
+                        {
+                            $appData[$row['FIELD_NAME']] = $row['FIELD_DEFAULT_VALUE'];
+                            //$appData = array_merge($record, $appData);
                         }
                     }
                 }
@@ -2652,14 +2664,14 @@ function importCreateCaseDelete($jsonMatchFields, $uidTask, $tableName, $firstLi
                 {
                     if (isset($row[$field['COLUMN_CSV']]))
                     {
-                        if ($row[$field['COLUMN_CSV']])
+                        if ($row[$field['COLUMN_CSV']]  != '')
                             $appData[$field['FIELD_NAME']] = _convert($row[$field['COLUMN_CSV']]);
                         else
                             $appData[$field['FIELD_NAME']] = ' ';
                     }
                     else
                     {
-                        if ($field['COLUMN_CSV'])
+                        if ($field['COLUMN_CSV']  != '')
                             $appData[$field['FIELD_NAME']] = _convert($field['COLUMN_CSV']);
                         else
                             $appData[$field['FIELD_NAME']] = ' ';
@@ -2747,39 +2759,15 @@ function importCreateCaseDelete($jsonMatchFields, $uidTask, $tableName, $firstLi
                     if ($row['FIELD_DEFAULT_VALUE'] == '')
                         $row['FIELD_DEFAULT_VALUE'] = 0;
 
-                    $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
-                    if ($appData[$row['FIELD_NAME'] . "_label"] == "")
+                    if($row['FIELD_TYPE'] != 'yesno')
                     {
-                        $i = $row['FIELD_DEFAULT_VALUE'];
-                        if (count($row['FIELD_SQL_OPTION']))
+                        $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
+                        if ($appData[$row['FIELD_NAME'] . "_label"] == "")
                         {
-                            $options = $row['FIELD_SQL_OPTION'];
-                            $id = "";
-                            $label = "";
-                            foreach ($options As $row2)
+                            $i = $row['FIELD_DEFAULT_VALUE'];
+                            if (count($row['FIELD_SQL_OPTION']))
                             {
-                                if ($row2['id'] == $i)
-                                {
-                                    $id = $row2['id'];
-                                    $label = $row2['descrip'];
-                                    break;
-                                }
-                            }
-
-                            if ($id == "" && $label == "")
-                            {
-                                $id = $row['FIELD_SQL_OPTION'][0]['id'];
-                                $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
-                            }
-                            $record[$row['FIELD_NAME']] = $id;
-                            $record[$row['FIELD_NAME'] . "_label"] = $label;
-                            $appData = array_merge($record, $appData);
-                        }
-                        else
-                        {
-                            if (count($row['FIELD_OPTION']))
-                            {
-                                $options = $row['FIELD_OPTION'];
+                                $options = $row['FIELD_SQL_OPTION'];
                                 $id = "";
                                 $label = "";
                                 foreach ($options As $row2)
@@ -2788,18 +2776,54 @@ function importCreateCaseDelete($jsonMatchFields, $uidTask, $tableName, $firstLi
                                     {
                                         $id = $row2['id'];
                                         $label = $row2['descrip'];
+                                        break;
                                     }
                                 }
 
                                 if ($id == "" && $label == "")
                                 {
-                                    $id = $row['FIELD_OPTION'][0]['id'];
-                                    $label = $row['FIELD_OPTION'][0]['descrip'];
+                                    $id = $row['FIELD_SQL_OPTION'][0]['id'];
+                                    $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
                                 }
                                 $record[$row['FIELD_NAME']] = $id;
                                 $record[$row['FIELD_NAME'] . "_label"] = $label;
                                 $appData = array_merge($record, $appData);
                             }
+                            else
+                            {
+                                if (count($row['FIELD_OPTION']))
+                                {
+                                    $options = $row['FIELD_OPTION'];
+                                    $id = "";
+                                    $label = "";
+                                    foreach ($options As $row2)
+                                    {
+                                        if ($row2['id'] == $i)
+                                        {
+                                            $id = $row2['id'];
+                                            $label = $row2['descrip'];
+                                        }
+                                    }
+
+                                    if ($id == "" && $label == "")
+                                    {
+                                        $id = $row['FIELD_OPTION'][0]['id'];
+                                        $label = $row['FIELD_OPTION'][0]['descrip'];
+                                    }
+                                    $record[$row['FIELD_NAME']] = $id;
+                                    $record[$row['FIELD_NAME'] . "_label"] = $label;
+                                    $appData = array_merge($record, $appData);
+                                }
+                            }
+                        }
+                    }
+                    else 
+                    {
+                        $record = Array();
+                        if( $appData[$row['FIELD_NAME']] == '' || $appData[$row['FIELD_NAME']] == ' ' )
+                        {
+                            $appData[$row['FIELD_NAME']] = $row['FIELD_DEFAULT_VALUE'];
+                            //$appData = array_merge($record, $appData);
                         }
                     }
                 }
@@ -2955,14 +2979,14 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                 {
                     if (isset($row[$field['COLUMN_CSV']]))
                     {
-                        if ($row[$field['COLUMN_CSV']])
+                        if ($row[$field['COLUMN_CSV']] != '')
                             $appData[$field['FIELD_NAME']] = _convert($row[$field['COLUMN_CSV']]);
                         else
                             $appData[$field['FIELD_NAME']] = ' ';
                     }
                     else
                     {
-                        if ($field['COLUMN_CSV'])
+                        if ($field['COLUMN_CSV'] != '')
                             $appData[$field['FIELD_NAME']] = _convert($field['COLUMN_CSV']);
                         else
                             $appData[$field['FIELD_NAME']] = ' ';
@@ -3050,39 +3074,15 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                     if ($row['FIELD_DEFAULT_VALUE'] == '')
                         $row['FIELD_DEFAULT_VALUE'] = 0;
 
-                    $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
-                    if ($appData[$row['FIELD_NAME'] . "_label"] == "")
+                    if($row['FIELD_TYPE'] != 'yesno')
                     {
-                        $i = $row['FIELD_DEFAULT_VALUE'];
-                        if (count($row['FIELD_SQL_OPTION']))
+                        $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
+                        if ($appData[$row['FIELD_NAME'] . "_label"] == "")
                         {
-                            $options = $row['FIELD_SQL_OPTION'];
-                            $id = "";
-                            $label = "";
-                            foreach ($options As $row2)
+                            $i = $row['FIELD_DEFAULT_VALUE'];
+                            if (count($row['FIELD_SQL_OPTION']))
                             {
-                                if ($row2['id'] == $i)
-                                {
-                                    $id = $row2['id'];
-                                    $label = $row2['descrip'];
-                                    break;
-                                }
-                            }
-
-                            if ($id == "" && $label == "")
-                            {
-                                $id = $row['FIELD_SQL_OPTION'][0]['id'];
-                                $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
-                            }
-                            $record[$row['FIELD_NAME']] = $id;
-                            $record[$row['FIELD_NAME'] . "_label"] = $label;
-                            $appData = array_merge($record, $appData);
-                        }
-                        else
-                        {
-                            if (count($row['FIELD_OPTION']))
-                            {
-                                $options = $row['FIELD_OPTION'];
+                                $options = $row['FIELD_SQL_OPTION'];
                                 $id = "";
                                 $label = "";
                                 foreach ($options As $row2)
@@ -3091,18 +3091,54 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                                     {
                                         $id = $row2['id'];
                                         $label = $row2['descrip'];
+                                        break;
                                     }
                                 }
 
                                 if ($id == "" && $label == "")
                                 {
-                                    $id = $row['FIELD_OPTION'][0]['id'];
-                                    $label = $row['FIELD_OPTION'][0]['descrip'];
+                                    $id = $row['FIELD_SQL_OPTION'][0]['id'];
+                                    $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
                                 }
                                 $record[$row['FIELD_NAME']] = $id;
                                 $record[$row['FIELD_NAME'] . "_label"] = $label;
                                 $appData = array_merge($record, $appData);
                             }
+                            else
+                            {
+                                if (count($row['FIELD_OPTION']))
+                                {
+                                    $options = $row['FIELD_OPTION'];
+                                    $id = "";
+                                    $label = "";
+                                    foreach ($options As $row2)
+                                    {
+                                        if ($row2['id'] == $i)
+                                        {
+                                            $id = $row2['id'];
+                                            $label = $row2['descrip'];
+                                        }
+                                    }
+
+                                    if ($id == "" && $label == "")
+                                    {
+                                        $id = $row['FIELD_OPTION'][0]['id'];
+                                        $label = $row['FIELD_OPTION'][0]['descrip'];
+                                    }
+                                    $record[$row['FIELD_NAME']] = $id;
+                                    $record[$row['FIELD_NAME'] . "_label"] = $label;
+                                    $appData = array_merge($record, $appData);
+                                }
+                            }
+                        }
+                    }
+                    else 
+                    {
+                        $record = Array();
+                        if( $appData[$row['FIELD_NAME']] == '' || $appData[$row['FIELD_NAME']] == ' ' )
+                        {
+                            $appData[$row['FIELD_NAME']] = $row['FIELD_DEFAULT_VALUE'];
+                            //$appData = array_merge($record, $appData);
                         }
                     }
                 }
@@ -3147,10 +3183,11 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                     $appData[$key] = $value;
                 }
             }
-            $query = "SELECT APP_UID FROM $tableName WHERE $whereUpdate" . mysql_escape_string(getSqlWhere($_REQUEST['idInbox']));
+            $query = "SELECT APP_UID FROM $tableName WHERE $whereUpdate" . mysql_escape_string(getSqlWhere($_REQUEST['idInbox'])); // get the where of the current inbox where we do the import csv to not update statut 0 for exemple.
             $updateData = executeQuery($query);
             if (sizeof($updateData))
-            {
+            {  
+                $user = userInfo($USR_UID);
                 foreach ($updateData as $index)
                 {
                     $oCase = new Cases ();
@@ -3163,7 +3200,11 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                     $appDataNew['FLAG_UPDATE'] = 1;
                     $appDataNew['CurrentUserAutoDerivate'] = $USR_UID;
                     $appDataNew['SW_CREATE_CASE'] = 1;
-                    ; // needed to create cases. If a loop is generated when you run the trigger
+                    ## changes USER_LOGGED, USR_USERNAME
+                    $appDataNew['USER_LOGGED'] = $USR_UID;
+                    $appDataNew['USR_USERNAME'] = $user['username'];
+                    ## end changes USER_LOGGED, USR_USERNAME
+                    // needed to create cases. If a loop is generated when you run the trigger
                     $appDataNew = array_merge($FieldsCase['APP_DATA'], $appDataNew);
                     $FieldsCase['APP_DATA'] = $appDataNew;
                     $oCase->updateCase($index['APP_UID'], $FieldsCase);
@@ -3199,7 +3240,7 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
         }
         $totalCases++;
     }
-    genDataReport($tableName);
+    // genDataReport($tableName);
     # create file tmp
     createFileTmpCSV($csv, $csv_file);
     # end create file tmp
@@ -3208,7 +3249,6 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
 }
 function importCreateCaseTruncate($jsonMatchFields, $uidTask, $tableName, $firstLineHeader) {
     // delete cases
-    // genDataReport($tableName);
     $query = "SELECT APP_UID FROM $tableName ";
     $deleteData = executeQuery($query);
     if (sizeof($deleteData))

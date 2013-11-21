@@ -785,17 +785,19 @@ function limousinProject_readLineFromAQCARTE($datas) {
 
 //INIT
     $err = array();
-
     foreach ($datas as $line)
     {
         $escapeLine = array();
 
-// Escape scpeial caracters
+        // Escape scpecial caracters
         foreach ($line as $key => $lineItem)
             $escapeLine[$key] = mysql_escape_string($lineItem);
 
         $qExist = 'select count(UID) as nb from PMT_CHEQUES where CARTE_PORTEUR_ID = "' . $escapeLine['CARTE_PORTEUR_ID'] . '"';
         $rExist = executeQuery($qExist);
+        // Requête utilisé pour les insertHistoryLogPlugin()
+        $qDemande = 'select count(*) as nb, APP_UID, OLD_PORTEUR_ID from PMT_DEMANDES where PORTEUR_ID ="' . $escapeLine['CARTE_PORTEUR_ID'] . '" and STATUT <> 0 and STATUT <> 999';
+        $rDemande = executeQuery($qDemande);
         $nbID = $rExist[1]['nb'];
         switch ($escapeLine['CODE_EVENT'])
         {
@@ -804,11 +806,15 @@ function limousinProject_readLineFromAQCARTE($datas) {
                 if ($nbID == 0)
                 {
                     $escapeLine['CARTE_STATUT'] = 'Création';
-                    $escapeLine['DATE_CREATION'] = date('Ymd');
+                    $escapeLine['DATE_CREATION'] = $escapeLine['DATE_EVENT_CARTE'];
                     $keys = implode(',', array_keys($escapeLine));
                     $values = '"' . implode('","', $escapeLine) . '"';
                     $query = 'INSERT INTO PMT_CHEQUES (' . $keys . ') VALUES (' . $values . ')';
                     $result = executeQuery($query);
+                    if ($rDemande[1]['nb'] > 0)
+                    {
+                        insertHistoryLogPlugin($rDemande[1]['APP_UID'], $_SESSION['USER_LOGGED'], date('Y-m-d H:i:s'), '0', '', 'Evénement AQOBA AQ_CARTE n°05', 7);
+                    }
                 }
                 else
                     $err[] = 'Porteur Id existe déjà';
@@ -822,7 +828,7 @@ function limousinProject_readLineFromAQCARTE($datas) {
                 {
                     $set = array();
                     $escapeLine['CARTE_STATUT'] = 'Envoyée';
-                    $escapeLine['DATE_EXPE'] = date('Ymd');
+                    $escapeLine['DATE_EXPE'] = $escapeLine['DATE_EVENT_CARTE'];
                     foreach ($escapeLine as $key => $value)
                     {
                         $set[] = $key . '="' . $value . '"';
@@ -830,15 +836,13 @@ function limousinProject_readLineFromAQCARTE($datas) {
                     $update = implode(',', $set);
                     $query = 'update PMT_CHEQUES SET ' . $update . ' where CARTE_PORTEUR_ID= "' . $escapeLine['CARTE_PORTEUR_ID'] . '"';
                     $result = executeQuery($query);
-// reste les ws dans le cas des ré-édition
-                    $qDemande = 'select count(*) as nb, APP_UID, OLD_PORTEUR_ID from PMT_DEMANDES where PORTEUR_ID ="' . $escapeLine['CARTE_PORTEUR_ID'] . '" and STATUT <> 0 and STATUT <> 999';
-                    $rDemande = executeQuery($qDemande);
+                    // reste les ws dans le cas des ré-édition TODO: à modifier
                     if ($rDemande[1]['nb'] > 0)
                     {
-                        convergence_changeStatut($rDemande[1]['APP_UID'], 6);
+                        convergence_changeStatut($rDemande[1]['APP_UID'], 6, 'Evenement AQOBA AQ_CARTE n°14');
                         if (!empty($rDemande[1]['OLD_PORTEUR_ID']))
                         {
-// ws pour le transfert des soldes
+                            // ws pour le transfert des soldes
                         }
                     }
                 }
@@ -851,7 +855,7 @@ function limousinProject_readLineFromAQCARTE($datas) {
                 if ($nbID > 0)
                 {
                     $escapeLine['CARTE_STATUT'] = 'Active';
-                    $escapeLine['DATE_ACTIVE'] = date('Ymd');
+                    $escapeLine['DATE_ACTIVE'] = $escapeLine['DATE_EVENT_CARTE'];
                     foreach ($escapeLine as $key => $value)
                     {
                         $set[] = $key . '="' . $value . '"';
@@ -859,6 +863,10 @@ function limousinProject_readLineFromAQCARTE($datas) {
                     $update = implode(',', $set);
                     $query = 'update PMT_CHEQUES SET ' . $update . ' where CARTE_PORTEUR_ID= "' . $escapeLine['CARTE_PORTEUR_ID'] . '" AND CARTE_STATUT != "Bloquée"';
                     $result = executeQuery($query);
+                    if ($rDemande[1]['nb'] > 0)
+                    {
+                        insertHistoryLogPlugin($rDemande[1]['APP_UID'], $_SESSION['USER_LOGGED'], date('Y-m-d H:i:s'), '0', '', 'Evénement AQOBA AQ_CARTE n°10', 6);
+                    }
                 }
                 else
                     $err[] = "Porteur Id n'existe pas";
@@ -949,22 +957,22 @@ function limousinProject_activationCarte($porteurId, $statut, $role_user = 'Bén
     $return = TRUE;
     if (!empty($porteurId) && $statut == 1)
     {
-// on regarde si le porteurid fourni est correct et on remonte le cas echeant les infos de la demande
+        // on regarde si le porteurid fourni est correct et on remonte le cas echeant les infos de la demande
         $exist = limousinProject_getCartePorteurId($porteurId);
         if (!empty($exist) && ($exist['USER_ID'] == $_SESSION['USER_LOGGED'] || $role_user != 'Bénéficiaires'))
         {
-//on appel le WS d'activation de la carte, on ajoute un groupe utilsateur carte active dans le fe_user Typo3
-//et mise a jour de la table des carte PMT_CHEQUES comme quoi elle est activée
+            //on appel le WS d'activation de la carte, on ajoute un groupe utilsateur carte active dans le fe_user Typo3
+            //et mise a jour de la table des carte PMT_CHEQUES comme quoi elle est activée
             $active = limousinProject_getActivation($porteurId);
             if (!empty($active->CODE) && $active->CODE == 'OK')
             {
-// on appel le WS de televersement des montants
+                // on appel le WS de televersement des montants
                 $sousMontants = array(165 => "800", "800", "1000", "800", "400", "1200");
                 $transaction = array();
                 $transaction = limousinProject_nouvelleTransaction('01', $porteurId, 'C', 5000, $sousMontants);
                 if (!empty($transaction['errors']))
                 {
-//on récupére le label du code erreur de transaction
+                    //on récupére le label du code erreur de transaction
                     $erreur = limousinProject_getErrorAqoba($transaction['errors'], 'WS201') . ' (code' . $transaction['errors'] . ' du WS201)';
                     $return = 'erreur';
                 }
@@ -973,13 +981,13 @@ function limousinProject_activationCarte($porteurId, $statut, $role_user = 'Bén
             {
                 if (!empty($active->Description))
                 {
-// Erreur lors de l'updateUsergroup dans Typo3
+                    // Erreur lors de l'updateUsergroup dans Typo3
                     $erreur = $active->Description;
                     $return = 'erreur';
                 }
                 else
                 {
-// On récupére le label de l'erreur lors de l'appel ws activation carte
+                    // On récupére le label de l'erreur lors de l'appel ws activation carte
                     $erreur = limousinProject_getErrorAqoba($active->code, 'WS211') . " (code $active->code du WS211)";
                     $return = FALSE;
                 }

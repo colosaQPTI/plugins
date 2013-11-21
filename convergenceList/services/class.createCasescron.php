@@ -187,14 +187,14 @@ class archivedCasesClassCron {
                 {
                     if (isset($row[$field['COLUMN_CSV']]))
                     {
-                        if ($row[$field['COLUMN_CSV']])
+                        if ($row[$field['COLUMN_CSV']] != '')
                             $appData[$field['FIELD_NAME']] = _convert($row[$field['COLUMN_CSV']]);
                         else
                             $appData[$field['FIELD_NAME']] = ' ';
                     }
                     else
                     {
-                        if ($field['COLUMN_CSV'])
+                        if ($field['COLUMN_CSV'] != '')
                             $appData[$field['FIELD_NAME']] = _convert($field['COLUMN_CSV']);
                         else
                             $appData[$field['FIELD_NAME']] = ' ';
@@ -276,40 +276,16 @@ class archivedCasesClassCron {
                 {
                     if ($row['FIELD_DEFAULT_VALUE'] == '')
                         $row['FIELD_DEFAULT_VALUE'] = 0;
-                    $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
-                    if ($appData[$row['FIELD_NAME'] . "_label"] == "")
+
+                    if($row['FIELD_TYPE'] != 'yesno')
                     {
-                        $i = $row['FIELD_DEFAULT_VALUE'];
-                        if (count($row['FIELD_SQL_OPTION']))
+                        $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
+                        if ($appData[$row['FIELD_NAME'] . "_label"] == "")
                         {
-                            $options = $row['FIELD_SQL_OPTION'];
-                            $id = "";
-                            $label = "";
-                            foreach ($options As $row2)
+                            $i = $row['FIELD_DEFAULT_VALUE'];
+                            if (count($row['FIELD_SQL_OPTION']))
                             {
-                                if ($row2['id'] == $i)
-                                {
-                                    $id = $row2['id'];
-                                    $label = $row2['descrip'];
-                                    break;
-                                }
-                            }
-
-                            if ($id == "" && $label == "")
-                            {
-                                $id = $row['FIELD_SQL_OPTION'][0]['id'];
-                                $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
-                            }
-
-                            $record[$row['FIELD_NAME']] = $id;
-                            $record[$row['FIELD_NAME'] . "_label"] = $label;
-                            $appData = array_merge($record, $appData);
-                        }
-                        else
-                        {
-                            if (count($row['FIELD_OPTION']))
-                            {
-                                $options = $row['FIELD_OPTION'];
+                                $options = $row['FIELD_SQL_OPTION'];
                                 $id = "";
                                 $label = "";
                                 foreach ($options As $row2)
@@ -324,14 +300,51 @@ class archivedCasesClassCron {
 
                                 if ($id == "" && $label == "")
                                 {
-                                    $id = $row['FIELD_OPTION'][0]['id'];
-                                    $label = $row['FIELD_OPTION'][0]['descrip'];
+                                    $id = $row['FIELD_SQL_OPTION'][0]['id'];
+                                    $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
                                 }
 
                                 $record[$row['FIELD_NAME']] = $id;
                                 $record[$row['FIELD_NAME'] . "_label"] = $label;
                                 $appData = array_merge($record, $appData);
                             }
+                            else
+                            {
+                                if (count($row['FIELD_OPTION']))
+                                {
+                                    $options = $row['FIELD_OPTION'];
+                                    $id = "";
+                                    $label = "";
+                                    foreach ($options As $row2)
+                                    {
+                                        if ($row2['id'] == $i)
+                                        {
+                                            $id = $row2['id'];
+                                            $label = $row2['descrip'];
+                                            break;
+                                        }
+                                    }
+
+                                    if ($id == "" && $label == "")
+                                    {
+                                        $id = $row['FIELD_OPTION'][0]['id'];
+                                        $label = $row['FIELD_OPTION'][0]['descrip'];
+                                    }
+
+                                    $record[$row['FIELD_NAME']] = $id;
+                                    $record[$row['FIELD_NAME'] . "_label"] = $label;
+                                    $appData = array_merge($record, $appData);
+                                }
+                            }
+                        }
+                    }
+                    else 
+                    {
+                        $record = Array();
+                        if( $appData[$row['FIELD_NAME']] == ''  || $appData[$row['FIELD_NAME']] == ' ')
+                        {
+                            $appData[$row['FIELD_NAME']] = $row['FIELD_DEFAULT_VALUE'];
+                            //$appData = array_merge($record, $appData);
                         }
                     }
                 }
@@ -419,14 +432,14 @@ class archivedCasesClassCron {
 
                     if (isset($row[$field['COLUMN_CSV']]))
                     {
-                        if ($row[$field['COLUMN_CSV']])
+                        if ($row[$field['COLUMN_CSV']] != '' )
                             $appData[$field['FIELD_NAME']] = _convert($row[$field['COLUMN_CSV']]);
                         else
                             $appData[$field['FIELD_NAME']] = ' ';
                     }
                     else
                     {
-                        if ($field['COLUMN_CSV'])
+                        if ($field['COLUMN_CSV'] != '' )
                             $appData[$field['FIELD_NAME']] = _convert($field['COLUMN_CSV']);
                         else
                             $appData[$field['FIELD_NAME']] = ' ';
@@ -516,42 +529,17 @@ class archivedCasesClassCron {
                     if ($row['FIELD_DEFAULT_VALUE'] == '')
                         $row['FIELD_DEFAULT_VALUE'] = 0;
 
-                    $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
+                    if($row['FIELD_TYPE'] != 'yesno')
+                    { 
+                        $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
 
-                    if ($appData[$row['FIELD_NAME'] . "_label"] == "")
-                    {
-                        $i = $row['FIELD_DEFAULT_VALUE'];
-                        if (count($row['FIELD_SQL_OPTION']))
+                        if ($appData[$row['FIELD_NAME'] . "_label"] == "")
                         {
-
-                            $options = $row['FIELD_SQL_OPTION'];
-                            $id = "";
-                            $label = "";
-                            foreach ($options As $row2)
+                            $i = $row['FIELD_DEFAULT_VALUE'];
+                            if (count($row['FIELD_SQL_OPTION']))
                             {
-                                if ($row2['id'] == $i)
-                                {
-                                    $id = $row2['id'];
-                                    $label = $row2['descrip'];
-                                    break;
-                                }
-                            }
 
-                            if ($id == "" && $label == "")
-                            {
-                                $id = $row['FIELD_SQL_OPTION'][0]['id'];
-                                $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
-                            }
-
-                            $record[$row['FIELD_NAME']] = $id;
-                            $record[$row['FIELD_NAME'] . "_label"] = $label;
-                            $appData = array_merge($record, $appData);
-                        }
-                        else
-                        {
-                            if (count($row['FIELD_OPTION']))
-                            {
-                                $options = $row['FIELD_OPTION'];
+                                $options = $row['FIELD_SQL_OPTION'];
                                 $id = "";
                                 $label = "";
                                 foreach ($options As $row2)
@@ -566,14 +554,50 @@ class archivedCasesClassCron {
 
                                 if ($id == "" && $label == "")
                                 {
-                                    $id = $row['FIELD_OPTION'][0]['id'];
-                                    $label = $row['FIELD_OPTION'][0]['descrip'];
+                                    $id = $row['FIELD_SQL_OPTION'][0]['id'];
+                                    $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
                                 }
 
                                 $record[$row['FIELD_NAME']] = $id;
                                 $record[$row['FIELD_NAME'] . "_label"] = $label;
                                 $appData = array_merge($record, $appData);
                             }
+                            else
+                            {
+                                if (count($row['FIELD_OPTION']))
+                                {
+                                    $options = $row['FIELD_OPTION'];
+                                    $id = "";
+                                    $label = "";
+                                    foreach ($options As $row2)
+                                    {
+                                        if ($row2['id'] == $i)
+                                        {
+                                            $id = $row2['id'];
+                                            $label = $row2['descrip'];
+                                            break;
+                                        }
+                                    }
+
+                                    if ($id == "" && $label == "")
+                                    {
+                                        $id = $row['FIELD_OPTION'][0]['id'];
+                                        $label = $row['FIELD_OPTION'][0]['descrip'];
+                                    }
+
+                                    $record[$row['FIELD_NAME']] = $id;
+                                    $record[$row['FIELD_NAME'] . "_label"] = $label;
+                                    $appData = array_merge($record, $appData);
+                                }
+                            }
+                        }
+                    }
+                    else 
+                    {                       
+                        if( $appData[$row['FIELD_NAME']] == '' || $appData[$row['FIELD_NAME']] == ' ' )
+                        {
+                            $appData[$row['FIELD_NAME']] = $row['FIELD_DEFAULT_VALUE'];
+                            //$appData = array_merge($record, $appData);
                         }
                     }
                 }
@@ -621,6 +645,7 @@ class archivedCasesClassCron {
             $updateData = executeQuery($query);
             if (sizeof($updateData))
             {
+                $user = userInfo($USR_UID);
                 foreach ($updateData as $index)
                 {
                     $oCase = new Cases ();
@@ -630,10 +655,14 @@ class archivedCasesClassCron {
                     $appDataNew['EXEC_AUTO_DERIVATE'] = 'NO';
                     $appDataNew['eligible'] = 0; // only process beneficiary
                     $appDataNew['FLAG_EDIT'] = 1;
-                    $appDataNew['FLAG_UPDATE'] = 1;
+                    $appDataNew['FLAG_UPDATE'] = 1; // add by Nico for historyLog
                     $appDataNew['CurrentUserAutoDerivate'] = $USR_UID;
                     $appDataNew['SW_CREATE_CASE'] = 1;
-                    ; // needed to create cases. If a loop is generated when you run the trigger
+                    ## changes USER_LOGGED, USR_USERNAME
+                    $appDataNew['USER_LOGGED'] = $USR_UID;
+                    $appDataNew['USR_USERNAME'] = $user['username'];
+                    ## end changes USER_LOGGED, USR_USERNAME
+                    // needed to create cases. If a loop is generated when you run the trigger
                     $appDataNew = array_merge($FieldsCase['APP_DATA'], $appDataNew);
                     $FieldsCase['APP_DATA'] = $appDataNew;
                     $oCase->updateCase($index['APP_UID'], $FieldsCase);
@@ -715,14 +744,14 @@ class archivedCasesClassCron {
 
                     if (isset($row[$field['COLUMN_CSV']]))
                     {
-                        if ($row[$field['COLUMN_CSV']])
+                        if ($row[$field['COLUMN_CSV']] != '' )
                             $appData[$field['FIELD_NAME']] = _convert($row[$field['COLUMN_CSV']]);
                         else
                             $appData[$field['FIELD_NAME']] = ' ';
                     }
                     else
                     {
-                        if ($field['COLUMN_CSV'])
+                        if ($field['COLUMN_CSV'] != '' )
                             $appData[$field['FIELD_NAME']] = _convert($field['COLUMN_CSV']);
                         else
                             $appData[$field['FIELD_NAME']] = ' ';
@@ -815,42 +844,17 @@ class archivedCasesClassCron {
                     if ($row['FIELD_DEFAULT_VALUE'] == '')
                         $row['FIELD_DEFAULT_VALUE'] = 0;
 
-                    $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
+                    if($row['FIELD_TYPE'] != 'yesno')
+                    { 
+                        $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
 
-                    if ($appData[$row['FIELD_NAME'] . "_label"] == "")
-                    {
-                        $i = $row['FIELD_DEFAULT_VALUE'];
-                        if (count($row['FIELD_SQL_OPTION']))
+                        if ($appData[$row['FIELD_NAME'] . "_label"] == "")
                         {
-
-                            $options = $row['FIELD_SQL_OPTION'];
-                            $id = "";
-                            $label = "";
-                            foreach ($options As $row2)
+                            $i = $row['FIELD_DEFAULT_VALUE'];
+                            if (count($row['FIELD_SQL_OPTION']))
                             {
-                                if ($row2['id'] == $i)
-                                {
-                                    $id = $row2['id'];
-                                    $label = $row2['descrip'];
-                                    break;
-                                }
-                            }
 
-                            if ($id == "" && $label == "")
-                            {
-                                $id = $row['FIELD_SQL_OPTION'][0]['id'];
-                                $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
-                            }
-
-                            $record[$row['FIELD_NAME']] = $id;
-                            $record[$row['FIELD_NAME'] . "_label"] = $label;
-                            $appData = array_merge($record, $appData);
-                        }
-                        else
-                        {
-                            if (count($row['FIELD_OPTION']))
-                            {
-                                $options = $row['FIELD_OPTION'];
+                                $options = $row['FIELD_SQL_OPTION'];
                                 $id = "";
                                 $label = "";
                                 foreach ($options As $row2)
@@ -865,14 +869,51 @@ class archivedCasesClassCron {
 
                                 if ($id == "" && $label == "")
                                 {
-                                    $id = $row['FIELD_OPTION'][0]['id'];
-                                    $label = $row['FIELD_OPTION'][0]['descrip'];
+                                    $id = $row['FIELD_SQL_OPTION'][0]['id'];
+                                    $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
                                 }
 
                                 $record[$row['FIELD_NAME']] = $id;
                                 $record[$row['FIELD_NAME'] . "_label"] = $label;
                                 $appData = array_merge($record, $appData);
                             }
+                            else
+                            {
+                                if (count($row['FIELD_OPTION']))
+                                {
+                                    $options = $row['FIELD_OPTION'];
+                                    $id = "";
+                                    $label = "";
+                                    foreach ($options As $row2)
+                                    {
+                                        if ($row2['id'] == $i)
+                                        {
+                                            $id = $row2['id'];
+                                            $label = $row2['descrip'];
+                                            break;
+                                        }
+                                    }
+
+                                    if ($id == "" && $label == "")
+                                    {
+                                        $id = $row['FIELD_OPTION'][0]['id'];
+                                        $label = $row['FIELD_OPTION'][0]['descrip'];
+                                    }
+
+                                    $record[$row['FIELD_NAME']] = $id;
+                                    $record[$row['FIELD_NAME'] . "_label"] = $label;
+                                    $appData = array_merge($record, $appData);
+                                }
+                            }
+                        }
+                    }
+                    else 
+                    {
+                        $record = Array();
+                        if( $appData[$row['FIELD_NAME']] == ''  || $appData[$row['FIELD_NAME']] == ' ')
+                        {
+                            $appData[$row['FIELD_NAME']] = $row['FIELD_DEFAULT_VALUE'];
+                            //$appData = array_merge($record, $appData);
                         }
                     }
                 }
@@ -892,7 +933,7 @@ class archivedCasesClassCron {
             // delete cases
             if ($whereDelete != '')
             {
-                genDataReport($tableName);
+                // genDataReport($tableName);
                 $query = "SELECT APP_UID FROM wf_" . $this->workspace . ".$tableName WHERE $whereDelete AND APP_UID NOT IN ( $idCasesGenerate ) "; //print($query.'  ');
                 $deleteData = executeQuery($query);
                 if (sizeof($deleteData))
@@ -901,7 +942,7 @@ class archivedCasesClassCron {
                     {
                         $CurDateTime = date('Y-m-d H:i:s');
                         insertHistoryLogPlugin($index['APP_UID'], $USR_UID, $CurDateTime, '1', $index['APP_UID'], 'Delete Case');
-                        $this->deletePMCases($index['APP_UID']);
+                        deletePMCases($index['APP_UID'],$tableName);
                     }
                 }
             }

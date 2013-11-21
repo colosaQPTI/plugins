@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?> 
+<?xml version="1.0" encoding="UTF-8"?>
 <dynaForm type="pagetable" width ="500" rowsPerPage="5">
-  <PRESTA_NAME type="text" maxlength="64" validate="Any" required="0" readonly="0" size="20" mode="view" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0" enableHtml="1">
-    <en>Raison sociale</en>
-  </PRESTA_NAME>
-  <VILLE type="text" maxlength="64" validate="Any" required="0" readonly="0" size="15" mode="view" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0" enableHtml="1">
-    <en>Ville</en>
-  </VILLE>
-  <SELECT_ETAB type="text" enableHtml="1" mode="view" btn_cancel="Cancel">
-    <en> <![CDATA[ Choisir]]></en>
-  </SELECT_ETAB>
+    <PRESTA_NAME type="text" maxlength="64" validate="Any" required="0" readonly="0" size="20" mode="view" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0" enableHtml="1">
+        <en>Nom du partenaire</en>
+    </PRESTA_NAME>
+    <VILLE type="text" maxlength="64" validate="Any" required="0" readonly="0" size="15" mode="view" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0" enableHtml="1">
+        <en>commune</en>
+    </VILLE>
+    <SELECT_ETAB type="text" enableHtml="1" mode="view" btn_cancel="Cancel">
+        <en> <![CDATA[ Choisir]]></en>
+    </SELECT_ETAB>
 </dynaForm>
