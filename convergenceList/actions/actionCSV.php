@@ -85,7 +85,15 @@ try {
                         $totalCases = importCreateCaseEdit($matchFields,$uidTask,$tableName,$firstLineHeader, $dataEdit);
                         echo G::json_encode(array("success" => true, "message" => "OK", "totalCases" => $totalCases));
                         break;
-                  case "truncateAdd": 
+                   case "edit": // option to update only, not create case
+                        $matchFields = isset($_REQUEST["matchFields"]) ? $_REQUEST["matchFields"] : '';
+                        $uidTask = isset($_REQUEST["uidTask"]) ? $_REQUEST["uidTask"] : '';
+                        $tableName = isset($_REQUEST["tableName"]) ? $_REQUEST["tableName"] : '';
+                        $dataEdit = isset($_REQUEST["dataEditDelete"]) ? $_REQUEST["dataEditDelete"] : '';
+                        $totalCases = importCreateCaseEdit($matchFields, $uidTask, $tableName, $firstLineHeader, $dataEdit, 1); // 1 at last params to update only
+                        echo G::json_encode(array( "success" => true, "message" => "OK", "totalCases" => $totalCases ));
+                        break;
+                    case "truncateAdd":
                         $matchFields = isset($_REQUEST["matchFields"])?$_REQUEST["matchFields"]:'';
                         $uidTask     = isset($_REQUEST["uidTask"])?$_REQUEST["uidTask"]:'';
                         $tableName   = isset($_REQUEST["tableName"])?$_REQUEST["tableName"]:'';
@@ -104,8 +112,8 @@ try {
             else
             {   
                 echo G::json_encode(array("success" => false,
-                                           "message" => "S'il vous plaît définir une colonne pour effectuer l'action du CSV", 
-                                           "totalCases" => 0));
+                                           "message" => "Séléctionnez le type d'import souhaité pour ce CSV",
+                    "totalCases" => 0));
             } 
   }
 

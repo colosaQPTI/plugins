@@ -326,7 +326,7 @@ function limousinProject_getDateNaissanceFromPorteurID($porteurID) {
 }
 function limousinProject_nouvelleTransaction($operation = 0, $porteurId = 0, $sens = 'N', $montant = 0, $sousMontants = array()) {
 
-// INIT Ws 201
+    // INIT Ws 201
     $t = new Transaction();
     $retour = array();
     /*
@@ -335,26 +335,19 @@ function limousinProject_nouvelleTransaction($operation = 0, $porteurId = 0, $se
      * 17: Chargement depuis carte bancaire,20: Virement entrant,21: Virement sortant
      */
 
-// SET Params
+    // SET Params
     $t->partenaire = wsPrestaId;
     $t->operation = $operation;
     $t->porteurId = $porteurId;
-// C -> Chargement ou D -> Dechargement
+    // C -> Chargement ou D -> Dechargement
     $t->sens = $sens;
     $t->montant = $montant;
-
-    /* Mode Test On */
-//$t->porteurId = "30280000023";
-//$t->porteurId = "30280055283"; 30280055364
-//$t->porteurId = "0009";
-//$t->sens = "C";
-//$t->montant = "200";
     foreach ($sousMontants as $rsx => $sm)
     {
         $t->addSousMontant($rsx, $sm);
     }
-    /* Mode Test Off */
-// CALL Ws
+
+    // CALL Ws
     try
     {
         $retour['success'] = $t->call();
@@ -434,9 +427,7 @@ function limousinProject_getOperations($porteurId = 0, $op = '00', $nbJours = '1
     catch (Exception $e)
     {
 // TODO
-//$echo = $e->errors; //. ' : ' . $e->message;
         echo 'Code Erreur operation = ' . $o->errors->code . '--- End Error ---';
-//var_dump($e);
     }
 }
 function limousinProject_getAutorisations() {
@@ -457,42 +448,36 @@ function limousinProject_getAutorisations() {
     catch (Exception $e)
     {
 // TODO
-//$echo = $e->errors; //. ' : ' . $e->message;
         echo 'Code Erreur operation = ' . $a->errors->code . '--- End Error ---';
-//var_dump($e);
     }
 }
 function limousinProject_getActivation($porteurId = 0) {
 
-// INIT Ws 211
+    // INIT Ws 211
     $result = null;
     $v = new Activation();
 
-// SET Params
+    // SET Params
     $v->partenaire = wsPrestaId;
     $v->porteurId = $porteurId;
 
-    /* Mode Test On */
-//$v->porteurId = 30280055364;
-//$s->porteurId = 30280000023;
-    /* Mode Test Off */
-// CALL Ws
-//    try
-//    {
-//        $v->call();
-// Si la carte est bien activée, on met à jour la table des cartes PMT_CHEQUES
-    $query = 'UPDATE PMT_CHEQUES SET CARTE_STATUT = "Active", DATE_ACTIVE = "' . date('Ymd') . '" where CARTE_PORTEUR_ID= "' . mysql_escape_string($porteurId) . '"';
-    $resQuery = executeQuery($query);
-// Puis on change le usergroup dans Typo3 en Carte activé
-    $data = limousinProject_getDemandeFromPorteurID($porteurId);
-    $userInfo = userInfo($data['USER_ID']);
-    $result = limousinProject_updateUsergroupTypo($userInfo, $porteurId, '222');
-//    }
-//    catch (Exception $e)
-//    {
-//        $result = $v->errors;
-//    }
-// RETURN
+    // CALL Ws
+    try
+    {
+        $v->call();
+        // Si la carte est bien activée, on met à jour la table des cartes PMT_CHEQUES
+        $query = 'UPDATE PMT_CHEQUES SET CARTE_STATUT = "Active", DATE_ACTIVE = "' . date('Ymd') . '" where CARTE_PORTEUR_ID= "' . mysql_escape_string($porteurId) . '"';
+        $resQuery = executeQuery($query);
+        // Puis on change le usergroup dans Typo3 en Carte activé
+        $data = limousinProject_getDemandeFromPorteurID($porteurId);
+        $userInfo = userInfo($data['USER_ID']);
+        $result = limousinProject_updateUsergroupTypo($userInfo, $porteurId, '222');
+    }
+   catch (Exception $e)
+   {
+       $result = $v->errors;
+    }
+    // RETURN
     return $result;
 }
 function limousinProject_getSolde($porteurId = 0) {
@@ -513,7 +498,6 @@ function limousinProject_getSolde($porteurId = 0) {
 // CALL Ws
     try
     {
-// TODOs
         $arraySolde = array();
         $arraySousSoldes = array();
         $obj = $s->call();
@@ -531,17 +515,11 @@ function limousinProject_getSolde($porteurId = 0) {
         $soldeComptable = (array) $obj->soldeComptable;
         $arraySolde['soldeComptable'] = $soldeComptable[0];
         $arraySolde['sousSoldes'] = $arraySousSoldes;
-//$arraySolde = $obj->sousSoldes->sousSolde[0]->attributes();
-//$arraySolde = (array) $arraySolde['reseau'];
-//return $obj->sousSoldes->sousSolde[0]->attributes();
         return $arraySolde;
     }
     catch (Exception $e)
     {
-// TODO
         return $s;
-//return $s;
-// echo 'Code Erreur solde = ' . $echo . '--- End Error ---';
     }
 }
 function limousinProject_testSolde($soldeReseau, $montant) {
@@ -789,7 +767,7 @@ function limousinProject_readLineFromAQCARTE($datas) {
     {
         $escapeLine = array();
 
-        // Escape scpecial caracters
+        // Escape special caracters
         foreach ($line as $key => $lineItem)
             $escapeLine[$key] = mysql_escape_string($lineItem);
 
@@ -917,7 +895,7 @@ function limousinProject_getSituationLabel($situation) {
 function limousinProject_getCartePorteurId($porteur_id) {
 
 // on check qu'il y ai bien une carte produite pour ce porteur id
-    $qExist = 'select count(UID) as nb from PMT_CHEQUES where CARTE_PORTEUR_ID = "' . mysql_escape_string($porteur_id) . '" AND CODE_EVENT = 14';
+    $qExist = 'select count(UID) as nb from PMT_CHEQUES where CARTE_PORTEUR_ID = "' . mysql_escape_string($porteur_id) . '" AND CODE_EVENT IN(14,10)';
     $rExist = executeQuery($qExist);
     $nbID = intval($rExist[1]['nb']);
     if (!empty($nbID) && $nbID > 0)
@@ -967,9 +945,11 @@ function limousinProject_activationCarte($porteurId, $statut, $role_user = 'Bén
             if (!empty($active->CODE) && $active->CODE == 'OK')
             {
                 // on appel le WS de televersement des montants
-                $sousMontants = array(165 => "800", "800", "1000", "800", "400", "1200");
+                //$sousMontants = array(165 => "800", "800", "1000", "800", "400", "1200");
+                $sousMontants = limousinProject_getMontantRsxByCodeOper($exist['CODE_OPERATION']);
+                $totalMontants = limousinProject_getMontantByCodeOper($exist['CODE_OPERATION']);
                 $transaction = array();
-                $transaction = limousinProject_nouvelleTransaction('01', $porteurId, 'C', 5000, $sousMontants);
+                $transaction = limousinProject_nouvelleTransaction('01', $porteurId, 'C', $totalMontants, $sousMontants);
                 if (!empty($transaction['errors']))
                 {
                     //on récupére le label du code erreur de transaction
@@ -1018,12 +998,12 @@ function limousinProject_activationCarte($porteurId, $statut, $role_user = 'Bén
                 $erreur = 'PorteurId incorrect.';
                 break;
         }
-//        if ($statut != 1)
-//            $erreur = 'Activation annulée par le ' . $role_user;
-//        else
-//            $erreur = 'PorteurId incorrect.';
+    //        if ($statut != 1)
+        //            $erreur = 'Activation annulée par le ' . $role_user;
+        //        else
+        //            $erreur = 'PorteurId incorrect.';
     }
-// Dans le cas où $return == 'erreur', alors la carte est activé, mais avec quand même des erreurs à signaler, donc on rentre dans les 2 conditions suivantes
+    // Dans le cas où $return == 'erreur', alors la carte est activé, mais avec quand même des erreurs à signaler, donc on rentre dans les 2 conditions suivantes
     if ($return !== FALSE)
     {
         insertHistoryLogPlugin($exist['APPLICATION'], $_SESSION['USER_LOGGED'], date('Y-m-d H:i:s'), '0', '', "Carte activée par le $role_user", $exist['STATUT']);
@@ -1051,36 +1031,30 @@ function limousinProject_activationCarte($porteurId, $statut, $role_user = 'Bén
 }
 function limousinProject_getThematiqueFromPartenaire($userId) {
 //array('1' => array('CODE'=>'165', 'TYPE'=>'Cinéma'));
-    $query = "SELECT CONCAT(TH_CINE, '-', TH_SPECTACLE, '-', TH_ACHAT, '-', TH_ARTS, '-', TH_SPORT, '-', IF(TH_ADH_ART = '0', TH_ADH_SPORT, TH_ADH_ART)) AS THEMATIQUE FROM PMT_PRESTATAIRE where STATUT=1 AND USER_ID ='" . $userId . "'";
-    $result = executeQuery($query);
     $thematiquesArray = array();
-    if (isset($result))
+    $queryTh = "SELECT TH_CINE, TH_SPECTACLE, TH_ACHAT, TH_ARTS, TH_SPORT, IF(TH_ADH_ART = '0', TH_ADH_SPORT, TH_ADH_ART) AS TH_ADH_SPORT
+      FROM PMT_PRESTATAIRE where STATUT=1 AND USER_ID ='" . $userId . "'";
+    $resultTh = executeQuery($queryTh);
+    if (!empty($resultTh[1]))
     {
-        $thematiqueString = $result[1]['THEMATIQUE'];
-        $thematiquePrestaArray = explode('-', $thematiqueString);
-        if ($thematiquePrestaArray[0] == 1)
+        $index = 1;
+        foreach ($resultTh[1] as $thematiqueFields => $value)
         {
-            $thematiquesArray['1'] = array('CODE' => '165', 'TYPE' => 'Cinéma');
-        }
-        if ($thematiquePrestaArray[1] == 1)
-        {
-            $thematiquesArray['2'] = array('CODE' => '166', 'TYPE' => 'Spectacle Vivant');
-        }
-        if ($thematiquePrestaArray[2] == 1)
-        {
-            $thematiquesArray['3'] = array('CODE' => '167', 'TYPE' => 'Achat de livre et produtis multimédia');
-        }
-        if ($thematiquePrestaArray[3] == 1)
-        {
-            $thematiquesArray['4'] = array('CODE' => '168', 'TYPE' => 'Arts Plastiques');
-        }
-        if ($thematiquePrestaArray[4] == 1)
-        {
-            $thematiquesArray['5'] = array('CODE' => '169', 'TYPE' => 'Manifestation ou évènement sportif');
-        }
-        if ($thematiquePrestaArray[5] == 1)
-        {
-            $thematiquesArray['6'] = array('CODE' => '170', 'TYPE' => 'Adhésion pratique sportive ou artistique');
+            if ($value == 1)
+            {
+                $query = 'SELECT CODE_RESEAU AS CODE, LIBELLE AS TYPE
+      FROM PMT_THEMATIQUES AS T
+      JOIN PMT_RSXTHEMATIQ_MM_PRESTAFIELDTHEMATIQ AS MM
+      ON (T.CODE_RESEAU = MM.MM_CODE_RESEAU)
+      WHERE PRESTA_NAMEFIELD="' . $thematiqueFields . '"';
+                $result = executeQuery($query);
+                if (!empty($result))
+                {
+                    $i = (string) $index;
+                    $thematiquesArray[$index] = array('CODE' => $result[1]['CODE'], 'TYPE' => $result[1]['TYPE']);
+                    $index++;
+                }
+            }
         }
     }
     return $thematiquesArray;
@@ -1115,6 +1089,47 @@ function limousinProject_getPartenaireIdFromPartenaire($userId) {
     }
     return $partenaireId;
 }
+
+/* * * Renvoie le tableau des sous montants en centimes pour le webservice de transaction ws 201 pour le premier versement
+ *
+ * @param   integer   $code_oper    code opération de l'offre que l'on souhaite initialiser
+ * @return  array     $sousMontants  liste des réseaux et de leurs montants à charger pour l'offre données
+ */
+function limousinProject_getMontantRsxByCodeOper($code_oper) {
+
+    // INIT
+    $sousMontants = array( );
+
+    $query = 'SELECT CODE_RESEAU, MONTANT_INITIAL * 100 AS MONTANT FROM PMT_THEMATIQUES WHERE NUM_OPER = ' . intval($code_oper);
+    $result = executeQuery($query);
+    if ( !empty($result) )
+    {
+        foreach ( $result as $reseau )
+        {
+            $sousMontants[$reseau['CODE_RESEAU']] = intval($reseau['MONTANT']);
+        }
+    }
+    return $sousMontants;
+}
+
+/* * * Renvoie le montant total en centimes pour le webservice de transaction ws 201 pour le premier versement
+ *
+ * @param   integer   $code_oper    code opération de l'offre que l'on souhaite initialiser
+ * @return  array     $montantTotal le montants à charger pour l'offre données
+ */
+function limousinProject_getMontantByCodeOper($code_oper) {
+
+    // INIT
+    $montantTotal = 0;
+    $query = 'SELECT SUM(MONTANT_INITIAL) * 100 as TOTAL FROM PMT_THEMATIQUES WHERE NUM_OPER = ' . $code_oper;
+    $result = executeQuery($query);
+    if ( !empty($result) )
+    {
+       $montantTotal = intval($result[1]['TOTAL']);
+    }
+    return $montantTotal;
+}
+
 function limousinProject_getFileEtatTransaction($path = '/var/tmp/Etat_Transaction_TPE_Hebdo', $ext = 'xlsx', $MoinsNSemaine = 0, $dateReferente = NULL) {
     $calendrier = array();
     $calendrier = convergence_getDateLastWeek($MoinsNSemaine, $dateReferente);
@@ -1128,8 +1143,8 @@ function limousinProject_getFileEtatTransaction($path = '/var/tmp/Etat_Transacti
                                     CONCAT(FORMAT((MONTANT_NET/POW(10,NB_DECIMAL_MONTANT_NET)), NB_DECIMAL_MONTANT_NET), ' €'),
                                     CONCAT('-', FORMAT((MONTANT_NET/POW(10,NB_DECIMAL_MONTANT_NET)), NB_DECIMAL_MONTANT_NET), ' €'))
                                 AS MONTANT
-                           FROM PMT_TRANSACTIONS
-                           WHERE STR_TO_DATE(DATE_EFFECTIVE, '%Y%m%d') > STR_TO_DATE('" . $calendrier['Lundi'] . "', '%d-%m-%Y')
+                            FROM PMT_TRANSACTIONS
+                            WHERE STR_TO_DATE(DATE_EFFECTIVE, '%Y%m%d') > STR_TO_DATE('" . $calendrier['Lundi'] . "', '%d-%m-%Y')
                                 AND STR_TO_DATE(DATE_EFFECTIVE, '%Y%m%d') < STR_TO_DATE('" . $calendrier['Dimanche'] . "', '%d-%m-%Y')";
     $resultTransaction = executeQuery($requeteTransaction);
     if (!empty($requeteTransaction))

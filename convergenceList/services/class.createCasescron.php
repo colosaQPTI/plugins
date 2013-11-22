@@ -81,6 +81,11 @@ class archivedCasesClassCron {
                         $delete = executeQuery("DELETE FROM wf_" . $this->workspace . ".PMT_IMPORT_CSV_DATA WHERE IMPCSV_IDENTIFY = '$csvIdentify' AND IMPCSV_TABLE_NAME = '$tableName' ");
                         $this->deleteFileCSV($fileCSV);
                         break;
+                    case "ONLY_UPDATE": // Action type to update but not create case, use 1 at last params to update only
+                        $totalCases = $this->importCreateCaseEditCSV($matchFields, $uidTask, $tableName, $firstLineHeader, $informationCSV, $dataDeleteEdit, $csvIdentify, $totCasesCSV, $csvWhereAction, 1);
+                        $delete = executeQuery("DELETE FROM wf_" . $this->workspace . ".PMT_IMPORT_CSV_DATA WHERE IMPCSV_IDENTIFY = '$csvIdentify' AND IMPCSV_TABLE_NAME = '$tableName' ");
+                        $this->deleteFileCSV($fileCSV);
+                        break;
                     case "ADD_TRUNCATE":
                         $totalCases = $this->importCreateCaseCSV($matchFields, $uidTask, $tableName, $firstLineHeader, $informationCSV, $csvIdentify, $totCasesCSV);
                         $delete = executeQuery("DELETE FROM wf_" . $this->workspace . ".PMT_IMPORT_CSV_DATA WHERE IMPCSV_IDENTIFY = '$csvIdentify' AND IMPCSV_TABLE_NAME = '$tableName' ");
@@ -400,7 +405,7 @@ class archivedCasesClassCron {
         unset($informationCSV);
         return $totalCases;
     }
-    function importCreateCaseEditCSV($jsonMatchFields, $uidTask, $tableName, $firstLineHeader, $informationCSV, $dataDeleteEdit, $csvIdentify, $totCasesCSV, $csvWhereAction) {
+    function importCreateCaseEditCSV($jsonMatchFields, $uidTask, $tableName, $firstLineHeader, $informationCSV, $dataDeleteEdit, $csvIdentify, $totCasesCSV, $csvWhereAction, $onlyUpdate = 0) {
         G::LoadClass('case');
         $items = $jsonMatchFields;
         $dataCSV = isset($informationCSV) ? $informationCSV : array();
@@ -669,7 +674,7 @@ class archivedCasesClassCron {
                     executeTriggers($proUid, $index['APP_UID'], $USR_UID);
                 }
             }
-            else
+            elseif ( $onlyUpdate == 0 ) // not create new case if we want juste update already existing cases
             {
                 $appData['VALIDATION'] = '0'; //needed for the process, if not you will have an error.
                 $appData['FLAG_ACTION'] = 'multipleDerivation';

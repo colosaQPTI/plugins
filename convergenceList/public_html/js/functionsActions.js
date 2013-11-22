@@ -2449,6 +2449,7 @@ function importCSV(_uidTask) {
     var _isCheckedAdd = 'on';
     var _isCheckedDeleteAdd = 'off';
     var _isCheckedEditAdd = 'off';
+    var _isCheckedEdit = 'off';
     var _isCheckedTruncateAdd = 'off';
     var _isCheckedOption = 'add';
     var _SELECT_OPTION = 'Select...';
@@ -2457,6 +2458,7 @@ function importCSV(_uidTask) {
     var _USE_ADD = 'Importer et ajouter';
     var _USE_DELETE_ADD = 'Supprimer puis importer';
     var _USE_EDIT_ADD = 'Importer et mettre à jour';
+    var _USE_EDIT = 'Mettre à jour uniquement';
     var _USE_TRUNCATE_ADD = 'Truncate puis importer';
     var _WINTITLE_MATCHDATA = 'Configurer le mapping Nom du champ - Colonne CSV';
     var _IMPORT_CREATE_CASES = 'Importer et créer';
@@ -2531,7 +2533,20 @@ function importCSV(_uidTask) {
                     }
                 }
             },
-            {
+        {
+            boxLabel: _USE_EDIT,
+            name: 'radioGroupOption',
+            checked: false,
+            id: 'edit',
+            listeners: {
+                'change': function() {
+                    _isCheckedOption = 'edit';
+                    _DELETE_EDIT_FIELD = "Clé logique pour modifier";
+                    hiddenDeleteEdit = false;
+                }
+            }
+        },
+        {
                 boxLabel: _USE_TRUNCATE_ADD,
                 name: 'radioGroupOption',
                 checked: false,
@@ -2555,6 +2570,11 @@ function importCSV(_uidTask) {
                     hiddenDeleteEdit = false;
                 }
                 if (_isCheckedOption == 'editAdd')
+                {
+                    _DELETE_EDIT_FIELD = "Clé logique pour modifier";
+                    hiddenDeleteEdit = false;
+                }
+                if (_isCheckedOption == 'edit')
                 {
                     _DELETE_EDIT_FIELD = "Clé logique pour modifier";
                     hiddenDeleteEdit = false;

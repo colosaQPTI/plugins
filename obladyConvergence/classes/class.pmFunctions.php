@@ -2907,7 +2907,7 @@ function importCreateCaseDelete($jsonMatchFields, $uidTask, $tableName, $firstLi
     unset($_SESSION['REQ_DATA_CSV']);
     return $totalCases;
 }
-function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLineHeader, $dataDeleteEdit) {
+function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLineHeader, $dataDeleteEdit, $updateOnly = 0) {
     G::LoadClass('case');
     $items = json_decode($jsonMatchFields, true);
     $dataCSV = isset($_SESSION['REQ_DATA_CSV']) ? $_SESSION['REQ_DATA_CSV'] : array();
@@ -2916,6 +2916,7 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
     $proUid = getProUid($tableName);
     $totalCases = 0;
     $itemsDeleteEdit = json_decode($dataDeleteEdit, true);
+    // TODO gerer le $updateOnly dans la creation du log
     $dataCSVdebug = createLog($dataCSV, $items, $tableName, $firstLineHeader, $itemsDeleteEdit);
     $dataCSV = $dataCSVdebug;
     // load Dynaforms of process
@@ -2931,6 +2932,11 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
     $csv = "";
     $csv_end = "\n";
     $swInsert = 0;
+    if ( $updateOnly == 0 )
+        $typeAction = 'ADD_UPDATE';
+    else
+        $typeAction = 'ONLY_UPDATE';
+
     //genDataReport($tableName);
 
     foreach ($dataCSV as $row)
@@ -2963,7 +2969,7 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                     $insert = "INSERT INTO PMT_IMPORT_CSV_DATA
                                (IMPCSV_ID, IMPCSV_FIELD_NAME, IMPCSV_VALUE,IMPCSV_TAS_UID, IMPCSV_TABLE_NAME, IMPCSV_FIRSTLINEHEADER, IMPCSV_IDENTIFY, IMPCSV_TYPE_ACTION, IMPCSV_CONDITION_ACTION, IMPCSV_WHERE_ACTION)
                                VALUES
-                               ('$maxId','" . $field['FIELD_NAME'] . "', '" . $field['COLUMN_CSV'] . "', '$uidTask', '$tableName','$firstLineHeader', '$identify', 'ADD_UPDATE', '" . mysql_real_escape_string($dataDeleteEdit) . "', '" . mysql_escape_string(getSqlWhere($_REQUEST['idInbox'])) . "')";
+                               ('$maxId','" . $field['FIELD_NAME'] . "', '" . $field['COLUMN_CSV'] . "', '$uidTask', '$tableName','$firstLineHeader', '$identify', '$typeAction', '" . mysql_real_escape_string($dataDeleteEdit) . "', '" . mysql_escape_string(getSqlWhere($_REQUEST['idInbox'])) . "')";
                     executeQuery($insert);
                     $swInsert = 1;
                     $maxId++;
@@ -3211,7 +3217,7 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                     executeTriggers($proUid, $index['APP_UID'], $USR_UID);
                 }
             }
-            else
+            elseif ( $updateOnly == 0 )
             {
                 $appData['VALIDATION'] = '0'; //needed for the process, if not you will have an error.
                 $appData['FLAG_ACTION'] = 'multipleDerivation';
@@ -3229,12 +3235,6 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                     $FieldsCase['APP_DATA']['NUM_DOSSIER'] = $FieldsCase['APP_NUMBER'];
                     $oCase->updateCase($caseUID, $FieldsCase);
                     autoDerivate($proUid, $caseUID, $USR_UID);
-
-                    /* Comment by Nico 28/08/2013
-                     * Please, don't remove the comment because make some bug on process
-                     * or explain to me why you want to put this value
-                     *
-                     */
                 }
             }
         }
@@ -3440,6 +3440,11 @@ function loadParametersCSV($idInbox, $pathCSV, $actionType, $fileNameCSV) {
             case "editAdd":
                 $totalCases = importCreateCaseEdit($matchFields, $uidTask, $tableName, $firstLineHeader, $dataDeleteEdit);
                 echo G::json_encode(array("success" => true, "message" => "OK", "totalCases" => $totalCases));
+                break;
+
+            case "edit":
+                $totalCases = importCreateCaseEdit($matchFields, $uidTask, $tableName, $firstLineHeader, $dataDeleteEdit, 1);
+                echo G::json_encode(array( "success" => true, "message" => "OK", "totalCases" => $totalCases ));
                 break;
 
             case "truncateAdd":
