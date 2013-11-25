@@ -26,9 +26,11 @@ require_once("plugins/limousinProject/classes/Webservices/Identification.php");
 function limousinProject_getMyCurrentDate() {
     return G::CurDate('Y-m-d');
 }
+
 function limousinProject_getMyCurrentTime() {
     return G::CurDate('H:i:s');
 }
+
 //LOCAL : a transforme dans le moteur de regle
 function convergence_getIncompletErreur($app_id) {
     $fields = convergence_getAllAppData($app_id);
@@ -71,6 +73,7 @@ function convergence_getIncompletErreur($app_id) {
     }
     return $incomplet;
 }
+
 function convergence_getMsgErreur($app_id) {
 
     $refus = array();
@@ -105,6 +108,7 @@ function convergence_getMsgErreur($app_id) {
     }
     return $refus;
 }
+
 function limousinProject_getGroupIdByRole($role) {
     $returnValue = false;
     $qGpId = ' SELECT *  FROM `CONTENT` WHERE `CON_VALUE` LIKE "' . $role . '" AND CON_CATEGORY = "GRP_TITLE"';
@@ -116,33 +120,34 @@ function limousinProject_getGroupIdByRole($role) {
 
     return $returnValue;
 }
+
 function limousinProject_blocageCarte($porteurId, $statut, $role_user = 'Bénéficiaires') {
     $return = TRUE;
     if (!empty($porteurId))
     {
-// on regarde si le porteurid fourni est correct et on remonte le cas echeant les infos de la demande
+        // on regarde si le porteurid fourni est correct et on remonte le cas echeant les infos de la demande
         $exist = limousinProject_getCartePorteurId($porteurId);
         if (!empty($exist) && ($exist['USER_ID'] == $_SESSION['USER_LOGGED'] || $role_user != 'Bénéficiaires'))
         {
-//on appel le WS d'activation de la carte, on ajoute un groupe utilsateur carte active dans le fe_user Typo3
-//et mise a jour de la table des carte PMT_CHEQUES comme quoi elle est activée
+            //on appel le WS d'activation de la carte, on ajoute un groupe utilsateur carte active dans le fe_user Typo3
+            //et mise a jour de la table des carte PMT_CHEQUES comme quoi elle est activée
             $groupeId = limousinProject_getGroupIdByRole($role_user);
             $active = limousinProject_getBlocage($porteurId, $groupeId);
             if (!empty($active->CODE) && $active->CODE == 'OK')
             {
-// pas d'erreur c'est lessieur ?
+                // pas d'erreur c'est lessieur ?
             }
             else
             {
                 if (!empty($active->Description))
                 {
-// Erreur lors de l'updateUsergroup dans Typo3
+                    // Erreur lors de l'updateUsergroup dans Typo3
                     $erreur = $active->Description;
                     $return = 'erreur';
                 }
                 else
                 {
-// On récupére le label de l'erreur lors de l'appel ws blocage carte
+                    // On récupére le label de l'erreur lors de l'appel ws blocage carte
                     $erreur = limousinProject_getErrorAqoba($active->code, 'WS210') . " (code $active->code du WS210)";
                     $return = FALSE;
                 }
@@ -165,7 +170,7 @@ function limousinProject_blocageCarte($porteurId, $statut, $role_user = 'Bénéf
         else
             $erreur = 'PorteurId incorrect.';
     }
-// Dans le cas où $return == 'erreur', alors la carte est bloqué, mais avec quand même des erreurs à signaler, donc on rentre dans les 2 conditions suivantes
+    // Dans le cas où $return == 'erreur', alors la carte est bloqué, mais avec quand même des erreurs à signaler, donc on rentre dans les 2 conditions suivantes
     if ($return !== FALSE)
     {
         insertHistoryLogPlugin($exist['APPLICATION'], $_SESSION['USER_LOGGED'], date('Y-m-d H:i:s'), '0', '', "Carte bloquée par le $role_user", $exist['STATUT']);
@@ -191,6 +196,7 @@ function limousinProject_blocageCarte($porteurId, $statut, $role_user = 'Bénéf
     }
     return $return;
 }
+
 function limousinProject_getBlocage($porteurId, $groupeId) {
 
 // INIT Ws 211
@@ -206,10 +212,10 @@ function limousinProject_getBlocage($porteurId, $groupeId) {
     try
     {
         $v->call();
-// Si la carte est bien activée, on met à jour la table des cartes PMT_CHEQUES
+        // Si la carte est bien activée, on met à jour la table des cartes PMT_CHEQUES
         $query = 'update PMT_CHEQUES SET CARTE_STATUT = "Bloquée" where CARTE_PORTEUR_ID= "' . mysql_escape_string($porteurId) . '"';
         $resQuery = executeQuery($query);
-// Puis on change le usergroup dans Typo3 en Carte activé
+        // Puis on change le usergroup dans Typo3 en Carte activé
         $data = limousinProject_getDemandeFromPorteurID($porteurId);
         $userInfo = userInfo($data['USER_ID']);
         $result = limousinProject_updateUsergroupTypo($userInfo, $porteurId, $groupeId);
@@ -221,6 +227,7 @@ function limousinProject_getBlocage($porteurId, $groupeId) {
 // RETURN
     return $result;
 }
+
 function limousinProject_getDeblocage($porteurId) {
 
 // INIT Ws 211
@@ -234,10 +241,10 @@ function limousinProject_getDeblocage($porteurId) {
     try
     {
         $v->call();
-// Si la carte est bien activée, on met à jour la table des cartes PMT_CHEQUES
+        // Si la carte est bien activée, on met à jour la table des cartes PMT_CHEQUES
         $query = 'update PMT_CHEQUES SET CARTE_STATUT = "Active" where CARTE_PORTEUR_ID= "' . mysql_escape_string($porteurId) . '"';
         $resQuery = executeQuery($query);
-// Puis on change le usergroup dans Typo3 en Carte activé
+        // Puis on change le usergroup dans Typo3 en Carte activé
         $data = limousinProject_getDemandeFromPorteurID($porteurId);
         $userInfo = userInfo($data['USER_ID']);
         $result = limousinProject_updateUsergroupTypo($userInfo, $porteurId, 222);
@@ -251,6 +258,7 @@ function limousinProject_getDeblocage($porteurId) {
 // RETURN
     return $result;
 }
+
 function limousinProject_generatePorteurID($numDossier) {
 
     /* Les 4 premiers caractères seront : 3028
@@ -275,6 +283,7 @@ function limousinProject_generatePorteurID($numDossier) {
 
     return $prefix . $middle . $checksum;
 }
+
 function limousinProject_getDemandeFromUserID($userId) {
     $arrayDemandeInfos = array();
     $queryDemande = "SELECT APP_UID FROM PMT_DEMANDES WHERE USER_ID = '" . $userId . "' AND STATUT = 6 AND THEMATIQUE = 1";
@@ -286,6 +295,7 @@ function limousinProject_getDemandeFromUserID($userId) {
     }
     return $arrayDemandeInfos;
 }
+
 function limousinProject_getDemandeFromPorteurID($porterId) {
     $arrayDemandeInfos = array();
     $queryDemande = 'select APP_UID from PMT_DEMANDES where PORTEUR_ID = "' . $porterId . '" and STATUT <> 0 and STATUT <> 999';
@@ -297,11 +307,13 @@ function limousinProject_getDemandeFromPorteurID($porterId) {
     }
     return $arrayDemandeInfos;
 }
+
 function limousin_addTransactionPriv($codePartenaire, $porteurID, $montant, $libelle, $thematique, $type) {
     $now = date('d-m-Y');
     $queryInsertTransactionPriv = "INSERT INTO PMT_TRANSACTIONS_PRIV(CODE_PARTENAIRE, PORTEUR_ID, MONTANT, LIBELLE, THEMATIQUE, TYPE, DATE_EMISSION, STATUT) VALUES('" . $codePartenaire . "','" . $porteurID . "','" . $montant . "','" . $libelle . "','" . $thematique . "','" . $type . "','" . $now . "', '16')";
     executeQuery($queryInsertTransactionPriv);
 }
+
 function limousinProject_isCarteActive($porteurID) {
     $isActive = false;
     $arrayData = array();
@@ -314,6 +326,7 @@ function limousinProject_isCarteActive($porteurID) {
     }
     return $isActive;
 }
+
 function limousinProject_getDateNaissanceFromPorteurID($porteurID) {
     $dateNaissance = '';
     $query = "SELECT FI_DATEDENAISSANCE FROM PMT_DEMANDES WHERE STATUT <> 0 AND STATUT <> 999 AND PORTEUR_ID = '" . $porteurID . "'";
@@ -324,6 +337,7 @@ function limousinProject_getDateNaissanceFromPorteurID($porteurID) {
     }
     return $dateNaissance;
 }
+
 function limousinProject_nouvelleTransaction($operation = 0, $porteurId = 0, $sens = 'N', $montant = 0, $sousMontants = array()) {
 
     // INIT Ws 201
@@ -358,6 +372,7 @@ function limousinProject_nouvelleTransaction($operation = 0, $porteurId = 0, $se
     }
     return $retour;
 }
+
 function limousinProject_nouvelleActionCRM($porteurId = 0, $action = '00', $motif = '') {
 
 // INIT Ws 210
@@ -389,6 +404,7 @@ function limousinProject_nouvelleActionCRM($porteurId = 0, $action = '00', $moti
         echo 'Code Erreur action = ' . $echo . '--- End Error ---';
     }
 }
+
 function limousinProject_getOperations($porteurId = 0, $op = '00', $nbJours = '100') {
 
 // INIT Ws 303
@@ -430,6 +446,7 @@ function limousinProject_getOperations($porteurId = 0, $op = '00', $nbJours = '1
         echo 'Code Erreur operation = ' . $o->errors->code . '--- End Error ---';
     }
 }
+
 function limousinProject_getAutorisations() {
 
 // INIT Ws 303
@@ -451,6 +468,7 @@ function limousinProject_getAutorisations() {
         echo 'Code Erreur operation = ' . $a->errors->code . '--- End Error ---';
     }
 }
+
 function limousinProject_getActivation($porteurId = 0) {
 
     // INIT Ws 211
@@ -480,6 +498,7 @@ function limousinProject_getActivation($porteurId = 0) {
     // RETURN
     return $result;
 }
+
 function limousinProject_getSolde($porteurId = 0) {
 
 // INIT Ws 304
@@ -522,6 +541,7 @@ function limousinProject_getSolde($porteurId = 0) {
         return $s;
     }
 }
+
 function limousinProject_testSolde($soldeReseau, $montant) {
     $result = -1;
     if ($soldeReseau >= $montant)
@@ -534,6 +554,7 @@ function limousinProject_testSolde($soldeReseau, $montant) {
     }
     return $result;
 }
+
 function limousinProject_identification($porteurId = 0, $tel = '', $portable = '', $mail = '', $numCarte = '') {
 
 // INIT Ws 307
@@ -545,15 +566,6 @@ function limousinProject_identification($porteurId = 0, $tel = '', $portable = '
     $i->portable = $portable;
     $i->email = $mail;
     $i->numcarte = $numCarte;
-
-    /* Mode Test On
-      //$i->porteurId = 30280055364;
-      $i->porteurId = 30280055283;
-      $i->numcarte = '0007';
-      $i->portable = 'quentin@oblady.fr';
-      $i->email = '11-15-61-56-51';
-      //$i->porteurId = 30280000023;
-      /* Mode Test Off */
 
 // CALL Ws
     try
@@ -567,12 +579,16 @@ function limousinProject_identification($porteurId = 0, $tel = '', $portable = '
         echo 'Code Erreur identification = ' . $echo . '--- End Error ---';
     }
 }
+
 function limousinProject_createUser($app_id, $role, $pwd) {
     $fields = convergence_getAllAppData($app_id);
     $fields['PASSWORD'] = $pwd;
-    if (empty($fields['PRENOM_CONTACT']))
-        $fields['PRENOM_CONTACT'] = $fields['NOM_CONTACT']; // need the both for create account on typo3
-//PMFCreateUser(string userId, string password, string firstname, string lastname, string email, string role)
+    if ( empty($fields['PRENOM_CONTACT']) )
+    {
+        $fields['PRENOM_CONTACT'] = $fields['NOM_CONTACT'];
+        // need the both for create account on typo3
+    }
+    //PMFCreateUser(string userId, string password, string firstname, string lastname, string email, string role)
     $isCreate = PMFCreateUser($fields['MAIL'], $fields['PASSWORD'], $fields['NOM_CONTACT'], $fields['PRENOM_CONTACT'], $fields['MAIL'], $role);
     if ($isCreate == 0)
     {
@@ -585,14 +601,11 @@ function limousinProject_createUser($app_id, $role, $pwd) {
         $usr_uid = $rQuery[1]['USR_UID'];
         $qGpId = ' SELECT *  FROM `CONTENT` WHERE `CON_VALUE` LIKE "' . $role . '" AND CON_CATEGORY = "GRP_TITLE"';
         $rGpId = executeQuery($qGpId);
-
         if (!empty($rGpId[1]['CON_ID']))
         {
-
             $groupId = $rGpId[1]['CON_ID'];
             $var = PMFAssignUserToGroup($usr_uid, $groupId);
-
-// creation du fe_user dans typo3
+            // creation du fe_user dans typo3
             ini_set("soap.wsdl_cache_enabled", "0");
             $hostTypo3 = 'http://' . HostName . '/typo3conf/ext/pm_webservices/serveur.php?wsdl';
             $pfServer = new SoapClient($hostTypo3);
@@ -615,6 +628,7 @@ function limousinProject_createUser($app_id, $role, $pwd) {
     }
     return $usr_uid;
 }
+
 function limousinProject_getEtablissementFromRNE($rneCode) {
     $sql = 'SELECT RNE, NOM FROM PMT_ETABLISSEMENT WHERE RNE = "' . $rneCode . '" AND STATUT = 1';
     $res = executeQuery($sql);
@@ -628,6 +642,7 @@ function limousinProject_getEtablissementFromRNE($rneCode) {
     }
     return $ret;
 }
+
 function limousinProject_getPathAQPORTR() {
 
     $sql = 'select PATH_FILE from PMT_LISTE_OPER';
@@ -641,6 +656,7 @@ function limousinProject_getPathAQPORTR() {
 
     return $path;
 }
+
 /*  Ajout les lignes d'entête et de fin de fichier pour le fichier AQ_PORT
  *
  * @param string $file le chemin du fichier à modifier
@@ -672,6 +688,7 @@ function limousinProject_updateAQPORTR($file, $num_dossier) {
     $w = fwrite($fp, $new_content);
     fclose($fp);
 }
+
 /*  Supprime les lignes d'entête et de fin de fichier fournie par AQOBA
  *
  * @param   array   $list_file  liste des fichiers sur la machine PM en local
@@ -699,6 +716,7 @@ function limousinProject_removeWrapFileAqoba($list_file) {
     }
     return FALSE;
 }
+
 function limousinProject_updateFromAQPORTREJ($file) {
 //on récupère le contenu du fichier
     $content = file($file);
@@ -731,6 +749,7 @@ function limousinProject_updateFromAQPORTREJ($file) {
         }
     }
 }
+
 function limousinProject_explicationStatut_callback($app_data) {
 
     $libelStatut = 'SELECT TITLE FROM PMT_STATUT WHERE UID=' . intval($app_data['STATUT']);
@@ -759,6 +778,7 @@ function limousinProject_explicationStatut_callback($app_data) {
     }
     return $messageInfo;
 }
+
 function limousinProject_readLineFromAQCARTE($datas) {
 
 //INIT
@@ -856,6 +876,7 @@ function limousinProject_readLineFromAQCARTE($datas) {
     }
     return TRUE;
 }
+
 // non op
 function limousinProject_showPdf($app_uid) {
     $query = 'SELECT * FROM APP_DOCUMENT, CONTENT WHERE APP_UID="' . $app_uid . '" AND DOC_UID="884895097521c61f362fc13075215643" AND APP_DOC_TYPE="OUTPUT" AND APP_DOC_STATUS="ACTIVE" AND APP_DOC_UID = CON_ID AND CON_CATEGORY = "APP_DOC_FILENAME" AND CON_LANG = "fr"';
@@ -887,11 +908,13 @@ function limousinProject_showPdf($app_uid) {
     }
     return;
 }
+
 function limousinProject_getSituationLabel($situation) {
     $query = 'select LABEL from PMT_FI_SITUATION where VALEUR = "' . intval($situation) . '"';
     $result = executeQuery($query);
     return $label = (!empty($result[1]['LABEL']) ? $result[1]['LABEL'] : '');
 }
+
 function limousinProject_getCartePorteurId($porteur_id) {
 
 // on check qu'il y ai bien une carte produite pour ce porteur id
@@ -906,6 +929,7 @@ function limousinProject_getCartePorteurId($porteur_id) {
     else
         return FALSE;
 }
+
 function limousinProject_getErrorAqoba($code, $service) {
 
     $qError = "select LABEL_E_AQ from PMT_CODE_ERREUR_AQOBA where CODE_E_AQ = '" . $code . "'  AND SERVICE_E_AQ = '" . $service . "'";
@@ -915,6 +939,7 @@ function limousinProject_getErrorAqoba($code, $service) {
     else
         return "Une erreur inconnue c'est produite !!! code : $code, service : $service";
 }
+
 function limousinProject_updateUsergroupTypo($userInfo, $porteurid, $groupId) {
 //appel du ws pour modifier le usergroup dans typo3
     ini_set("soap.wsdl_cache_enabled", "0");
@@ -931,6 +956,7 @@ function limousinProject_updateUsergroupTypo($userInfo, $porteurid, $groupId) {
         'cHash' => md5($userInfo['username'] . '*' . $userInfo['lastname'] . '*' . $userInfo['firstname'] . '*' . $key)));
     return $ret;
 }
+
 function limousinProject_activationCarte($porteurId, $statut, $role_user = 'Bénéficiaires') {
     $return = TRUE;
     if (!empty($porteurId) && $statut == 1)
@@ -993,15 +1019,10 @@ function limousinProject_activationCarte($porteurId, $statut, $role_user = 'Bén
             case '3':
                 $erreur = 'CGU non accepté par le ' . $role_user;
                 break;
-
             default:
                 $erreur = 'PorteurId incorrect.';
                 break;
         }
-    //        if ($statut != 1)
-        //            $erreur = 'Activation annulée par le ' . $role_user;
-        //        else
-        //            $erreur = 'PorteurId incorrect.';
     }
     // Dans le cas où $return == 'erreur', alors la carte est activé, mais avec quand même des erreurs à signaler, donc on rentre dans les 2 conditions suivantes
     if ($return !== FALSE)
@@ -1029,8 +1050,8 @@ function limousinProject_activationCarte($porteurId, $statut, $role_user = 'Bén
     }
     return $return;
 }
+
 function limousinProject_getThematiqueFromPartenaire($userId) {
-//array('1' => array('CODE'=>'165', 'TYPE'=>'Cinéma'));
     $thematiquesArray = array();
     $queryTh = "SELECT TH_CINE, TH_SPECTACLE, TH_ACHAT, TH_ARTS, TH_SPORT, IF(TH_ADH_ART = '0', TH_ADH_SPORT, TH_ADH_ART) AS TH_ADH_SPORT
       FROM PMT_PRESTATAIRE where STATUT=1 AND USER_ID ='" . $userId . "'";
@@ -1059,6 +1080,7 @@ function limousinProject_getThematiqueFromPartenaire($userId) {
     }
     return $thematiquesArray;
 }
+
 function limousinProject_getPartenaireInfoForTicket($userId) {
     $partenaireInfo = '';
     $query = "SELECT RAISONSOCIALE, CP, VILLE FROM PMT_PRESTATAIRE WHERE STATUT = 1 AND USER_ID ='" . $userId . "'";
@@ -1079,6 +1101,7 @@ function limousinProject_getPartenaireInfoForTicket($userId) {
     }
     return $partenaireInfo;
 }
+
 function limousinProject_getPartenaireIdFromPartenaire($userId) {
     $partenaireId = '';
     $query = "SELECT PARTENAIRE_UID FROM PMT_PRESTATAIRE where STATUT=1 AND USER_ID ='" . $userId . "'";
@@ -1135,6 +1158,17 @@ function limousinProject_getFileEtatTransaction($path = '/var/tmp/Etat_Transacti
     $calendrier = convergence_getDateLastWeek($MoinsNSemaine, $dateReferente);
     G::pr($calendrier);
     die;
+    /* SELECT a.NUMERO, a.`ID_COMMERCANT`, a.`ID_PORTEUR`, a.`CODE_PARTENAIRE`, t.UID as NUM_OPERATION, CONVERT(DATE_FORMAT(STR_TO_DATE(t.DATE_EFFECTIVE, '%Y%m%d'), '%d/%m/%Y') USING utf8) AS DATE_TRANSACTION,  t.C_RAISON_SOCIALE as NOM_PRESTA,
+      t.NUMERO,
+      IF(t.SENS_MONTANT_NET = 'D',
+      CONCAT(FORMAT((t.MONTANT_NET/POW(10,t.NB_DECIMAL_MONTANT_NET)), t.NB_DECIMAL_MONTANT_NET), ' €'),
+      CONCAT('-', FORMAT((t.MONTANT_NET/POW(10,t.NB_DECIMAL_MONTANT_NET)), t.NB_DECIMAL_MONTANT_NET), ' €'))
+      AS MONTANT,
+      CONCAT(FORMAT((SUM(t.MONTANT_NET)/POW(10,t.NB_DECIMAL_MONTANT_NET)), t.NB_DECIMAL_MONTANT_NET), ' €') as TOTAL,
+      SUM(t.MONTANT_NET) as net
+      FROM PMT_TRANSACTIONS as t join PMT_AUTORISATIONS as a on (t.NUMERO = a.`NUMERO`)
+      WHERE STR_TO_DATE(t.DATE_EFFECTIVE, '%Y%m%d') > STR_TO_DATE('16-09-2013', '%d-%m-%Y')
+      AND STR_TO_DATE(t.DATE_EFFECTIVE, '%Y%m%d') < STR_TO_DATE('22-09-2013', '%d-%m-%Y') group by ID_COMMERCANT order by `ID_COMMERCANT` */
     $requeteTransaction = "SELECT UID as NUM_OPERATION,
                                 CONVERT(DATE_FORMAT(STR_TO_DATE(DATE_EFFECTIVE, '%Y%m%d'), '%d/%m/%Y') USING utf8) AS DATE_TRANSACTION,
                                 C_RAISON_SOCIALE as NOM_PRESTA,

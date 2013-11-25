@@ -2459,7 +2459,7 @@ function importCSV(_uidTask) {
     var _USE_DELETE_ADD = 'Supprimer puis importer';
     var _USE_EDIT_ADD = 'Importer et mettre à jour';
     var _USE_EDIT = 'Mettre à jour uniquement';
-    var _USE_TRUNCATE_ADD = 'Truncate puis importer';
+    var _USE_TRUNCATE_ADD = 'Tout effacer puis importer';
     var _WINTITLE_MATCHDATA = 'Configurer le mapping Nom du champ - Colonne CSV';
     var _IMPORT_CREATE_CASES = 'Importer et créer';
     var _UPOLADING_FILE = 'chargement du fichier...';
@@ -2507,7 +2507,7 @@ function importCSV(_uidTask) {
                     }
                 }
             },
-            {
+        /*{
                 boxLabel: _USE_DELETE_ADD,
                 name: 'radioGroupOption',
                 checked: false,
@@ -2519,7 +2519,7 @@ function importCSV(_uidTask) {
                         hiddenDeleteEdit = false;
                     }
                 }
-            },
+            },*/
             {
                 boxLabel: _USE_EDIT_ADD,
                 name: 'radioGroupOption',
@@ -2594,7 +2594,7 @@ function importCSV(_uidTask) {
     var w = new Ext.Window({
         title: '',
         width: 440,
-        height: 250,
+        height: 320,
         modal: true,
         autoScroll: false,
         maximizable: false,
