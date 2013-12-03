@@ -199,7 +199,7 @@ class archivedCasesClassCron {
                     }
                     else
                     {
-                        if ($field['COLUMN_CSV'] != '')
+                        if ($field['COLUMN_CSV'] != '' )
                             $appData[$field['FIELD_NAME']] = _convert($field['COLUMN_CSV']);
                         else
                             $appData[$field['FIELD_NAME']] = ' ';
@@ -281,10 +281,16 @@ class archivedCasesClassCron {
                 {
                     if ($row['FIELD_DEFAULT_VALUE'] == '')
                         $row['FIELD_DEFAULT_VALUE'] = 0;
-
+                    
                     if($row['FIELD_TYPE'] != 'yesno')
                     {
                         $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
+                        ## Control label type field suggest
+                        if($row['FIELD_TYPE'] == 'suggest')
+                        {
+                            $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME']]) ? $appData[$row['FIELD_NAME']] : '';                              
+                        }
+                        ## end Control label type field suggest
                         if ($appData[$row['FIELD_NAME'] . "_label"] == "")
                         {
                             $i = $row['FIELD_DEFAULT_VALUE'];
@@ -302,13 +308,13 @@ class archivedCasesClassCron {
                                         break;
                                     }
                                 }
-
+    
                                 if ($id == "" && $label == "")
                                 {
                                     $id = $row['FIELD_SQL_OPTION'][0]['id'];
                                     $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
                                 }
-
+    
                                 $record[$row['FIELD_NAME']] = $id;
                                 $record[$row['FIELD_NAME'] . "_label"] = $label;
                                 $appData = array_merge($record, $appData);
@@ -329,13 +335,13 @@ class archivedCasesClassCron {
                                             break;
                                         }
                                     }
-
+    
                                     if ($id == "" && $label == "")
                                     {
                                         $id = $row['FIELD_OPTION'][0]['id'];
                                         $label = $row['FIELD_OPTION'][0]['descrip'];
                                     }
-
+    
                                     $record[$row['FIELD_NAME']] = $id;
                                     $record[$row['FIELD_NAME'] . "_label"] = $label;
                                     $appData = array_merge($record, $appData);
@@ -405,6 +411,7 @@ class archivedCasesClassCron {
         unset($informationCSV);
         return $totalCases;
     }
+    
     function importCreateCaseEditCSV($jsonMatchFields, $uidTask, $tableName, $firstLineHeader, $informationCSV, $dataDeleteEdit, $csvIdentify, $totCasesCSV, $csvWhereAction, $onlyUpdate = 0) {
         G::LoadClass('case');
         $items = $jsonMatchFields;
@@ -537,13 +544,19 @@ class archivedCasesClassCron {
                     if($row['FIELD_TYPE'] != 'yesno')
                     { 
                         $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
-
+                        ## Control label type field suggest
+                        if($row['FIELD_TYPE'] == 'suggest')
+                        {
+                            $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME']]) ? $appData[$row['FIELD_NAME']] : '';                              
+                        }
+                        ## end Control label type field suggest
+    
                         if ($appData[$row['FIELD_NAME'] . "_label"] == "")
                         {
                             $i = $row['FIELD_DEFAULT_VALUE'];
                             if (count($row['FIELD_SQL_OPTION']))
                             {
-
+    
                                 $options = $row['FIELD_SQL_OPTION'];
                                 $id = "";
                                 $label = "";
@@ -556,13 +569,13 @@ class archivedCasesClassCron {
                                         break;
                                     }
                                 }
-
+    
                                 if ($id == "" && $label == "")
                                 {
                                     $id = $row['FIELD_SQL_OPTION'][0]['id'];
                                     $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
                                 }
-
+    
                                 $record[$row['FIELD_NAME']] = $id;
                                 $record[$row['FIELD_NAME'] . "_label"] = $label;
                                 $appData = array_merge($record, $appData);
@@ -583,13 +596,13 @@ class archivedCasesClassCron {
                                             break;
                                         }
                                     }
-
+    
                                     if ($id == "" && $label == "")
                                     {
                                         $id = $row['FIELD_OPTION'][0]['id'];
                                         $label = $row['FIELD_OPTION'][0]['descrip'];
                                     }
-
+    
                                     $record[$row['FIELD_NAME']] = $id;
                                     $record[$row['FIELD_NAME'] . "_label"] = $label;
                                     $appData = array_merge($record, $appData);
@@ -624,7 +637,7 @@ class archivedCasesClassCron {
             {
                 foreach ($items as $row)
                 {
-                    if ($row['FIELD_NAME'] == $key)
+                    if ($row['FIELD_NAME'] == $key || $row['FIELD_NAME'].'_label' == $key)
                     {
                         if (!is_array($value))
                         {
@@ -660,7 +673,7 @@ class archivedCasesClassCron {
                     $appDataNew['EXEC_AUTO_DERIVATE'] = 'NO';
                     $appDataNew['eligible'] = 0; // only process beneficiary
                     $appDataNew['FLAG_EDIT'] = 1;
-                    $appDataNew['FLAG_UPDATE'] = 1; // add by Nico for historyLog
+                    $appDataNew['FLAG_UPDATE'] = 1;
                     $appDataNew['CurrentUserAutoDerivate'] = $USR_UID;
                     $appDataNew['SW_CREATE_CASE'] = 1;
                     ## changes USER_LOGGED, USR_USERNAME
@@ -852,13 +865,18 @@ class archivedCasesClassCron {
                     if($row['FIELD_TYPE'] != 'yesno')
                     { 
                         $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
-
+                        ## Control label type field suggest
+                        if($row['FIELD_TYPE'] == 'suggest')
+                        {
+                            $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME']]) ? $appData[$row['FIELD_NAME']] : '';                              
+                        }
+                        ## end Control label type field suggest
                         if ($appData[$row['FIELD_NAME'] . "_label"] == "")
                         {
                             $i = $row['FIELD_DEFAULT_VALUE'];
                             if (count($row['FIELD_SQL_OPTION']))
                             {
-
+    
                                 $options = $row['FIELD_SQL_OPTION'];
                                 $id = "";
                                 $label = "";
@@ -871,13 +889,13 @@ class archivedCasesClassCron {
                                         break;
                                     }
                                 }
-
+    
                                 if ($id == "" && $label == "")
                                 {
                                     $id = $row['FIELD_SQL_OPTION'][0]['id'];
                                     $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
                                 }
-
+    
                                 $record[$row['FIELD_NAME']] = $id;
                                 $record[$row['FIELD_NAME'] . "_label"] = $label;
                                 $appData = array_merge($record, $appData);
@@ -898,13 +916,13 @@ class archivedCasesClassCron {
                                             break;
                                         }
                                     }
-
+    
                                     if ($id == "" && $label == "")
                                     {
                                         $id = $row['FIELD_OPTION'][0]['id'];
                                         $label = $row['FIELD_OPTION'][0]['descrip'];
                                     }
-
+    
                                     $record[$row['FIELD_NAME']] = $id;
                                     $record[$row['FIELD_NAME'] . "_label"] = $label;
                                     $appData = array_merge($record, $appData);
@@ -938,7 +956,7 @@ class archivedCasesClassCron {
             // delete cases
             if ($whereDelete != '')
             {
-                // genDataReport($tableName);
+                //genDataReport($tableName);
                 $query = "SELECT APP_UID FROM wf_" . $this->workspace . ".$tableName WHERE $whereDelete AND APP_UID NOT IN ( $idCasesGenerate ) "; //print($query.'  ');
                 $deleteData = executeQuery($query);
                 if (sizeof($deleteData))

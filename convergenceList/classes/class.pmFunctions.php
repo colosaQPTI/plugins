@@ -258,7 +258,7 @@ function frderivateCase($processId, $currentTask , $fcaseUID,$userId,$taskNumber
 	
 }
 
-function executeTriggers($processId,$caseUID,$userId){	
+function frexecuteTriggers($processId,$caseUID,$userId){
 
 	$query = "SELECT TAS_UID FROM TASK WHERE TAS_START = 'TRUE' AND PRO_UID = '".$processId."'";	//query for select all start tasks
 	$startTasks = executeQuery($query);	
@@ -295,6 +295,7 @@ function frExecuteTriggersCase($processId, $currentTask , $fcaseUID,$userId,$tas
 		G::LoadClass( 'case' );
 		$oPMScript = new PMScript();
 		$sw = 0;
+		$indexCase = $_SESSION["INDEX"] = 1;
 		while($sw == 0)
 		{
 	    	$_SESSION['APPLICATION'] = $fcaseUID;
@@ -335,22 +336,24 @@ function frExecuteTriggersCase($processId, $currentTask , $fcaseUID,$userId,$tas
 			
 			if($NextTask[1]['ROU_NEXT_TASK'] == '-1')
 			{
-				$stepUid = -1;							
+				$stepUid = -1;					
 				$beforeA = true;
 				if($taskNumber == 0){
 					$beforeA = false;
 				}
 				else 
 				{
-					executeTriggersMon($processId, $fcaseUID, $stepUid, 'BEFORE', $currentTask);	//execute trigger before form
-					executeTriggersMon($processId, $fcaseUID, $stepUid, 'AFTER', $currentTask);	//execute trigger after form	
+					executeTriggersMon($processId, $fcaseUID, $stepUid, 'BEFORE', $currentTask);	//execute trigger before assignment
+					executeTriggersMon($processId, $fcaseUID, -2, 'BEFORE', $currentTask); //execute trigger before derivation
+					executeTriggersMon($processId, $fcaseUID, -2, 'AFTER', $currentTask);	//execute trigger after derivation	
 				}				
 				$sw = 1;
 			}
 			else
-			{
-				if($totStep == 0)
-					executeTriggersMon( $processId, $fcaseUID, -1, 'BEFORE', $currentTask );
+			{				
+				executeTriggersMon($processId, $fcaseUID, -1, 'BEFORE', $currentTask ); //execute trigger before assignment
+				executeTriggersMon($processId, $fcaseUID, -2, 'BEFORE', $currentTask); //execute trigger before derivation
+				executeTriggersMon($processId, $fcaseUID, -2, 'AFTER', $currentTask);	//execute trigger after derivation	
 				
 				$queryNextTask = "SELECT ROU_NEXT_TASK, ROU_TYPE, ROU_CONDITION FROM ROUTE WHERE PRO_UID = '".$processId."' AND TAS_UID = '".$currentTask."'";
 				$NextTask = executeQuery($queryNextTask);
@@ -372,6 +375,19 @@ function frExecuteTriggersCase($processId, $currentTask , $fcaseUID,$userId,$tas
 						$currentTask = $row['ROU_NEXT_TASK'];		 
     				
 				}
+				$_SESSION["INDEX"] = $indexCase + 1;
+				$indexCase = $_SESSION["INDEX"];
+				## update app_delegation
+				$finishDate = date("Y-m-d H:i:s");
+				$queryuPDel = "	UPDATE APP_DELEGATION SET 
+								USR_UID = '".$userLoggedIni."',
+								TAS_UID = '".$currentTask."',
+								DEL_INDEX = '".$indexCase."',
+								DEL_FINISH_DATE = '".$finishDate."'
+	            				WHERE APP_UID = '".$fcaseUID."' AND DEL_INDEX = '".$indexCase."' ";
+	          	$queryuPDel = executeQuery($queryuPDel);
+	          	## end update app_delegation
+
 			}
 				
 		}
@@ -420,14 +436,19 @@ function executeTriggersMon($process, $appUid, $stepUid, $time='BEFORE', $task){
   //$type = '';
   $oCase = new Cases();
   $Fields = $oCase->loadCase($appUid);  
-  if($stepUid == -1){
+  if($stepUid == -1 || $stepUid == -2){
   	$obj = 'ASSIGN_TASK';
   }else{
   	$obj = 'DYNAFORM';  	
   }
-  //G::pr($task.'  '. $obj.'  '. $stepUid.'  '.$time);
+  
   $triggers = $oCase->loadTriggers ( $task, $obj, $stepUid, $time );
-  //G::pr($triggers);
+   if($stepUid == -1 || $stepUid == -2)
+   {
+   		$type = 'ASSIGN_TASK';
+   		G::pr($triggers);
+   }
+  // G::pr($task.' task '. $type.' type '. $stepUid.' step '. $time.' time ');
   $Fields['APP_DATA'] = $oCase->ExecuteTriggers($task, $type , $stepUid, $time, $Fields['APP_DATA'] );  
   $oCase->updateCase($appUid, $Fields);
   return true;

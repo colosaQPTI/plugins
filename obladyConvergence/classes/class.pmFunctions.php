@@ -527,11 +527,16 @@ function convergence_getOutputDocument($app_id, $doc_id) {
     $outDoc = executeQuery($outDocQuery);
     if (!empty($outDoc))
     {
+        // Ajout suite à la modification de la gestion des documents dans processmaker
+        if ( method_exists('G', 'getPathFromUID') )
+        {
+            $app_id = G::getPathFromUID($app_id);
+        }
         $path = PATH_DOCUMENT . $app_id . PATH_SEP . 'outdocs' . PATH_SEP .
                 $outDoc[1]['APP_DOC_UID'] . '_' . $outDoc[1]['DOC_VERSION'];
         $filename = $outDoc[1]['FILENAME'];
         $aAttachFiles[$filename . '.pdf'] = $path . '.pdf';
-        $aAttachFiles[$filename . '.doc'] = $path . '.doc';
+        //$aAttachFiles[$filename . '.doc'] = $path . '.doc';
     }
 
     return $aAttachFiles;
@@ -594,6 +599,7 @@ function convergence_annuleChequier($commandeID) {
     else
         return '';
 }
+
 //GLOBAL
 function convergence_concatFiles($files, $where_exclude) {
 
@@ -602,22 +608,28 @@ function convergence_concatFiles($files, $where_exclude) {
     {
 
         $i = 0;
-        $query = 'SELECT * FROM APP_DOCUMENT, CONTENT WHERE APP_UID IN (' . implode(',', $files) . ') AND APP_DOC_TYPE="OUTPUT" AND APP_DOC_STATUS="ACTIVE" AND APP_DOC_UID = CON_ID AND CON_CATEGORY = "APP_DOC_FILENAME" AND CON_LANG = "fr"' . $where_exclude;
+       /* $query = 'SELECT DOC_VERSION, APP_UID, APP_DOC_UID, CON_VALUE FROM APP_DOCUMENT, CONTENT WHERE APP_UID IN (' . implode(',', $files) . ') AND APP_DOC_TYPE="OUTPUT" AND APP_DOC_STATUS="ACTIVE" AND APP_DOC_UID = CON_ID AND CON_CATEGORY = "APP_DOC_FILENAME" AND CON_LANG = "fr"' . $where_exclude;
         $result = executeQuery($query);
-        if (sizeof($result) == 0)
+        if(sizeof($result) == 0)
         {
-            $query = 'SELECT * FROM APP_DOCUMENT, CONTENT WHERE APP_UID IN (' . implode(',', $files) . ') AND APP_DOC_TYPE="OUTPUT" AND APP_DOC_STATUS="ACTIVE" AND APP_DOC_UID = CON_ID AND CON_CATEGORY = "APP_DOC_FILENAME" AND CON_LANG = "en"' . $where_exclude;
+            $query = 'SELECT DOC_VERSION, APP_UID, APP_DOC_UID, CON_VALUE FROM APP_DOCUMENT, CONTENT WHERE APP_UID IN (' . implode(',', $files) . ') AND APP_DOC_TYPE="OUTPUT" AND APP_DOC_STATUS="ACTIVE" AND APP_DOC_UID = CON_ID AND CON_CATEGORY = "APP_DOC_FILENAME" AND CON_LANG = "en"' . $where_exclude;
             $result = executeQuery($query);
-        }
+        }*/
 
-        foreach ($result as $f)
-        {
-            $app_uid = $f['APP_UID'];
-            if (method_exists('G', 'getPathFromUID'))
+        foreach ($files as $f)
+        { 
+            $query = 'SELECT MAX(DOC_VERSION) AS DOC_VERSION, APP_UID, APP_DOC_UID, CON_VALUE FROM APP_DOCUMENT, CONTENT WHERE APP_UID IN (' . $f . ') AND APP_DOC_TYPE="OUTPUT" AND APP_DOC_STATUS="ACTIVE" AND APP_DOC_UID = CON_ID AND CON_CATEGORY = "APP_DOC_FILENAME" AND CON_LANG = "fr"' . $where_exclude;
+            $result = executeQuery($query);
+            if(sizeof($result) == 0)
             {
-                $app_uid = G::getPathFromUID($f['APP_UID']);
+                $query = 'SELECT MAX(DOC_VERSION) AS DOC_VERSION, APP_UID, APP_DOC_UID, CON_VALUE FROM APP_DOCUMENT, CONTENT WHERE APP_UID IN (' . $f . ') AND APP_DOC_TYPE="OUTPUT" AND APP_DOC_STATUS="ACTIVE" AND APP_DOC_UID = CON_ID AND CON_CATEGORY = "APP_DOC_FILENAME" AND CON_LANG = "en"' . $where_exclude;
+                $result = executeQuery($query);
+            } 
+            $app_uid = trim($f,"'");
+            if(method_exists('G','getPathFromUID')){
+                $app_uid = G::getPathFromUID(trim($f,"'"));
             }
-            $path = PATH_DOCUMENT . $app_uid . PATH_SEP . 'outdocs' . PATH_SEP . $f['APP_DOC_UID'] . '_' . $f['DOC_VERSION'];
+            $path = PATH_DOCUMENT .$app_uid. PATH_SEP . 'outdocs' . PATH_SEP . $result[1]['APP_DOC_UID'] . '_' . $result[1]['DOC_VERSION'];
             $concatFile[$i++] = $path . '.pdf';
         }
     }
@@ -625,26 +637,31 @@ function convergence_concatFiles($files, $where_exclude) {
     else
     {
         $i = 0;
-        $query = 'SELECT * FROM APP_DOCUMENT, CONTENT WHERE APP_UID IN (' . implode(',', $files) . ') AND APP_DOC_TYPE="OUTPUT" AND APP_DOC_STATUS="ACTIVE" AND APP_DOC_UID = CON_ID AND CON_CATEGORY = "APP_DOC_FILENAME" AND CON_LANG = "fr"' . $where_exclude;
+        /* $query = 'SELECT DOC_VERSION, APP_UID, APP_DOC_UID, CON_VALUE FROM APP_DOCUMENT, CONTENT WHERE APP_UID IN (' . implode(',', $files) . ') AND APP_DOC_TYPE="OUTPUT" AND APP_DOC_STATUS="ACTIVE" AND APP_DOC_UID = CON_ID AND CON_CATEGORY = "APP_DOC_FILENAME" AND CON_LANG = "fr"' . $where_exclude;
         $result = executeQuery($query);
-        if (sizeof($result) == 0)
+        if(sizeof($result) == 0)
         {
-            $query = 'SELECT * FROM APP_DOCUMENT, CONTENT WHERE APP_UID IN (' . implode(',', $files) . ') AND APP_DOC_TYPE="OUTPUT" AND APP_DOC_STATUS="ACTIVE" AND APP_DOC_UID = CON_ID AND CON_CATEGORY = "APP_DOC_FILENAME" AND CON_LANG = "en"' . $where_exclude;
+            $query = 'SELECT DOC_VERSION, APP_UID, APP_DOC_UID, CON_VALUE FROM APP_DOCUMENT, CONTENT WHERE APP_UID IN (' . implode(',', $files) . ') AND APP_DOC_TYPE="OUTPUT" AND APP_DOC_STATUS="ACTIVE" AND APP_DOC_UID = CON_ID AND CON_CATEGORY = "APP_DOC_FILENAME" AND CON_LANG = "en"' . $where_exclude;
             $result = executeQuery($query);
-        }
-
-        foreach ($result as $f)
-        {
-            $app_uid = $f['APP_UID'];
-            if (method_exists('G', 'getPathFromUID'))
+        }*/
+        
+        foreach ($files as $f)
+        { 
+            $query = 'SELECT MAX(DOC_VERSION) AS DOC_VERSION, APP_UID, APP_DOC_UID, CON_VALUE FROM APP_DOCUMENT, CONTENT WHERE APP_UID IN (' . $f . ') AND APP_DOC_TYPE="OUTPUT" AND APP_DOC_STATUS="ACTIVE" AND APP_DOC_UID = CON_ID AND CON_CATEGORY = "APP_DOC_FILENAME" AND CON_LANG = "fr"' . $where_exclude;
+            $result = executeQuery($query);
+            if(sizeof($result) == 0)
             {
-                $app_uid = G::getPathFromUID($f['APP_UID']);
+                $query = 'SELECT MAX(DOC_VERSION) AS DOC_VERSION, APP_UID, APP_DOC_UID, CON_VALUE FROM APP_DOCUMENT, CONTENT WHERE APP_UID IN (' . $f . ') AND APP_DOC_TYPE="OUTPUT" AND APP_DOC_STATUS="ACTIVE" AND APP_DOC_UID = CON_ID AND CON_CATEGORY = "APP_DOC_FILENAME" AND CON_LANG = "en"' . $where_exclude;
+                $result = executeQuery($query);
+            } 
+            $app_uid = trim($f,"'"); 
+            if(method_exists('G','getPathFromUID')){
+                $app_uid = G::getPathFromUID(trim($f,"'"));
             }
-            $path = PATH_DOCUMENT . $app_uid . PATH_SEP . 'outdocs' . PATH_SEP . $f['APP_DOC_UID'] . '_' . $f['DOC_VERSION'];
+            $path = PATH_DOCUMENT .$app_uid. PATH_SEP . 'outdocs' . PATH_SEP . $result[1]['APP_DOC_UID'] . '_' . $result[1]['DOC_VERSION'];
             $concatFile[$i++] = $path . '.pdf';
         }
-    }
-
+    } 
     $resultFile = '/tmp/temp_concat_' . time() . '.pdf';
     $a = exec('gs -q -dBATCH -dNOPAUSE -dSAFER -sDEVICE=pdfwrite -sOutputFile=' . $resultFile . ' -dBATCH ' . implode(' ', $concatFile));
 
@@ -654,6 +671,7 @@ function convergence_concatFiles($files, $where_exclude) {
 
     return $return;
 }
+
 /* * *
  *      Récupère la liste des fichiers sur le server ftp distant
  *
@@ -2200,73 +2218,75 @@ function createLog($dataCSV, $items, $tableName, $firstLineHeader, $dataEdit = '
 
     return $dataCSV;
 }
-function dataDynaforms($resultDynaform, $proUid) {
-    $_dataForms = array();
-    foreach ($resultDynaform As $rowDynaform)
+function dataDynaforms($resultDynaform,$proUid)
+{
+    $_dataForms =  array();
+    foreach($resultDynaform As $rowDynaform)
     {
-        $dynaform = new Form($proUid . PATH_SEP . $rowDynaform['DYN_UID'], PATH_DYNAFORM, SYS_LANG, false);
-
-        foreach ($dynaform->fields as $fieldName => $field)
+        $dynaform = new Form($proUid . PATH_SEP . $rowDynaform['DYN_UID'], PATH_DYNAFORM , SYS_LANG , false);
+        
+        foreach ($dynaform->fields as $fieldName => $field) 
         {
-            if ($field->type == 'dropdown' || $field->type == 'radiogroup')
+            if( $field->type == 'dropdown' || $field->type == 'radiogroup' || $field->type == 'checkgroup' || $field->type == 'listbox' || $field->type == 'yesno' || $field->type == 'suggest')
             {
                 $aData = array();
                 $dataSQL = array();
                 $data = array();
-                if (strlen($field->sql))
+                if(strlen($field->sql))
                 {
                     $query = $field->sql;
-                    $valueData = explode(",", $query);
-                    $valueId = explode(" ", $valueData[0]);
-                    $position = count($valueId) - 1;
+                    $valueData = explode(",",$query);
+                    $valueId = explode(" ",$valueData[0]);
+                    $position = count($valueId)-1 ;
                     $valueId = $valueId[$position];
                     $valueDataCount = count($valueData);
-                    $valueName = explode(" ", $valueData[$valueDataCount - 1]);
-                    for ($i = 0; $i < count($valueName); $i++)
+                    $valueName = explode(" ",$valueData[$valueDataCount-1]);
+                    for($i = 0; $i <count($valueName) ; $i++)
                     {
-                        if ($valueName[$i] == "from" || $valueName[$i] == "FROM")
+                        if($valueName[$i]=="from" || $valueName[$i]=="FROM")
                         {
-                            $dataName = $valueName[$i - 1];
+                            $dataName = $valueName[$i-1];   
                             break;
                         }
                     }
-
+                    
                     $aData = executeQuery($field->sql);
-                }
-                if (sizeof($aData))
+                }   
+                if(sizeof($aData))
                 {
-                    foreach ($aData As $key => $row)
+                    foreach($aData As $key => $row)
                     {
-                        $rowData = array('id' => $row[$valueId], 'descrip' => $row[$dataName]);
+                        $rowData = array ( 'id'=>$row[$valueId],'descrip'=>$row[$dataName]);
                         $dataSQL[] = $rowData;
                     }
                 }
-
-                if (sizeof($field->option))
+                    
+                if(sizeof($field->option))
                 {
-                    foreach ($field->option As $key => $row)
+                    foreach($field->option As $key => $row)
                     {
-                        $rowData = array('id' => $key, 'descrip' => $row);
+                        $rowData = array ( 'id'=>$key,'descrip'=>$row);
                         $data[] = $rowData;
                     }
                 }
-
-                $record = array(
-                    "FIELD_NAME" => $field->name,
-                    "FIELD_LABEL" => $field->label,
-                    "FIELD_TYPE" => $field->type,
-                    "FIELD_DEFAULT_VALUE" => $field->defaultValue,
-                    "FIELD_DEPENDENT_FIELD" => $field->dependentFields,
-                    "FIELD_OPTION" => $data,
-                    "FIELD_READONLY" => $field->readonly,
-                    "FIELD_SQL_CONNECTION" => $field->sqlConnection,
-                    "FIELD_SQL" => $field->sql,
-                    "FIELD_SQL_OPTION" => $dataSQL,
-                    "FIELD_SELECTED_VALUE" => $field->selectedValue,
-                    "FIELD_SAVE_LABEL" => $field->saveLabel
-                );
+                
+                $record = array (
+                        "FIELD_NAME" => $field->name, 
+                        "FIELD_LABEL" => $field->label,
+                        "FIELD_TYPE" => $field->type,
+                        "FIELD_DEFAULT_VALUE" => $field->defaultValue,
+                        "FIELD_DEPENDENT_FIELD" => $field->dependentFields,
+                        "FIELD_OPTION" => $data,
+                        "FIELD_READONLY" => $field->readonly,
+                        "FIELD_SQL_CONNECTION" => $field->sqlConnection,
+                        "FIELD_SQL" => $field->sql,
+                        "FIELD_SQL_OPTION" => $dataSQL,
+                        "FIELD_SELECTED_VALUE" => $field->selectedValue,
+                        "FIELD_SAVE_LABEL" => $field->saveLabel
+                        );
                 $_dataForms[] = $record;
             }
+            
         }
     }
     return $_dataForms;
@@ -2295,237 +2315,242 @@ function createFileTmpCSV($csv, $csv_file) {
         //fclose($handle);
     }
 }
-function importCreateCase($jsonMatchFields, $uidTask, $tableName, $firstLineHeader, $typeAction) {
+function importCreateCase($jsonMatchFields,$uidTask, $tableName,$firstLineHeader, $typeAction)
+{
     G::LoadClass('case');
-    $items = json_decode($jsonMatchFields, true);
-    $dataCSV = isset($_SESSION['REQ_DATA_CSV']) ? $_SESSION['REQ_DATA_CSV'] : array();
+    $items   = json_decode($jsonMatchFields,true); 
+    $dataCSV = isset($_SESSION['REQ_DATA_CSV']) ?$_SESSION['REQ_DATA_CSV']: array(); 
     $USR_UID = $_SESSION['USER_LOGGED'];
     $_SESSION['USER_LOGGED_INI'] = $USR_UID;
-    $proUid = getProUid($tableName);
+    $proUid  = getProUid($tableName);
     $totalCases = 0;
     // check all fields and remove wrong data
 
     $dataCSVdebug = createLog($dataCSV, $items, $tableName, $firstLineHeader);
     //$dataCSV = $dataCSVdebug;
     // load Dynaforms of process
-    $select = "SELECT DYN_UID, PRO_UID, DYN_TYPE, DYN_FILENAME FROM DYNAFORM WHERE PRO_UID = '" . $proUid . "'";
+    $select = "SELECT DYN_UID, PRO_UID, DYN_TYPE, DYN_FILENAME FROM DYNAFORM WHERE PRO_UID = '".$proUid ."'";
     $resultDynaform = executeQuery($select);
-    $_dataForms = dataDynaforms($resultDynaform, $proUid);
-    // end load dynaforms process
+    $_dataForms =  dataDynaforms($resultDynaform,$proUid);
+    // end load dynaforms process   
     $select = executeQuery("SELECT MAX(IMPCSV_IDENTIFY) AS IDENTIFY FROM PMT_IMPORT_CSV_DATA WHERE IMPCSV_TABLE_NAME = '$tableName' ");
-    $identify = isset($select[1]['IDENTIFY']) ? $select[1]['IDENTIFY'] : 0;
+    $identify = isset($select[1]['IDENTIFY'])? $select[1]['IDENTIFY']:0;
     $identify = $identify + 1;
-    $csv_file = $tableName . "_" . $identify . ".csv";
-    $csv_sep = ",";
-    $csv = "";
+    $csv_file = $tableName."_".$identify.".csv";  
+    $csv_sep = ",";     
+    $csv="";  
     $csv_end = "\n";
     $swInsert = 0;
 
-    foreach ($dataCSV as $row)
+    foreach ($dataCSV as $row) 
     {
         $totRow = sizeof($row);
         $totIni = 1;
-
-        if ($totalCases >= 50)
+       
+        if($totalCases >= 10)
         {
             /* add header on csv temp files for import background */
             if ($firstLineHeader == 'on' && $swInsert == 0)
+              {
+              $csv .= getCSVHeader($dataCSV, $csv_sep) . $csv_end;
+            } 
+            foreach($row as $value)
             {
-                $csv .= getCSVHeader($dataCSV, $csv_sep) . $csv_end;
-            }
-            foreach ($row as $value)
-            {
-                if ($totIni == $totRow)
+                if($totIni == $totRow)
                     $csv.= _convert($value);
                 else
-                    $csv.= _convert($value) . $csv_sep;
+                    $csv.= _convert($value).$csv_sep;
                 $totIni++;
             }
             $csv.=$csv_end;
-            if ($swInsert == 0)
+            if($swInsert == 0)
             {
                 $select = executeQuery("SELECT MAX(IMPCSV_ID) AS ID_CSV FROM PMT_IMPORT_CSV_DATA");
-                $maxId = isset($select[1]['ID_CSV']) ? $select[1]['ID_CSV'] : 0;
+                $maxId = isset($select[1]['ID_CSV'])? $select[1]['ID_CSV']:0;
                 $maxId = $maxId + 1;
                 foreach ($items as $field)
-                {
-                    $insert = "INSERT INTO PMT_IMPORT_CSV_DATA
+                { 
+                    $insert = "INSERT INTO PMT_IMPORT_CSV_DATA 
                           (IMPCSV_ID, IMPCSV_FIELD_NAME, IMPCSV_VALUE,IMPCSV_TAS_UID, IMPCSV_TABLE_NAME, IMPCSV_FIRSTLINEHEADER, IMPCSV_IDENTIFY, IMPCSV_TYPE_ACTION) VALUES
-                          ('$maxId','" . $field['FIELD_NAME'] . "', '" . $field['COLUMN_CSV'] . "', '$uidTask', '$tableName','$firstLineHeader', '$identify', '$typeAction')";
+                          ('$maxId','".$field['FIELD_NAME']."', '".$field['COLUMN_CSV']."', '$uidTask', '$tableName','$firstLineHeader', '$identify', '$typeAction')";
                     executeQuery($insert);
                     $swInsert = 1;
                     $maxId++;
                 }
             }
+            
         }
-        else
+        else 
         {
-            $appData = array();
-            foreach ($items as $field)
-            {
-                if ($firstLineHeader == 'on')
-                {
-
-                    if (isset($row[$field['COLUMN_CSV']]))
+            $appData =  array();
+            foreach ($items as $field) { 
+                if($firstLineHeader == 'on'){
+                
+                    if(isset($row[$field['COLUMN_CSV']]))
                     {
-                        if ($row[$field['COLUMN_CSV']] != '')
-                            $appData[$field['FIELD_NAME']] = _convert($row[$field['COLUMN_CSV']]);
+                        if($row[$field['COLUMN_CSV']]  != '')
+                            $appData[$field['FIELD_NAME']] = _convert($row[$field['COLUMN_CSV']]);                           
                         else
                             $appData[$field['FIELD_NAME']] = '';
                     }
                     else
                     {
-                        if ($field['COLUMN_CSV'] != '')
+                        if($field['COLUMN_CSV']  != '')
                             $appData[$field['FIELD_NAME']] = _convert($field['COLUMN_CSV']);
                         else
                             $appData[$field['FIELD_NAME']] = '';
-                    }
+                    } 
                 }
                 else
                 {
                     $aCol = explode(' ', trim($field['COLUMN_CSV']));
-                    if ((isset($aCol[0]) && trim($aCol[0]) == 'Column' ) && ( isset($aCol[1]) && isset($row[$aCol[1]]) ))
-                    {
+                    if( (isset($aCol[0]) && trim($aCol[0]) == 'Column' ) &&  ( isset($aCol[1]) && isset($row[$aCol[1]]) ) )
+                    {   
                         $appData[$field['FIELD_NAME']] = _convert($row[$aCol[1]]);
                     }
-                    else if (( isset($aCol[0]) && trim($aCol[0]) != 'Column'))
-                    {
-                        $appData[$field['FIELD_NAME']] = _convert($field['COLUMN_CSV']);
-                    }
+                    else if ( ( isset($aCol[0])  &&  trim($aCol[0]) != 'Column' )  ){
+                        $appData[$field['FIELD_NAME']] =  _convert($field['COLUMN_CSV']);
+                    }        
                 }
-            }
+            }       
 
-            // labels //
-
-            foreach ($appData As $key => $fields)
+        // labels //
+      
+            foreach($appData As $key => $fields)
             {
                 foreach ($_dataForms As $row)
                 {
-                    if ($row['FIELD_DEFAULT_VALUE'] == '')
+                    if($row['FIELD_DEFAULT_VALUE'] == '')
                         $row['FIELD_DEFAULT_VALUE'] = 0;
-
-                    if ($key == $row['FIELD_NAME'])
+                    
+                    if($key == $row['FIELD_NAME'])
                     {
                         $i = isset($fields) ? $fields : $row['FIELD_DEFAULT_VALUE'];
 
-                        if (count($row['FIELD_SQL_OPTION']))
-                        {
-
+                        if(count($row['FIELD_SQL_OPTION']))
+                        {                            
                             $options = $row['FIELD_SQL_OPTION'];
                             $id = "";
                             $label = "";
-                            foreach ($options As $row2)
+                            foreach($options As $row2)
                             {
-                                if ($row2['id'] == $i)
+                                if($row2['id'] == $i)
                                 {
                                     $id = $row2['id'];
                                     $label = $row2['descrip'];
                                     break;
                                 }
                             }
-
-                            if ($id == "" && $label == "")
+                            
+                            if($id=="" && $label=="")
                             {
                                 $id = $row['FIELD_SQL_OPTION'][0]['id'];
                                 $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
                             }
-
+                            
                             $record[$row['FIELD_NAME']] = $id;
-                            $record[$row['FIELD_NAME'] . "_label"] = $label;
-                            $appData = array_merge($record, $appData);
+                            $record[$row['FIELD_NAME']."_label"] = $label;
+                            $appData = array_merge($record,$appData);
                         }
                         else
                         {
-                            if (count($row['FIELD_OPTION']))
+                            if(count($row['FIELD_OPTION']))
                             {
                                 $options = $row['FIELD_OPTION'];
                                 $id = "";
                                 $label = "";
-                                foreach ($options As $row2)
+                                foreach($options As $row2)
                                 {
-                                    if ($row2['id'] == $i)
+                                    if($row2['id'] == $i)
                                     {
                                         $id = $row2['id'];
                                         $label = $row2['descrip'];
                                         break;
                                     }
                                 }
-
+                                
                                 $record = Array();
                                 $record[$row['FIELD_NAME']] = $id;
-                                $record[$row['FIELD_NAME'] . "_label"] = $label;
+                                $record[$row['FIELD_NAME']."_label"] = $label;
                                 $appData = array_merge($record, $appData);
                             }
                         }
                     }
-                }
+                }   
             }
-
-            foreach ($appData As $key => $fields)
+            
+            foreach($appData As $key => $fields)
             {
                 foreach ($_dataForms As $row)
                 {
-                    if ($row['FIELD_DEFAULT_VALUE'] == '')
+                    if($row['FIELD_DEFAULT_VALUE'] == '')
                         $row['FIELD_DEFAULT_VALUE'] = 0;
-
+                        
                     if($row['FIELD_TYPE'] != 'yesno')
                     { 
-                        $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
-                        if ($appData[$row['FIELD_NAME'] . "_label"] == "")
+                        $appData[$row['FIELD_NAME']."_label"] = isset($appData[$row['FIELD_NAME']."_label"]) ? $appData[$row['FIELD_NAME']."_label"]:'';
+                        ## Control label type field suggest
+                        if($row['FIELD_TYPE'] == 'suggest')
                         {
-                            $i = $row['FIELD_DEFAULT_VALUE'];
-                            if (count($row['FIELD_SQL_OPTION']))
+                            $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME']]) ? $appData[$row['FIELD_NAME']] : '';                              
+                        }
+                        ## end Control label type field suggest
+                        if($appData[$row['FIELD_NAME']."_label"] =="")
+                        {
+                            $i = $row['FIELD_DEFAULT_VALUE'];   
+                            if(count($row['FIELD_SQL_OPTION']))
                             {
-
+                                
                                 $options = $row['FIELD_SQL_OPTION'];
                                 $id = "";
                                 $label = "";
-                                foreach ($options As $row2)
+                                foreach($options As $row2)
                                 {
-                                    if ($row2['id'] == $i)
+                                    if($row2['id'] == $i)
                                     {
                                         $id = $row2['id'];
                                         $label = $row2['descrip'];
                                         break;
                                     }
                                 }
-
-                                if ($id == "" && $label == "")
+                                
+                                if($id=="" && $label=="")
                                 {
                                     $id = $row['FIELD_SQL_OPTION'][0]['id'];
                                     $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
                                 }
-
+                                
                                 $record[$row['FIELD_NAME']] = $id;
-                                $record[$row['FIELD_NAME'] . "_label"] = $label;
+                                $record[$row['FIELD_NAME']."_label"] = $label;
                                 $appData = array_merge($record, $appData);
                             }
                             else
                             {
-                                if (count($row['FIELD_OPTION']))
+                                if(count($row['FIELD_OPTION']))
                                 {
                                     $options = $row['FIELD_OPTION'];
                                     $id = "";
                                     $label = "";
-                                    foreach ($options As $row2)
+                                    foreach($options As $row2)
                                     {
-                                        if ($row2['id'] == $i)
+                                        if($row2['id'] == $i)
                                         {
                                             $id = $row2['id'];
                                             $label = $row2['descrip'];
                                             break;
                                         }
                                     }
-
-                                    if ($id == "" && $label == "")
+                                    
+                                    if($id=="" && $label=="")
                                     {
                                         $id = $row['FIELD_OPTION'][0]['id'];
                                         $label = $row['FIELD_OPTION'][0]['descrip'];
                                     }
-
+                                
                                     $record[$row['FIELD_NAME']] = $id;
-                                    $record[$row['FIELD_NAME'] . "_label"] = $label;
+                                    $record[$row['FIELD_NAME']."_label"] = $label;
                                     $appData = array_merge($record, $appData);
+                                   
                                 }
                             }
                         }
@@ -2533,7 +2558,7 @@ function importCreateCase($jsonMatchFields, $uidTask, $tableName, $firstLineHead
                     else 
                     {
                         $record = Array();
-                        if( $appData[$row['FIELD_NAME']] == '' || $appData[$row['FIELD_NAME']] == ' ' )
+                        if( $appData[$row['FIELD_NAME']] == '' )
                         {
                             $appData[$row['FIELD_NAME']] = $row['FIELD_DEFAULT_VALUE'];
                             //$appData = array_merge($record, $appData);
@@ -2541,17 +2566,17 @@ function importCreateCase($jsonMatchFields, $uidTask, $tableName, $firstLineHead
                     }
                 }
             }
-
-            // end labels
-
+         
+         // end labels 
+        
             foreach ($appData as $key => $value)
-            {
-                if (!is_array($value))
+            {   
+                if(!is_array($value))
                     $appData[$key] = ($value);
                 else
                     $appData[$key] = ($value);
-            }
-
+            } 
+           
             $appData['VALIDATION'] = '0'; //needed for the process, if not you will have an error.
             $appData['FLAG_ACTION'] = 'multipleDerivation';
             $appData['EXEC_AUTO_DERIVATE'] = 'NO';
@@ -2560,259 +2585,268 @@ function importCreateCase($jsonMatchFields, $uidTask, $tableName, $firstLineHead
             $appData['STATUT'] = 1;
             $appData['CurrentUserAutoDerivate'] = $USR_UID;
             $appData['SW_CREATE_CASE'] = 1; // needed to create cases. If a loop is generated when you run the trigger
-            // $appData['LOOP'] = 1;
+            // $appData['LOOP'] = 1;           
 
-            $caseUID = PMFNewCase($proUid, $USR_UID, $uidTask, $appData);
-            if ($caseUID > 0)
-            {
+            $caseUID = PMFNewCase($proUid, $USR_UID, $uidTask, $appData);        
+            if($caseUID > 0) 
+            {  
                 $oCase = new Cases ();
-                $FieldsCase = $oCase->loadCase($caseUID);
-                $FieldsCase['APP_DATA']['NUM_DOSSIER'] = $FieldsCase['APP_NUMBER'];
-                $oCase->updateCase($caseUID, $FieldsCase);
-                autoDerivate($proUid, $caseUID, $USR_UID);
-
+                $FieldsCase = $oCase->loadCase ( $caseUID ); 
+                $FieldsCase['APP_DATA']['NUM_DOSSIER'] = $FieldsCase['APP_NUMBER']; 
+                $oCase->updateCase($caseUID,$FieldsCase);
+                autoDerivate($proUid,$caseUID,$USR_UID);
+              
                 /* Comment by Nico 28/08/2013
                  * Please, don't remove the comment because make some bug on process
                  * or explain to me why you want to put this value
                  *
                  */
-                //$FieldsCase['APP_DATA']['STATUT'] = 1;
-                //$FieldsCase['APP_DATA']['LOOP'] = '';
+               
+                
             }
+            
         }
         $totalCases++;
     }
-    genDataReport($tableName);
+     genDataReport($tableName);
     # create file tmp
-    createFileTmpCSV($csv, $csv_file);
-    # end create file tmp
-
+    createFileTmpCSV($csv,$csv_file);   
+    # end create file tmp 
+    
     unset($_SESSION['REQ_DATA_CSV']);
     return $totalCases;
 }
-function importCreateCaseDelete($jsonMatchFields, $uidTask, $tableName, $firstLineHeader, $dataDeleteEdit) {
+function importCreateCaseDelete($jsonMatchFields,$uidTask, $tableName,$firstLineHeader,$dataDeleteEdit)
+{
     G::LoadClass('case');
-    $items = json_decode($jsonMatchFields, true);
-    $dataCSV = isset($_SESSION['REQ_DATA_CSV']) ? $_SESSION['REQ_DATA_CSV'] : array();
+    $items   = json_decode($jsonMatchFields,true);
+    $dataCSV = isset($_SESSION['REQ_DATA_CSV']) ?$_SESSION['REQ_DATA_CSV']: array();
     $USR_UID = $_SESSION['USER_LOGGED'];
     $_SESSION['USER_LOGGED_INI'] = $USR_UID;
-    $proUid = getProUid($tableName);
+    $proUid  = getProUid($tableName);
     $totalCases = 0;
     $itemsDeleteEdit = json_decode($dataDeleteEdit, true);
 
     $dataCSVdebug = createLog($dataCSV, $items, $tableName, $firstLineHeader, $itemsDeleteEdit);
     $dataCSV = $dataCSVdebug;
     // load Dynaforms of process
-    $select = "SELECT DYN_UID, PRO_UID, DYN_TYPE, DYN_FILENAME FROM DYNAFORM WHERE PRO_UID = '" . $proUid . "'";
+    $select = "SELECT DYN_UID, PRO_UID, DYN_TYPE, DYN_FILENAME FROM DYNAFORM WHERE PRO_UID = '".$proUid ."'";
     $resultDynaform = executeQuery($select);
-    $idCasesGenerate = "''";
-
-    $_dataForms = dataDynaforms($resultDynaform, $proUid);
-
+    $idCasesGenerate = "''";    
+    
+    $_dataForms =  dataDynaforms($resultDynaform,$proUid);
+        
     $select = executeQuery("SELECT MAX(IMPCSV_IDENTIFY) AS IDENTIFY FROM PMT_IMPORT_CSV_DATA WHERE IMPCSV_TABLE_NAME = '$tableName' ");
-    $identify = isset($select[1]['IDENTIFY']) ? $select[1]['IDENTIFY'] : 0;
+    $identify = isset($select[1]['IDENTIFY'])? $select[1]['IDENTIFY']:0;
     $identify = $identify + 1;
-    $csv_file = $tableName . "_" . $identify . ".csv";
-    $csv_sep = ",";
-    $csv = "";
+    $csv_file = $tableName."_".$identify.".csv";  
+    $csv_sep = ",";     
+    $csv="";  
     $csv_end = "\n";
     $swInsert = 0;
 
-    foreach ($dataCSV as $row)
+    foreach ($dataCSV as $row) 
     {
         $totRow = sizeof($row);
         $totIni = 1;
-
-        if ($totalCases >= 50)
+      
+        if($totalCases >= 10) 
         {
             /* add header on csv temp files for import background */
             if ($firstLineHeader == 'on' && $swInsert == 0)
             {
                 $csv .= getCSVHeader($dataCSV, $csv_sep) . $csv_end;
             }
-            foreach ($row as $value)
+            foreach($row as $value)
             {
-                if ($totIni == $totRow)
+                if($totIni == $totRow)
                     $csv.= _convert($value);
                 else
-                    $csv.= _convert($value) . $csv_sep;
+                    $csv.= _convert($value).$csv_sep;
                 $totIni++;
             }
             $csv.=$csv_end;
-            if ($swInsert == 0)
+            if($swInsert == 0)
             {
                 $select = executeQuery("SELECT MAX(IMPCSV_ID) AS ID_CSV FROM PMT_IMPORT_CSV_DATA");
-                $maxId = isset($select[1]['ID_CSV']) ? $select[1]['ID_CSV'] : 0;
+                $maxId = isset($select[1]['ID_CSV'])? $select[1]['ID_CSV']:0;
                 $maxId = $maxId + 1;
                 foreach ($items as $field)
-                {
-                    $insert = "INSERT INTO PMT_IMPORT_CSV_DATA
+                { 
+                    $insert = "INSERT INTO PMT_IMPORT_CSV_DATA 
                           (IMPCSV_ID, IMPCSV_FIELD_NAME, IMPCSV_VALUE,IMPCSV_TAS_UID, IMPCSV_TABLE_NAME, IMPCSV_FIRSTLINEHEADER, IMPCSV_IDENTIFY, IMPCSV_TYPE_ACTION, IMPCSV_CONDITION_ACTION) VALUES
-                          ('$maxId','" . $field['FIELD_NAME'] . "', '" . $field['COLUMN_CSV'] . "', '$uidTask', '$tableName','$firstLineHeader', '$identify', 'ADD_DELETE', '" . mysql_real_escape_string($dataDeleteEdit) . "' )";
+                          ('$maxId','".$field['FIELD_NAME']."', '".$field['COLUMN_CSV']."', '$uidTask', '$tableName','$firstLineHeader', '$identify', 'ADD_DELETE', '".mysql_real_escape_string($dataDeleteEdit)."' )";
                     executeQuery($insert);
                     $swInsert = 1;
                     $maxId++;
                 }
             }
+            
         }
         else
         {
-            $appData = array();
-            foreach ($items as $field)
-            {
-                if ($firstLineHeader == 'on')
+            $appData =  array();
+            foreach ($items as $field) 
+            { 
+                if($firstLineHeader == 'on')
                 {
-                    if (isset($row[$field['COLUMN_CSV']]))
+                    if(isset($row[$field['COLUMN_CSV']]))
                     {
-                        if ($row[$field['COLUMN_CSV']]  != '')
+                        if($row[$field['COLUMN_CSV']]  != '')
                             $appData[$field['FIELD_NAME']] = _convert($row[$field['COLUMN_CSV']]);
                         else
-                            $appData[$field['FIELD_NAME']] = ' ';
+                            $appData[$field['FIELD_NAME']] = '';
                     }
                     else
                     {
-                        if ($field['COLUMN_CSV']  != '')
+                        if($field['COLUMN_CSV']  != '')
                             $appData[$field['FIELD_NAME']] = _convert($field['COLUMN_CSV']);
                         else
-                            $appData[$field['FIELD_NAME']] = ' ';
-                    }
+                            $appData[$field['FIELD_NAME']] = '';
+                    } 
                 }
                 else
                 {
                     $aCol = explode(' ', trim($field['COLUMN_CSV']));
-                    if ((isset($aCol[0]) && trim($aCol[0]) == 'Column' ) && ( isset($aCol[1]) && isset($row[$aCol[1]]) ))
+                    if( (isset($aCol[0]) && trim($aCol[0]) == 'Column' ) &&  ( isset($aCol[1]) && isset($row[$aCol[1]]) ) )
                         $appData[$field['FIELD_NAME']] = _convert($row[$aCol[1]]);
-                    else if (( isset($aCol[0]) && trim($aCol[0]) != 'Column'))
-                    {
-                        $appData[$field['FIELD_NAME']] = _convert($field['COLUMN_CSV']);
-                    }
+                    else if ( ( isset($aCol[0])  &&  trim($aCol[0]) != 'Column' )  ){
+                        $appData[$field['FIELD_NAME']] =  _convert($field['COLUMN_CSV']);
+                    }        
                 }
-            }
-
-            foreach ($appData As $key => $fields)
+            }       
+            
+            foreach($appData As $key => $fields)
             {
                 foreach ($_dataForms As $row)
                 {
-                    if ($row['FIELD_DEFAULT_VALUE'] == '')
+                    if($row['FIELD_DEFAULT_VALUE'] == '')
                         $row['FIELD_DEFAULT_VALUE'] = 0;
-
-                    if ($key == $row['FIELD_NAME'])
+                        
+                    if($key == $row['FIELD_NAME'])
                     {
-                        $i = isset($fields) ? $fields : $row['FIELD_DEFAULT_VALUE'];
-
-                        if (count($row['FIELD_SQL_OPTION']))
+                        $i = isset($fields)?$fields:$row['FIELD_DEFAULT_VALUE'];
+                            
+                        if(count($row['FIELD_SQL_OPTION']))
                         {
                             $options = $row['FIELD_SQL_OPTION'];
                             $id = "";
                             $label = "";
-                            foreach ($options As $row2)
+                            foreach($options As $row2)
                             {
-                                if ($row2['id'] == $i)
+                                if($row2['id'] == $i)
                                 {
                                     $id = $row2['id'];
                                     $label = $row2['descrip'];
                                     break;
                                 }
                             }
-
-                            if ($id == "" && $label == "")
+                                
+                            if($id=="" && $label=="")
                             {
                                 $id = $row['FIELD_SQL_OPTION'][0]['id'];
                                 $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
                             }
-
+                            
                             $record[$row['FIELD_NAME']] = $id;
-                            $record[$row['FIELD_NAME'] . "_label"] = $label;
-                            $appData = array_merge($record, $appData);
+                            $record[$row['FIELD_NAME']."_label"] = $label;
+                            $appData = array_merge($record,$appData);
                         }
                         else
                         {
-                            if (count($row['FIELD_OPTION']))
+                            if(count($row['FIELD_OPTION']))
                             {
                                 $options = $row['FIELD_OPTION'];
                                 $id = "";
                                 $label = "";
-                                foreach ($options As $row2)
+                                foreach($options As $row2)
                                 {
-                                    if ($row2['id'] == $i)
+                                    if($row2['id'] == $i)
                                     {
                                         $id = $row2['id'];
                                         $label = $row2['descrip'];
                                         break;
                                     }
                                 }
-
+                                
                                 $record = Array();
                                 $record[$row['FIELD_NAME']] = $id;
-                                $record[$row['FIELD_NAME'] . "_label"] = $label;
-                                $appData = array_merge($record, $appData);
+                                $record[$row['FIELD_NAME']."_label"] = $label;
+                                $appData = array_merge($record,$appData);
                             }
                         }
                     }
-                }
+                }   
             }
             $whereDelete = '';
-            foreach ($appData As $key => $fields)
+            foreach($appData As $key => $fields)
             {
                 foreach ($_dataForms As $row)
                 {
-                    if ($row['FIELD_DEFAULT_VALUE'] == '')
+                    if($row['FIELD_DEFAULT_VALUE'] == '')
                         $row['FIELD_DEFAULT_VALUE'] = 0;
-
+                            
                     if($row['FIELD_TYPE'] != 'yesno')
                     {
-                        $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
-                        if ($appData[$row['FIELD_NAME'] . "_label"] == "")
+                        $appData[$row['FIELD_NAME']."_label"] = isset($appData[$row['FIELD_NAME']."_label"])?$appData[$row['FIELD_NAME']."_label"]:'';
+                        ## Control label type field suggest
+                        if($row['FIELD_TYPE'] == 'suggest')
                         {
-                            $i = $row['FIELD_DEFAULT_VALUE'];
-                            if (count($row['FIELD_SQL_OPTION']))
+                            $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME']]) ? $appData[$row['FIELD_NAME']] : '';                              
+                        }
+                        ## end Control label type field suggest
+                        if($appData[$row['FIELD_NAME']."_label"] =="")
+                        {
+                            $i = $row['FIELD_DEFAULT_VALUE'];   
+                            if(count($row['FIELD_SQL_OPTION']))
                             {
                                 $options = $row['FIELD_SQL_OPTION'];
                                 $id = "";
                                 $label = "";
-                                foreach ($options As $row2)
+                                foreach($options As $row2)
                                 {
-                                    if ($row2['id'] == $i)
+                                    if($row2['id'] == $i)
                                     {
                                         $id = $row2['id'];
                                         $label = $row2['descrip'];
                                         break;
                                     }
                                 }
-
-                                if ($id == "" && $label == "")
+                                    
+                                if($id=="" && $label=="")
                                 {
                                     $id = $row['FIELD_SQL_OPTION'][0]['id'];
                                     $label = $row['FIELD_SQL_OPTION'][0]['descrip'];
                                 }
                                 $record[$row['FIELD_NAME']] = $id;
-                                $record[$row['FIELD_NAME'] . "_label"] = $label;
-                                $appData = array_merge($record, $appData);
+                                $record[$row['FIELD_NAME']."_label"] = $label;
+                                $appData = array_merge($record,$appData);
                             }
                             else
                             {
-                                if (count($row['FIELD_OPTION']))
+                                if(count($row['FIELD_OPTION']))
                                 {
                                     $options = $row['FIELD_OPTION'];
                                     $id = "";
                                     $label = "";
-                                    foreach ($options As $row2)
+                                    foreach($options As $row2)
                                     {
-                                        if ($row2['id'] == $i)
+                                        if($row2['id'] == $i)
                                         {
                                             $id = $row2['id'];
                                             $label = $row2['descrip'];
+                                            
                                         }
                                     }
-
-                                    if ($id == "" && $label == "")
+                                        
+                                    if($id=="" && $label=="")
                                     {
                                         $id = $row['FIELD_OPTION'][0]['id'];
                                         $label = $row['FIELD_OPTION'][0]['descrip'];
                                     }
                                     $record[$row['FIELD_NAME']] = $id;
-                                    $record[$row['FIELD_NAME'] . "_label"] = $label;
-                                    $appData = array_merge($record, $appData);
+                                    $record[$row['FIELD_NAME']."_label"] = $label;
+                                    $appData = array_merge($record,$appData);
                                 }
                             }
                         }
@@ -2820,52 +2854,54 @@ function importCreateCaseDelete($jsonMatchFields, $uidTask, $tableName, $firstLi
                     else 
                     {
                         $record = Array();
-                        if( $appData[$row['FIELD_NAME']] == '' || $appData[$row['FIELD_NAME']] == ' ' )
+                        if( $appData[$row['FIELD_NAME']] == '' )
                         {
                             $appData[$row['FIELD_NAME']] = $row['FIELD_DEFAULT_VALUE'];
                             //$appData = array_merge($record, $appData);
                         }
                     }
                 }
-                // delete cases
-                foreach ($itemsDeleteEdit as $field)
-                {
+                // delete cases 
+                foreach ($itemsDeleteEdit as $field ) 
+                { 
                     $fieldNameEditDelete = htmlspecialchars_decode($field['CSV_FIELD_NAME']);
-                    if ($fieldNameEditDelete == $key)
+                    if($fieldNameEditDelete == $key )
                     {
-                        if ($whereDelete == '')
-                            $whereDelete = $key . " = '" . mysql_escape_string($fields) . "'";
-                        else
-                            $whereDelete = $whereDelete . " AND " . $key . " = '" . mysql_escape_string($fields) . "'";
+                        if($whereDelete == '')
+                            $whereDelete = $key." = '".mysql_escape_string($fields)."'";
+                        else 
+                            $whereDelete = $whereDelete." AND " .$key." = '".mysql_escape_string($fields)."'";
                     }
-                }
-                // end delete cases
+                } 
+                // end delete cases 
+                
             }
             // end labels
-            // delete cases
-            if ($whereDelete != '')
+            
+            // delete cases            
+            if($whereDelete != '')
             {
-                // genDataReport($tableName);
-                $query = "SELECT APP_UID FROM $tableName WHERE $whereDelete AND APP_UID NOT IN ( $idCasesGenerate ) "; //print($query.'  ');
+                $query = "SELECT APP_UID FROM $tableName WHERE $whereDelete AND APP_UID NOT IN ( $idCasesGenerate ) "; //print($query.'  '); 
                 $deleteData = executeQuery($query);
-                if (sizeof($deleteData))
+                if(sizeof($deleteData))
                 {
-                    foreach ($deleteData as $index)
-                    {
-                        $CurDateTime = date('Y-m-d H:i:s');
-                        insertHistoryLogPlugin($index['APP_UID'], $_SESSION['USER_LOGGED'], $CurDateTime, '1', $index['APP_UID'], 'Delete Case');
-                        deletePMCases($index['APP_UID']);
+                    foreach($deleteData as $index)
+                    {   
+                        $CurDateTime=date('Y-m-d H:i:s');
+                        insertHistoryLogPlugin($index['APP_UID'],$_SESSION['USER_LOGGED'],$CurDateTime,'1',$index['APP_UID'],'Delete Case');
+                        deletePMCases($index['APP_UID'],$tableName); 
                     }
+                    //genDataReport($tableName);
                 }
             }
             // end delete cases
             foreach ($appData as $key => $value)
             {
-                if (!is_array($value))
+                if(!is_array($value))
                     $appData[$key] = ($value);
                 else
                     $appData[$key] = $value;
-            }
+            } 
             $appData['VALIDATION'] = '0'; //needed for the process, if not you will have an error.
             $appData['FLAG_ACTION'] = 'multipleDerivation';
             $appData['EXEC_AUTO_DERIVATE'] = 'NO';
@@ -2874,36 +2910,37 @@ function importCreateCaseDelete($jsonMatchFields, $uidTask, $tableName, $firstLi
             $appData['STATUT'] = 1;
             $appData['CurrentUserAutoDerivate'] = $USR_UID;
             $appData['SW_CREATE_CASE'] = 1; // needed to create cases. If a loop is generated when you run the trigger
-            $caseUID = PMFNewCase($proUid, $USR_UID, $uidTask, $appData);
-            if ($totalCases == 0)
-                $idCasesGenerate = "'" . $caseUID . "'";
+            $caseUID = PMFNewCase($proUid, $USR_UID, $uidTask, $appData);  
+            if($totalCases == 0)
+                $idCasesGenerate = "'".$caseUID."'";
             else
-                $idCasesGenerate = $idCasesGenerate . ", '" . $caseUID . "'";
-            if ($caseUID > 0)
+                $idCasesGenerate = $idCasesGenerate.", '".$caseUID."'";
+            if($caseUID >0) 
             {
                 $oCase = new Cases ();
-                $FieldsCase = $oCase->loadCase($caseUID);
-                $FieldsCase['APP_DATA']['NUM_DOSSIER'] = $FieldsCase['APP_NUMBER'];
-                $oCase->updateCase($caseUID, $FieldsCase);
-                autoDerivate($proUid, $caseUID, $USR_UID);
-
-
-                /* Comment by Nico 28/08/2013
+                $FieldsCase = $oCase->loadCase ( $caseUID );
+                $FieldsCase['APP_DATA']['NUM_DOSSIER'] = $FieldsCase['APP_NUMBER'];  
+                $oCase->updateCase($caseUID,$FieldsCase);
+                autoDerivate($proUid,$caseUID,$USR_UID);
+               
+               
+               /* Comment by Nico 28/08/2013
                  * Please, don't remove the comment because make some bug on process
                  * or explain to me why you want to put this value
                  *
                  */
-                //$FieldsCase['APP_DATA']['STATUT'] = 1;
-                //$FieldsCase['APP_DATA']['LOOP'] = '';
+               
+               
             }
         }
         $totalCases++;
     }
-    genDataReport($tableName);
+    
+    
     # create file tmp
-    createFileTmpCSV($csv, $csv_file);
-    # end create file tmp
-
+    createFileTmpCSV($csv,$csv_file);   
+    # end create file tmp 
+    
     unset($_SESSION['REQ_DATA_CSV']);
     return $totalCases;
 }
@@ -2943,7 +2980,7 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
     {
         $totRow = sizeof($row);
         $totIni = 1;
-        if ($totalCases >= 50)
+        if ($totalCases >= 10)
         {
             /* add header on csv temp files for import background */
             if ($firstLineHeader == 'on' && $swInsert == 0)
@@ -2988,14 +3025,14 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                         if ($row[$field['COLUMN_CSV']] != '')
                             $appData[$field['FIELD_NAME']] = _convert($row[$field['COLUMN_CSV']]);
                         else
-                            $appData[$field['FIELD_NAME']] = ' ';
+                            $appData[$field['FIELD_NAME']] = '';
                     }
                     else
                     {
                         if ($field['COLUMN_CSV'] != '')
                             $appData[$field['FIELD_NAME']] = _convert($field['COLUMN_CSV']);
                         else
-                            $appData[$field['FIELD_NAME']] = ' ';
+                            $appData[$field['FIELD_NAME']] = '';
                     }
                 }
                 else
@@ -3009,7 +3046,7 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                     }
                 }
             }
-
+            
             foreach ($appData As $key => $fields)
             {
                 foreach ($_dataForms As $row)
@@ -3072,7 +3109,7 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                     }
                 }
             }
-            $whereUpdate = '';
+            $whereUpdate = ''; 
             foreach ($appData As $key => $fields)
             {
                 foreach ($_dataForms As $row)
@@ -3083,6 +3120,12 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                     if($row['FIELD_TYPE'] != 'yesno')
                     {
                         $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME'] . "_label"]) ? $appData[$row['FIELD_NAME'] . "_label"] : '';
+                        ## Control label type field suggest
+                        if($row['FIELD_TYPE'] == 'suggest')
+                        {
+                            $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME']]) ? $appData[$row['FIELD_NAME']] : '';                              
+                        }
+                        ## end Control label type field suggest
                         if ($appData[$row['FIELD_NAME'] . "_label"] == "")
                         {
                             $i = $row['FIELD_DEFAULT_VALUE'];
@@ -3100,7 +3143,7 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                                         break;
                                     }
                                 }
-
+    
                                 if ($id == "" && $label == "")
                                 {
                                     $id = $row['FIELD_SQL_OPTION'][0]['id'];
@@ -3125,7 +3168,7 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                                             $label = $row2['descrip'];
                                         }
                                     }
-
+    
                                     if ($id == "" && $label == "")
                                     {
                                         $id = $row['FIELD_OPTION'][0]['id'];
@@ -3137,6 +3180,7 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                                 }
                             }
                         }
+                            
                     }
                     else 
                     {
@@ -3144,7 +3188,6 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                         if( $appData[$row['FIELD_NAME']] == '' || $appData[$row['FIELD_NAME']] == ' ' )
                         {
                             $appData[$row['FIELD_NAME']] = $row['FIELD_DEFAULT_VALUE'];
-                            //$appData = array_merge($record, $appData);
                         }
                     }
                 }
@@ -3168,7 +3211,7 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
             {
                 foreach ($items as $row)
                 {
-                    if ($row['FIELD_NAME'] == $key)
+                    if ($row['FIELD_NAME'] == $key || $row['FIELD_NAME'].'_label' == $key)
                     {
                         if (!is_array($value))
                         {
@@ -3189,10 +3232,11 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                     $appData[$key] = $value;
                 }
             }
-            $query = "SELECT APP_UID FROM $tableName WHERE $whereUpdate" . mysql_escape_string(getSqlWhere($_REQUEST['idInbox'])); // get the where of the current inbox where we do the import csv to not update statut 0 for exemple.
+            $query = "SELECT APP_UID FROM $tableName WHERE $whereUpdate" . mysql_escape_string(getSqlWhere($_REQUEST['idInbox']));
             $updateData = executeQuery($query);
+            //G::pr($appDataNew); die;
             if (sizeof($updateData))
-            {  
+            {
                 $user = userInfo($USR_UID);
                 foreach ($updateData as $index)
                 {
@@ -3214,7 +3258,7 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                     $appDataNew = array_merge($FieldsCase['APP_DATA'], $appDataNew);
                     $FieldsCase['APP_DATA'] = $appDataNew;
                     $oCase->updateCase($index['APP_UID'], $FieldsCase);
-                    executeTriggers($proUid, $index['APP_UID'], $USR_UID);
+                    frexecuteTriggers($proUid, $index['APP_UID'], $USR_UID);
                 }
             }
             elseif ( $updateOnly == 0 )
@@ -3240,34 +3284,35 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
         }
         $totalCases++;
     }
-    // genDataReport($tableName);
+    //genDataReport($tableName);
     # create file tmp
     createFileTmpCSV($csv, $csv_file);
     # end create file tmp
     unset($_SESSION['REQ_DATA_CSV']);
     return $totalCases;
 }
-function importCreateCaseTruncate($jsonMatchFields, $uidTask, $tableName, $firstLineHeader) {
-    // delete cases
-    $query = "SELECT APP_UID FROM $tableName ";
+function importCreateCaseTruncate($jsonMatchFields,$uidTask, $tableName,$firstLineHeader)
+{
+   // delete cases 
+    $query = "SELECT APP_UID FROM $tableName "; 
     $deleteData = executeQuery($query);
-    if (sizeof($deleteData))
+    if(sizeof($deleteData))
     {
-        foreach ($deleteData as $index)
-        {
-            $CurDateTime = date('Y-m-d H:i:s');
+        foreach($deleteData as $index)
+        {   
+            $CurDateTime=date('Y-m-d H:i:s');
             //insertHistoryLogPlugin($index['APP_UID'],$_SESSION['USER_LOGGED'],$CurDateTime,'1',$index['APP_UID'],'Delete Case');
-            deletePMCases($index['APP_UID']);
-
+            deletePMCases($index['APP_UID'],$tableName);           
             $dir = PATH_DOCUMENT . $index['APP_UID'];
             DeleteDir($dir);
+           
         }
     }
-    genDataReport($tableName);
-    // end delete cases
+    //genDataReport($tableName);
+    // end delete cases 
     $typeAction = 'ADD';
-    $totalCases = importCreateCase($jsonMatchFields, $uidTask, $tableName, $firstLineHeader, $typeAction);
-
+    $totalCases = importCreateCase($jsonMatchFields,$uidTask,$tableName,$firstLineHeader,$typeAction);
+    
     return $totalCases;
 }
 function DeleteDir($dir) {
@@ -3629,4 +3674,13 @@ function convergence_getDateLastWeek($MoinsNSemaine = 0, $dateReferente = NULL) 
 
     // RETURN
     return $dateSemaine;
+}
+
+function convergence_getDateCreateDemande($num_dossier) {
+    $query = "SELECT DATE_FORMAT(APP_CREATE_DATE, '%d/%m/%Y') AS APP_CREATE_DATE
+                FROM APPLICATION                    
+                WHERE  APP_NUMBER = '$num_dossier'";
+    $res = executeQuery($query);
+    $date = $res[1]['APP_CREATE_DATE'];
+    return $date;
 }

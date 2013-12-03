@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<dynaForm type="pagetable" width ="500" rowsPerPage="5">
+<dynaForm type="pagetable" width="600" rowsPerPage="10">
     <PRESTA_NAME type="text" maxlength="64" validate="Any" required="0" readonly="0" size="20" mode="view" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0" enableHtml="1">
         <en>Nom du partenaire</en>
     </PRESTA_NAME>

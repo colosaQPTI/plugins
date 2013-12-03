@@ -453,8 +453,8 @@ Ext.onReady(function()
 	});*/
 	
 	var messagePager = 'No Accounts to show';
-	var messageConfig = '<div align="center"><b> ** Aucun résultat trouvé ** </b></div>';
-	var displayMsg = 'Accounts {0} - {1} Of {2}';
+ 	var messageConfig = '<div align="center"><b> ** Aucun r&#233;sultat trouv&#233; ** </b></div>';
+ 	var displayMsg  = 'Accounts {0} - {1} Of {2}';
 	
 	if(filterSearch == '1'){
 
@@ -597,18 +597,33 @@ Ext.onReady(function()
 		items:[gridInboxDinamic], 
 		tbar: ToolForm
 	}); 
-	
-	var displayNewPanel = new Ext.Panel({
-		width        : 650,
-		height       : 300,
-		layout       : 'hbox',
-		title		 : nameInbox,
-		defaults     : { flex : 1 }, //auto stretch
-		layoutConfig : { align : 'stretch' },
-		items        : [
-		                gridInboxDinamic
-		]			
-	});
+
+    if (filterSearch == '1') {
+        var displayNewPanel = new Ext.Panel({
+            width: 650,
+            height: 300,
+            layout: 'hbox',
+            title: nameInbox,
+            defaults: {flex: 1}, //auto stretch
+            layoutConfig: {align: 'stretch'},
+            items: [
+                gridInboxDinamic
+            ]
+        });
+    }
+    if (filterSearch == '0') {
+        var displayNewPanel = new Ext.Panel({
+            width: 650,
+            height: 300,
+            layout: 'hbox',
+            //title		 : nameInbox,
+            defaults: {flex: 1}, //auto stretch
+            layoutConfig: {align: 'stretch'},
+            items: [
+                gridInboxDinamic
+            ]
+        });
+    }
 
 	var viewport = new Ext.Viewport({
 		layout : 'fit',

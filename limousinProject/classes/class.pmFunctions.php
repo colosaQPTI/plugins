@@ -717,6 +717,51 @@ function limousinProject_removeWrapFileAqoba($list_file) {
     return FALSE;
 }
 
+/*  Supprime les lignes d'entête et de fin de fichier fournie par AQOBA
+ *
+ * @param   array   $list_file  liste des fichiers sur la machine PM en local
+ *
+ * @return  array   $list_file  liste des fichiers modifiés sur la machine PM en local
+ */
+function limousinProject_removeWrapFileAqobaTransaction($list_file) {
+    if (!empty($list_file))
+    {
+        foreach ($list_file as $file)
+        {
+            $content = file($file);
+            if (!empty($content))
+            {
+                $first = array_shift($content);
+                $new_content = implode('', $content);
+                $fp = fopen($file, 'w+');
+                $w = fwrite($fp, $new_content);
+                fclose($fp);
+            }
+        }
+        return TRUE;
+    }
+    return FALSE;
+}
+
+function limousinProject_importFromFileTransaction($file)
+{
+    if(($handle = fopen($file, "r")) !== FALSE)
+    {
+        while(($data = fgetcsv($handle, 500, ";")) !== FALSE)
+        {
+            $valuesQuery .= '("'.$data[0].'","'.$data[1].'","'.$data[2].'","'.$data[3].'","'.$data[4].'","'.$data[5].'","'.($data[6]*100).'","'.$data[7].'","'.$data[8].'","'.$data[9].'","'.$data[10].'","'.$data[11].'","'.$data[12].'","'.$data[13].'","'.$data[14].'"), ';
+        }
+        $valuesQuery = substr($valuesQuery, 0, -2);
+        $insertQuery = 'INSERT INTO PMT_TRANSACTIONS(NOM_OFFRE, SOCIETE_CLIENTE, ID_PORTEUR, DATE_EFFECTIVE, DATE_COMPENSATION, TYPE_TRANSACTION, '.
+                       ' MONTANT_NET, DEVISE, C_RAISON_SOCIALE, ADRESSE_COMMERCANT, CP_COMMERCANT, CODE_MCC, LIBELLE_MCC, ID_COMMERCANT, ID_TRANSACTION) VALUES ';
+        $insertQuery .= $valuesQuery;
+        executeQuery($insertQuery);
+        //mail('quentin@oblady.fr', 'plop', var_export($insertQuery, true));
+        fclose($handle);
+        unlink($file);
+    }
+}
+
 function limousinProject_updateFromAQPORTREJ($file) {
 //on récupère le contenu du fichier
     $content = file($file);
@@ -1196,4 +1241,27 @@ function limousinProject_getFileEtatTransaction($path = '/var/tmp/Etat_Transacti
         return NULL;
     }
 }
+
+function limousinProject_updateEtabNameFromRNE($rne)
+{
+    $query = "SELECT NOM FROM PMT_ETABLISSEMENT WHERE RNE='".$rne."'";
+    $result = executeQuery($query);
+    if(!empty($result))
+    {
+        $nomEtab = $result[1]['NOM'];
+    }
+    return $nomEtab;
+}
+
+function limousinProject_getLibelleFromCodeReseau($codeReseau)
+{
+    $query = "SELECT LIBELLE FROM PMT_THEMATIQUES WHERE CODE_RESEAU=".$codeReseau;
+    $result = executeQuery($query);
+    if(!empty($result))
+    {
+        $libelle = $result[1]['LIBELLE'];
+    }
+    return $libelle;
+}
+
 ?>
