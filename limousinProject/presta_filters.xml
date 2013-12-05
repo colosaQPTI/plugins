@@ -3,15 +3,8 @@
     <TITLE_SEARCH type="title" enablehtml="0" btn_cancel="Cancel">
         <en>Recherche :</en>
     </TITLE_SEARCH>
-    <THEMATIQUE type="dropdown" maxlength="64" validate="Any" required="0" readonly="0" size="15" mode="edit" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0">
-        <en>Thématique : <option name=""/>
-            <option name="165"><![CDATA[Cinéma]]></option>
-            <option name="166"><![CDATA[Spectacle Vivant]]></option>
-            <option name="167"><![CDATA[Achat de livre et de produits multimédia]]></option>
-            <option name="168"><![CDATA[Arts Plastiques]]></option>
-            <option name="169"><![CDATA[Manifestation ou évènement sportif]]></option>
-            <option name="170"><![CDATA[Adhésion pratique sportive ou artistique]]></option>
-        </en>
+    <THEMATIQUE type="dropdown" maxlength="64" validate="Any" required="0" readonly="0" size="15" mode="edit" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="workflow" savelabel="0">SELECT CODE_RESEAU, LIBELLE FROM PMT_THEMATIQUES
+        <en>Thématique : <option name=""/></en>
     </THEMATIQUE>
     <PRESTA_NAME type="text" maxlength="64" validate="Any" required="0" readonly="0" size="15" mode="edit" btn_cancel="Cancel" mask="" strto="" dependentfields="" defaultvalue="" hint="" formula="" function="" sqlconnection="" savelabel="0">
         <en>Nom du partenaire</en>

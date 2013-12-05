@@ -1,6 +1,4 @@
 <?php
-ini_set ( 'error_reporting', E_ALL );
-ini_set ( 'display_errors', True );
 G::LoadClass ( 'case' );
 G::LoadClass ( 'pmFunctions' );
 
@@ -14,19 +12,19 @@ $res = false;
 
 if (isset ( $_POST ['idRoles'] ) && isset( $_POST ['idInbox']) ) {
 	
-	$qInboxRoles = executeQuery("SELECT POSITION FROM PMT_INBOX_ROLES WHERE ROL_CODE = '" .$_POST ['idRoles'] ."' AND ID_INBOX = '" . $_POST ['idInbox'] ."'");
+	$qInboxRoles = executeQuery("SELECT POSITION FROM PMT_INBOX_ROLES WHERE ROL_CODE = '" .mysql_escape_string($_POST ['idRoles']) ."' AND ID_INBOX = '" . $_POST ['idInbox'] ."'");
 	if(count($qInboxRoles))
 		$positionField = $qInboxRoles[1]['POSITION'];
 	
-	$delete = executeQuery ( "DELETE FROM PMT_INBOX_FIELDS WHERE ROL_CODE = '" . $_POST ['idRoles'] . "' AND  ID_INBOX = '" . $_POST ['idInbox'] . "' " );
-	$delete = executeQuery ( "DELETE FROM PMT_INBOX_ROLES WHERE ROL_CODE = '" . $_POST ['idRoles'] . "' AND  ID_INBOX = '" . $_POST ['idInbox'] . "' " );
-	$delete = executeQuery ( "DELETE FROM PMT_INBOX_FILTERS WHERE ROL_CODE = '" . $_POST ['idRoles'] . "' AND  ID_INBOX = '" . $_POST ['idInbox'] . "' " );
-	$delete = executeQuery ( "DELETE FROM PMT_INBOX_JOIN WHERE JOIN_ROL_CODE = '" . $_POST ['idRoles'] . "' AND  JOIN_ID_INBOX = '" . $_POST ['idInbox'] . "' " );
-	$delete = executeQuery ( "DELETE FROM PMT_INBOX_PARENT_TABLE WHERE ROL_CODE = '" . $_POST ['idRoles'] . "' AND  ID_INBOX = '" . $_POST ['idInbox'] . "' " );
+	$delete = executeQuery ( "DELETE FROM PMT_INBOX_FIELDS WHERE ROL_CODE = '" . mysql_escape_string($_POST ['idRoles']) . "' AND  ID_INBOX = '" . $_POST ['idInbox'] . "' " );
+	$delete = executeQuery ( "DELETE FROM PMT_INBOX_ROLES WHERE ROL_CODE = '" . mysql_escape_string($_POST ['idRoles']) . "' AND  ID_INBOX = '" . $_POST ['idInbox'] . "' " );
+	$delete = executeQuery ( "DELETE FROM PMT_INBOX_FILTERS WHERE ROL_CODE = '" . mysql_escape_string($_POST ['idRoles']) . "' AND  ID_INBOX = '" . $_POST ['idInbox'] . "' " );
+	$delete = executeQuery ( "DELETE FROM PMT_INBOX_JOIN WHERE JOIN_ROL_CODE = '" . mysql_escape_string($_POST ['idRoles']) . "' AND  JOIN_ID_INBOX = '" . $_POST ['idInbox'] . "' " );
+	$delete = executeQuery ( "DELETE FROM PMT_INBOX_PARENT_TABLE WHERE ROL_CODE = '" . mysql_escape_string($_POST ['idRoles']) . "' AND  ID_INBOX = '" . $_POST ['idInbox'] . "' " );
 	
 	if(!isset($positionField))
 	{
-		$qPos = "SELECT max(POSITION) AS POSITION FROM PMT_INBOX_ROLES WHERE ROL_CODE = '" . $_POST ['idRoles'] . "' ";
+		$qPos = "SELECT max(POSITION) AS POSITION FROM PMT_INBOX_ROLES WHERE ROL_CODE = '" . mysql_escape_string($_POST ['idRoles']) . "' ";
 		$position = executeQuery ( $qPos );
 		$positionField = $position [1] ['POSITION'];
 		$positionField = $positionField + 1;
@@ -36,20 +34,8 @@ if (isset ( $_POST ['idRoles'] ) && isset( $_POST ['idInbox']) ) {
 	$maxId = executeQuery ( $queryId );
 	$sgtId = $maxId[1]['MAX_ID'] + 1;
 			
-	$insert = "INSERT INTO PMT_INBOX_ROLES ( 
-					ID,
-					ROL_CODE,
-					ID_INBOX,
-					POSITION
-				)
-				VALUES (
-				'" . $sgtId . "',
-				'" . $_POST ['idRoles'] . "',
-				'" . $_POST ['idInbox'] . "',
-				'" . $positionField ."'
-				)
-    	
-			  ";
+	$insert = "INSERT INTO PMT_INBOX_ROLES (ID, ROL_CODE, ID_INBOX, POSITION)
+				VALUES ('" . $sgtId . "', '" . mysql_escape_string($_POST ['idRoles']) . "', '" . $_POST ['idInbox'] . "', '" . $positionField ."')";
 	executeQuery ( $insert );
 	
 	if(isset($_POST ['idTable']) && $_POST ['idTable'] != '')
@@ -57,21 +43,10 @@ if (isset ( $_POST ['idRoles'] ) && isset( $_POST ['idInbox']) ) {
 		$queryId = "SELECT max(ID) AS MAX_ID FROM  PMT_INBOX_PARENT_TABLE  ";
 		$maxId = executeQuery ( $queryId );
 		$sgtId = $maxId[1]['MAX_ID'] + 1;
-		$insert = "INSERT INTO PMT_INBOX_PARENT_TABLE (  
-						ID,
-						ID_TABLE,
-						ID_INBOX,
-						ROL_CODE
-					)
-					VALUES (
-						'" . $sgtId . "',
-						'" . $_POST ['idTable'] . "',
-						'" . $_POST ['idInbox'] . "',
-						'" . $_POST ['idRoles'] . "'
-					)";
+		$insert = "INSERT INTO PMT_INBOX_PARENT_TABLE (ID, ID_TABLE, ID_INBOX, ROL_CODE)
+					VALUES ('" . $sgtId . "', '" . $_POST ['idTable'] . "', '" . $_POST ['idInbox'] . "', '" . mysql_escape_string($_POST ['idRoles']) . "')";
 		executeQuery ( $insert );
 	}
-	
 }
 
 $data = json_decode ( $_POST ['myArray'] );
@@ -89,7 +64,7 @@ foreach ( $data as $name => $value )
 	$aliasTable = $value->aliasTable;
 	$orderBy = $value->orderBy;
 	
-	$queryPos = "SELECT max(POSITION) AS POSITION FROM  PMT_INBOX_FIELDS WHERE ROL_CODE = '" . $idRoles . "'  AND  ID_INBOX = '" . $_POST ['idInbox'] . "' ";
+	$queryPos = "SELECT max(POSITION) AS POSITION FROM  PMT_INBOX_FIELDS WHERE ROL_CODE = '" . mysql_escape_string($idRoles) . "'  AND  ID_INBOX = '" . $_POST ['idInbox'] . "' ";
 	$position = executeQuery ( $queryPos );
 	$positionField = $position [1] ['POSITION'];
 	$positionField = $positionField + 1;
@@ -117,20 +92,20 @@ foreach ( $data as $name => $value )
 					ORDER_BY
 				)
 				VALUES (
-				'" . $sgtId . "',
-				'" . $idField . "',
-				'" . $idRoles . "',
-				'" . $descripField . "',
-				'1',
-				'" . $positionField . "',
-				'" . $idField . "',
-				'" . $idTable . "',
-				'" . $fieldChange . "',
-				'" . $idInbox . "',
-				'" . $hiddenField . "',
-				'" . $filterField . "',
-				'" . $aliasTable . "',
-				'" . $orderBy . "'
+					'" . $sgtId . "',
+					'" . $idField . "',
+					'" . mysql_escape_string($idRoles) . "',
+					'" . $descripField . "',
+					'1',
+					'" . $positionField . "',
+					'" . $idField . "',
+					'" . $idTable . "',
+					'" . $fieldChange . "',
+					'" . $idInbox . "',
+					'" . $hiddenField . "',
+					'" . $filterField . "',
+					'" . $aliasTable . "',
+					'" . $orderBy . "'
 				)
     	
 		";
@@ -140,7 +115,7 @@ foreach ( $data as $name => $value )
 	{
 		$update = "UPDATE  PMT_INBOX_FIELDS  SET
 				   FIELD_NAME = '" . $fieldChange . "'
-				   WHERE FLD_UID = '" . $idField . "' AND ROL_CODE = '" . $idRoles . "'
+				   WHERE FLD_UID = '" . $idField . "' AND ROL_CODE = '" . mysql_escape_string($idRoles) . "'
 					   ";
 		executeQuery($update);
 	}
@@ -153,16 +128,14 @@ foreach ( $data as $name => $value )
 						ID_TABLE,
 						FIELD_NAME,
 						DESCRIPTION_FILTER
-						)
-						VALUES (
-						'" . $_POST ['idRoles'] . "',
+					)
+					VALUES (
+						'" . mysql_escape_string($_POST ['idRoles']) . "',
 						'" . $_POST ['idInbox'] . "',
 						'" . $idTable . "',
 						'" . $idField . "',
 						'" . $descripField . "'
-						)
-    	
-			  			";
+					)";
 		executeQuery ( $insert );
 	}
 	if($innerJoin != '')
@@ -171,19 +144,15 @@ foreach ( $data as $name => $value )
 						JOIN_QUERY,
 						JOIN_ID_INBOX,
 						JOIN_ROL_CODE
-						)
-						VALUES (
+					)
+					VALUES (
 						'" . $innerJoin . "',
 						'" . $_POST ['idInbox'] . "',
-						'" . $_POST ['idRoles'] . "'
-						)
-    	
-			  			";
-			executeQuery ( $insert );
+						'" . mysql_escape_string($_POST ['idRoles']) . "'
+					)";
+		executeQuery ( $insert );
 	}	
-	
 	$res = true;
-
 }
 
 $save = array ('success' => $res );

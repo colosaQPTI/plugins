@@ -1,6 +1,4 @@
 <?php
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', True); 
 G::LoadClass ( 'case' );
 G::LoadClass ( 'pmFunctions' );
 $form=$_POST;
@@ -11,7 +9,7 @@ function removeSelectQueryInbox($id){
 	
 	$selectInbox = "SELECT ALIAS_ID_INBOX FROM PMT_INBOX_FIELDS_SELECT 
 					WHERE ID = '$id' ";
-	$idAliasInbox = executeQUery($selectInbox);
+	$idAliasInbox = executeQuery($selectInbox);
 	
 	$sql = "DELETE FROM PMT_INBOX_FIELDS_SELECT WHERE ID = " . $id;
 	executeQuery($sql);
@@ -54,7 +52,6 @@ function editSelectQueryInbox($idSelect,$data,$dataFields, $rolID, $idInbox)
 		}
 		$i++;
 	}
-	//print($dataFields); die;
 	$newFielData = explode('AS',$data);
 	if(sizeof($newFielData) <= 1)
 	{
@@ -92,11 +89,11 @@ function editSelectQueryInbox($idSelect,$data,$dataFields, $rolID, $idInbox)
 	
 	$updateSelect="UPDATE PMT_INBOX_FIELDS_SELECT SET
 			FIELDS = '$dataFields',
-			ROL_CODE = '$rolID',
+			ROL_CODE = '".mysql_escape_string($rolID)."',
 			ID_INBOX = '$idInbox',
 			QUERY_SELECT = '$data',
 			FIELD_NAME = '$newField'
-			WHERE ROL_CODE = '$rolID' 
+			WHERE ROL_CODE = '".mysql_escape_string($rolID)."'
 			AND ID_INBOX = '$idInbox'
 			AND ID = '$idSelect'
 			AND TYPE != 'Yes'
@@ -105,17 +102,17 @@ function editSelectQueryInbox($idSelect,$data,$dataFields, $rolID, $idInbox)
 	executeQuery($updateSelect);
 
 	$selectInbox = "SELECT ALIAS_ID_INBOX FROM PMT_INBOX_FIELDS_SELECT 
-					WHERE ROL_CODE = '$rolID' AND ID_INBOX = '$idInbox' AND ID = '$idSelect' AND ID_INBOX = '$idInbox' AND TYPE != 'Yes' ";
-	$idAliasInbox = executeQUery($selectInbox);
+					WHERE ROL_CODE = '".mysql_escape_string($rolID)."' AND ID_INBOX = '$idInbox' AND ID = '$idSelect' AND ID_INBOX = '$idInbox' AND TYPE != 'Yes' ";
+	$idAliasInbox = executeQuery($selectInbox);
 	if(sizeof($idAliasInbox))
 	{
 		$updateInbox="UPDATE PMT_INBOX_FIELDS SET
 			FLD_UID = '$newField',
-			ROL_CODE = '$rolID',
+			ROL_CODE = '".mysql_escape_string($rolID)."',
 			ID_INBOX = '$idInbox',
 			DESCRIPTION = '$newField',
 			FIELD_NAME = '$newField'
-			WHERE ROL_CODE = '$rolID' 
+			WHERE ROL_CODE = '".mysql_escape_string($rolID)."' 
 			AND ID_INBOX = '$idInbox'
 			AND ID = '".$idAliasInbox[1]['ALIAS_ID_INBOX']."'
 			";
@@ -195,7 +192,7 @@ function addSelectQueryInbox($data,$dataFields, $rolID, $idInbox, $idFieldTable)
 		$newField = trim($newFielData[1]);
 	}
 			
-	$queryPos = "SELECT max(POSITION) AS POSITION FROM  PMT_INBOX_FIELDS WHERE ROL_CODE = '" . $rolID . "'  AND  ID_INBOX = '" . $idInbox . "' ";
+	$queryPos = "SELECT max(POSITION) AS POSITION FROM  PMT_INBOX_FIELDS WHERE ROL_CODE = '".mysql_escape_string($rolID)."'  AND  ID_INBOX = '" . $idInbox . "' ";
 	$position = executeQuery ( $queryPos );
 	$positionField = $position [1] ['POSITION'];
 	$positionField = $positionField + 1;
@@ -223,20 +220,20 @@ function addSelectQueryInbox($data,$dataFields, $rolID, $idInbox, $idFieldTable)
 					ORDER_BY
 				)
 				VALUES (
-				'" . $sgtIdIn ."',
-				'" . $newField . "',
-				'" . $rolID . "',
-				'" . $newField . "',
-				'1',
-				'" . $positionField . "',
-				'" . $newField . "',
-				'',
-				'',
-				'" . $idInbox . "',
-				'0',
-				'0',
-				'',
-				''
+					'" . $sgtIdIn ."',
+					'" . $newField . "',
+					'" . mysql_escape_string($rolID) . "',
+					'" . $newField . "',
+					'1',
+					'" . $positionField . "',
+					'" . $newField . "',
+					'',
+					'',
+					'" . $idInbox . "',
+					'0',
+					'0',
+					'',
+					''
 				)
     	
 			";
@@ -248,7 +245,7 @@ function addSelectQueryInbox($data,$dataFields, $rolID, $idInbox, $idFieldTable)
 		
 	
 	$selectID = "SELECT ID FROM PMT_INBOX_FIELDS 
-						WHERE FLD_UID = '".$newField."' AND  ROL_CODE = '".$rolID."' AND FIELD_NAME = '".$newField."' AND ID_INBOX = '".$idInbox."'  ";
+					WHERE FLD_UID = '".$newField."' AND  ROL_CODE = '".mysql_escape_string($rolID)."' AND FIELD_NAME = '".$newField."' AND ID_INBOX = '".$idInbox."'  ";
 	$dataId = 	executeQuery($selectID);
 	$type = '';
 	if($idFieldTable != 0)
@@ -267,32 +264,28 @@ function addSelectQueryInbox($data,$dataFields, $rolID, $idInbox, $idFieldTable)
 				TYPE 
 			)
 			VALUES (
-			'". $sgtId ."',
-			'". $newField ."',
-			'". $dataFields ."',
-			'". $rolID ."',
-			'". $idInbox ."',
-			'". $data ."',
-			'". $newField ."', 
-			'". $dataId[1]['ID'] ."',
-			'". $type ."'
+				'". $sgtId ."',
+				'". $newField ."',
+				'". $dataFields ."',
+				'". mysql_escape_string($rolID) ."',
+				'". $idInbox ."',
+				'". $data ."',
+				'". $newField ."', 
+				'". $dataId[1]['ID'] ."',
+				'". $type ."'
 			)";
 	executeQuery($queryItemFile);
 	
 	$newFielData = $newFielData[0];
 	$newFielDataTable = explode('.',$newFielData);
-	$idTable = trim($newFielDataTable[0]);
-	$idField = trim($newFielDataTable[1]);
-		//print($idFieldTable.'   ');
+
 	if($idFieldTable != 0)
 	{
 		$update = "UPDATE PMT_INBOX_FIELDS SET INCLUDE_OPTION = '0'
 						WHERE ID = '".$idFieldTable."' ";
 		executeQuery($update);
 	}
-		
-		
-	
+
 	$res = true;
 	$save = array ('success' => $res );
 	echo json_encode ( $save );
@@ -310,7 +303,7 @@ switch ($method) {
 		$dataParameters = str_replace("'", '"', $dataParameters);
 		if(isset($_POST ['rolID']) && $_POST ['rolID']!='')
 		{
-			$delQuery = "DELETE FROM PMT_INBOX_FIELDS_SELECT WHERE ROL_CODE = '" . $_POST ['rolID'] . "' AND ID_INBOX = '" . $_POST ['idInbox'] ."' AND QUERY_SELECT = '" . $dataParameters . "' ";
+			$delQuery = "DELETE FROM PMT_INBOX_FIELDS_SELECT WHERE ROL_CODE = '" . mysql_escape_string($_POST ['rolID']) . "' AND ID_INBOX = '" . $_POST ['idInbox'] ."' AND QUERY_SELECT = '" . $dataParameters . "' ";
 			$delete = executeQuery ($delQuery);
 		}
 		

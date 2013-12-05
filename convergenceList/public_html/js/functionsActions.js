@@ -5280,7 +5280,7 @@ function listeTransactions(porteurId)
 
 function message(mess)
 {
-    Ext.Msg.alert('Confirmed', mess, function(btn, text) {
+    Ext.Msg.alert('Confirmation', mess, function(btn, text) {
         if (btn == 'ok') {
             Ext.getCmp('win2').hide();
         }

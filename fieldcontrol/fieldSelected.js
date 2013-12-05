@@ -154,7 +154,7 @@ Ext.onReady(function()
 	 functionsStore.load();
 	
 	 var store = new Ext.data.JsonStore({
-			url           : 'ajaxListRoles.php?rolID=' + rolID,
+			url           : 'ajaxListRoles.php?rolID=' + encodeURIComponent(rolID),
 			root          : 'data',
 			totalProperty : 'total', 
 			remoteSort    : true,
@@ -174,7 +174,6 @@ Ext.onReady(function()
 			                 	}
 			                 }]
 			});
-		//store.load();
 		 
 	var TableCombo = new Ext.form.ComboBox({
 		valueField    : 'ID',
@@ -208,7 +207,6 @@ Ext.onReady(function()
 		 		buttonConcat = Ext.getCmp('idConcatFields');
 		 		buttonConcat.setDisabled(false);
 		 		Ext.getCmp('idQuery').setValue('');
-		 		//Ext.getCmp('idQuery').setValue(record.data.INNER_JOIN);
 		 		idInbox = Ext.getCmp('idInboxCombo').getValue();	
 				store.load({
 					params : {
@@ -257,7 +255,7 @@ Ext.onReady(function()
 		        params : {
 		          "idInbox" : ID_INBOX
 		        },
-		        url : '../fieldcontrol/ajaxListRoles.php?rolID=' + rolID
+		        url : '../fieldcontrol/ajaxListRoles.php?rolID=' + encodeURIComponent(rolID)
 		        ,
 		        success : function(result) {
 			          var data = Ext.util.JSON.decode(result.responseText);
@@ -552,7 +550,7 @@ Ext.onReady(function()
     };
     
     var FieldNameStore = new Ext.data.Store({
-        proxy: new Ext.data.HttpProxy({url: 'ajaxInnerJoin.php?rolID=' + rolID}),
+        proxy: new Ext.data.HttpProxy({url: 'ajaxInnerJoin.php?rolID=' + encodeURIComponent(rolID)}),
         
         reader: new Ext.data.JsonReader({
             root: 'data',
@@ -669,7 +667,6 @@ Ext.onReady(function()
 		                    }
 						}
 		         }) 
-				//store.load();
 		      }
 		   }
 		},
@@ -1021,7 +1018,7 @@ Ext.onReady(function()
 		  });
 		
 		var FieldsRepeat_popup_store = new Ext.data.JsonStore({
-			url : 'ajaxConcatFields.php?actionInbox_id='+idInbox+'&rolID='+rolID + '&type=verify' + '&dataVerify=' + myArray,
+			url : 'ajaxConcatFields.php?actionInbox_id='+idInbox+'&rolID=' + encodeURIComponent(rolID) + '&type=verify' + '&dataVerify=' + myArray,
 			root : 'data',
 			totalProperty : 'total',
 			autoWidth : true,
@@ -1336,7 +1333,7 @@ Ext.onReady(function()
 		idTable   = Ext.getCmp('idTableCombo').getValue();
 			ROLE_CODE = rolID;
 			var WhereInbox_popup_store = new Ext.data.JsonStore({
-				url : 'ajaxWhereInboxPopup.php?actionInbox_id='+ID_INBOX+'&rolID='+rolID,	
+				url : 'ajaxWhereInboxPopup.php?actionInbox_id='+ID_INBOX+'&rolID='+ encodeURIComponent(rolID),	
 				root : 'data',
 				totalProperty : 'total',
 				autoWidth : true,
@@ -1428,7 +1425,6 @@ Ext.onReady(function()
 				      selectSingle: false,
 				      listeners:{
 						rowselect: function(sm,index,record){
-							//console.log(record.data);
 							var tableName = record.data.TABLE_NAME;
 							if(tableName != 'PMT_INBOX_WHERE_USER')
 							{
@@ -1482,7 +1478,7 @@ Ext.onReady(function()
 		var ID = Ext.getCmp('idInboxCombo').getValue();
 	    var ID_INBOX = Ext.getCmp('idInboxCombo').getValue();
 		var ActionInbox_popup_store = new Ext.data.JsonStore({
-		        url : 'ajaxActionInboxPopup.php?actionInbox_id='+ID_INBOX+'&rolID='+rolID,
+		        url : 'ajaxActionInboxPopup.php?actionInbox_id='+ID_INBOX+'&rolID='+ encodeURIComponent(rolID),
 		        root : 'data',
 		        totalProperty : 'total',
 		        autoWidth : true,
@@ -1596,7 +1592,6 @@ Ext.onReady(function()
 					                    }
 									}
 					         }) 
-							//store.load();
 					      }
 					   }
 					},
@@ -1640,7 +1635,7 @@ Ext.onReady(function()
 		// add Grid parameters Action
 		
 		var gridParametersAction_store = new Ext.data.JsonStore({
-	        url : 'FieldsInboxRoles_Ajax.php?actionInbox_id='+ID_INBOX+'&rolID='+rolID,
+	        url : 'FieldsInboxRoles_Ajax.php?actionInbox_id='+ID_INBOX+'&rolID=' + encodeURIComponent(rolID),
 	        root : 'data',
 	        totalProperty : 'total',
 	        autoWidth : true,
@@ -1739,7 +1734,6 @@ Ext.onReady(function()
 		        	
 			});					
 			
-			    // grid.render('div_form');
 			add_ActionInbox_popup_form = new Ext.FormPanel({
 			id: 'add_ActionInbox_popup_form',								  
 			labelAlign: 'top',
@@ -1902,7 +1896,7 @@ Ext.onReady(function()
 			// add Grid parameters Action
 			
 				var gridParametersAction_store = new Ext.data.JsonStore({
-			        url : 'FieldsInboxRoles_Ajax.php?actionInbox_id='+ID_INBOX+'&rolID='+rolID,
+			        url : 'FieldsInboxRoles_Ajax.php?actionInbox_id='+ID_INBOX+'&rolID=' + encodeURIComponent(rolID),
 			        root : 'data',
 			        totalProperty : 'total',
 			        autoWidth : true,
@@ -2157,7 +2151,6 @@ Ext.onReady(function()
 	
 	function saveActions_DragAndDrop(ActionInbox_popup_store)
 	{
-			//'ID', 'NAME', 'DESCRIPTION','PM_FUNCTION','PARAMETERS_FUNCTION','PARAMETERS_FUNCTION_AUX','ID_ACTION','SENT_FUNCTION_PARAMETERS'
 			var i  = 0;
 			var arrayActionsInbox = new Array ();
 			var myJSON  = '';
@@ -2219,9 +2212,6 @@ Ext.onReady(function()
 		          		},
 		        success: function(r,o){
 		          		Ext.MessageBox.hide();
-		          		//var data = Ext.decode(r.response.responseText);
-	  		        //var url = data.success; 
-	                //if (url == true) {
 	                    Ext.MessageBox.show({                            
 	                         msg : MsgOperation,
 	                         buttons : Ext.MessageBox.OK,
@@ -2305,7 +2295,7 @@ Ext.onReady(function()
 				});
 
 				var byFields_Action_store = new Ext.data.JsonStore({
-				        url : 'ajaxActionInboxPopup.php?actionInbox_id='+ID_INBOX+'&rolID='+rolID + '&idAction=' + idAction,
+				        url : 'ajaxActionInboxPopup.php?actionInbox_id='+ID_INBOX+'&rolID=' + encodeURIComponent(rolID) + '&idAction=' + idAction,
 				        root : 'data',
 				        totalProperty : 'total',
 				        autoWidth : true,
@@ -2347,7 +2337,6 @@ Ext.onReady(function()
 			    		hidden	  	: false,
 			    		items     	: [{
 			    			iconCls :'button_menu_ext ss_cleardata',
-			    			//icon    : '/plugin/fieldcontrol/clear.png', 
 			    			tooltip : 'Clean',
 			    			handler : function(grid, rowIndex, colIndex) {
 								var rec = grid.getStore().getAt(rowIndex);
@@ -2405,13 +2394,6 @@ Ext.onReady(function()
 					autoScroll  	: true,
 			        items       	: byFields_Action_grid,
 			        layout      	: 'fit'
-				   /* buttons:[{
-						iconCls:'boton-guardar',
-						text:'Close Panel',
-						handler: function(){
-				    		byFields.destroy();
-						}
-					}]*/
 				});
 				
 				byFields.show();	
@@ -2430,7 +2412,6 @@ Ext.onReady(function()
 				var swByFields = 0;
 				byFields_Action_store.each(function(record)  
 				{  
-					//console.log(record);
 					if(record.get('INCLUDE_SELECT') == true)
 					{
 						if(record.get('OPERATOR') != '')
@@ -2509,9 +2490,6 @@ Ext.onReady(function()
 		          		},
 		        success: function(r,o){
 		          		Ext.MessageBox.hide();
-		          		//var data = Ext.decode(r.response.responseText);
-	  		        //var url = data.success; 
-	                //if (url == true) {
 	                    Ext.MessageBox.show({                            
 	                         msg : 'The operation completed sucessfully!',
 	                         buttons : Ext.MessageBox.OK,
@@ -2543,7 +2521,7 @@ Ext.onReady(function()
 			var	idTable = Ext.getCmp('idTableCombo').getValue();
 			var ConcatFields_store = new Ext.data.JsonStore({
 			
-			        url : 'ajaxConcatFields.php?idInboxData='+ID_INBOX+'&rolID=' + rolID + '&idTable=' + idTable,
+			        url : 'ajaxConcatFields.php?idInboxData='+ID_INBOX+'&rolID=' + encodeURIComponent(rolID) + '&idTable=' + idTable,
 			        root : 'data',
 			        totalProperty : 'total',
 			        autoWidth : true,
@@ -2669,7 +2647,7 @@ Ext.onReady(function()
 			var	idTable = Ext.getCmp('idTableCombo').getValue();
 			var innerJoin = Ext.getCmp('idQuery').getValue();
 			var gridSelectQuey_store = new Ext.data.JsonStore({
-		        url : 'ajaxListFieldInbox.php?idInboxData='+ID_INBOX+'&rolID='+rolID + '&idTable=' + idTable ,
+		        url : 'ajaxListFieldInbox.php?idInboxData='+ID_INBOX+'&rolID='+encodeURIComponent(rolID) + '&idTable=' + idTable ,
 		        root : 'data',
 		        totalProperty : 'total',
 		        autoWidth : true,
@@ -2691,7 +2669,6 @@ Ext.onReady(function()
 				      selectSingle: false,
 				      listeners:{
 				        selectionchange: function(sm){
-				          //console.log('select');
 				        }
 				      }
 				    }),
@@ -2717,7 +2694,6 @@ Ext.onReady(function()
 		    	   textParameters = Ext.getCmp('parametersfield').getValue();
 		    	   if(textParameters.length == 0)
 						 Ext.getCmp('parametersfieldAux').setValue(''); 
-		    	   //console.log( Ext.getCmp('parametersfieldAux').getValue());
 		    	   add_ParametersQuery(gridSelectQueyFields_store);}
 		       }
 			});
@@ -2732,7 +2708,7 @@ Ext.onReady(function()
 		  	}); 
 		    
 		    var gridSelectQueyFields_store = new Ext.data.JsonStore({
-		        url : 'ajaxListFieldInbox.php?idInboxData='+ID_INBOX+'&rolID='+rolID + '&idTable=' + idTable ,
+		        url : 'ajaxListFieldInbox.php?idInboxData='+ID_INBOX+'&rolID='+encodeURIComponent(rolID) + '&idTable=' + idTable ,
 		        root : 'data',
 		        totalProperty : 'total',
 		        autoWidth : true,
@@ -2794,7 +2770,6 @@ Ext.onReady(function()
 							id : 'idParameters',
 							title : CustomColParameters,
 							xtype : 'fieldset',
-							//checkboxToggle : true,
 							autoHeight : true,
 							defaults : {
 								width : 350
@@ -2816,7 +2791,6 @@ Ext.onReady(function()
 						id : 'idParametersSelect',
 						title : CustomColParameters,
 						xtype : 'fieldset',
-						//checkboxToggle : true,
 						autoHeight : true,
 						hidden: true,
 						defaults : {
@@ -2911,7 +2885,7 @@ Ext.onReady(function()
 			var ID_INBOX = Ext.getCmp('idInboxCombo').getValue();
 			var	idTable = Ext.getCmp('idTableCombo').getValue();
 			var gridSelectQuey_store = new Ext.data.JsonStore({
-		        url : 'ajaxListFieldInbox.php?idInboxData='+ID_INBOX+'&rolID='+rolID + '&idTable=' + idTable ,
+		        url : 'ajaxListFieldInbox.php?idInboxData='+ID_INBOX+'&rolID='+encodeURIComponent(rolID) + '&idTable=' + idTable ,
 		        root : 'data',
 		        totalProperty : 'total',
 		        autoWidth : true,
@@ -2975,7 +2949,6 @@ Ext.onReady(function()
 							id : 'idParameters',
 							title : CustomColParameters,
 							xtype : 'fieldset',
-							//checkboxToggle : true,
 							autoHeight : true,
 							defaults : {
 								width : 300
@@ -3161,7 +3134,6 @@ Ext.onReady(function()
 				 textParametersAux = parameters;
 			 
 			 Ext.getCmp('parametersfieldAux').setValue(textParametersAux);
-			 //console.log( Ext.getCmp('parametersfieldAux').getValue());
 			 var casesGridField_ = Ext.getCmp('gridCenterSelect');
 			 gridSelectQueyFields_store.add(new dateRow({FIELD_NAME: rowSelected.data.FIELD_NAME, FLD_UID: rowSelected.data.FLD_UID, ADD_TAB_NAME: rowSelected.data.ADD_TAB_NAME }));
 			 
@@ -3310,7 +3282,7 @@ Ext.onReady(function()
 
 
 				var configUser_where_store = new Ext.data.JsonStore({
-				        url : 'ajaxListUserData.php?idInboxData='+ID_INBOX+'&rolID='+rolID + '&idTable=' + idTable ,
+				        url : 'ajaxListUserData.php?idInboxData='+ID_INBOX+'&rolID='+encodeURIComponent(rolID) + '&idTable=' + idTable ,
 				        root : 'data',
 				        totalProperty : 'total',
 				        autoWidth : true,
@@ -3425,7 +3397,6 @@ Ext.onReady(function()
 				var swByFields = 0;
 				configUser_where_store.each(function(record)  
 				{  
-					//console.log(record);
 					if(record.get('INCLUDE_SELECT') == true)
 					{
 						if(record.get('OPERATOR') != '')

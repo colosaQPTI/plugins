@@ -1,7 +1,5 @@
 <?php
 
-ini_set ( 'error_reporting', E_ALL );
-ini_set ( 'display_errors', True );
 G::LoadClass ( 'case' );
 G::LoadClass ( 'configuration' );
 G::loadClass ( 'pmFunctions' );
@@ -26,8 +24,7 @@ $total = 0;
 if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '') 
 {
 	$select = "SELECT * FROM PMT_INBOX_FIELDS_SELECT 
-			   WHERE ROL_CODE = '".$_REQUEST ['rolID']."' AND ID_INBOX = '".$_REQUEST ['idInboxData']."' AND (TYPE IS NULL OR TYPE = '')
-			  ";
+			   WHERE ROL_CODE = '".mysql_escape_string($_REQUEST ['rolID'])."' AND ID_INBOX = '".$_REQUEST ['idInboxData']."' AND (TYPE IS NULL OR TYPE = '')";
 	$dataSelect = executeQuery($select);
 	$total = sizeof($dataSelect);
 	foreach($dataSelect as $row)
@@ -39,11 +36,10 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 if (isset ( $_REQUEST ['type'] ) && $_REQUEST ['type'] == 'verify') 
 {		
 	 $select = "SELECT ID, FIELD_NAME, count( FIELD_NAME ) AS count FROM PMT_INBOX_FIELDS
-			   WHERE ROL_CODE = '".$_REQUEST ['rolID']."' AND ID_INBOX = '".$_REQUEST ['actionInbox_id']."' AND  ID_TABLE != ''
-			   GROUP BY FIELD_NAME
-			   HAVING count >1
-			   ORDER BY id ASC
-			  ";
+				WHERE ROL_CODE = '".mysql_escape_string($_REQUEST ['rolID'])."' AND ID_INBOX = '".$_REQUEST ['actionInbox_id']."' AND  ID_TABLE != ''
+				GROUP BY FIELD_NAME
+				HAVING count >1
+				ORDER BY id ASC";
 	$dataVerify = executeQuery($select);
 	$total = sizeof($dataVerify);
 	$i = 0;
@@ -52,12 +48,12 @@ if (isset ( $_REQUEST ['type'] ) && $_REQUEST ['type'] == 'verify')
 		foreach($dataVerify as $row)
 		{
 			$select = "SELECT ID, FIELD_NAME, ID_TABLE, ALIAS_TABLE FROM PMT_INBOX_FIELDS
-			   WHERE ROL_CODE = '".$_REQUEST ['rolID']."' AND ID_INBOX = '".$_REQUEST ['actionInbox_id']."' AND  FIELD_NAME = '".$row['FIELD_NAME']."'
+			   WHERE ROL_CODE = '".mysql_escape_string($_REQUEST ['rolID'])."' AND ID_INBOX = '".$_REQUEST ['actionInbox_id']."' AND  FIELD_NAME = '".$row['FIELD_NAME']."'
 			  ";
 			$dataSelect = executeQuery($select);
 		
 			$selectQuery = "SELECT FIELD_NAME FROM PMT_INBOX_FIELDS_SELECT
-			   WHERE ROL_CODE = '".$_REQUEST ['rolID']."' AND ID_INBOX = '".$_REQUEST ['actionInbox_id']."' AND  FIELDS = '".$row['FIELD_NAME']."'
+			   WHERE ROL_CODE = '".mysql_escape_string($_REQUEST ['rolID'])."' AND ID_INBOX = '".$_REQUEST ['actionInbox_id']."' AND  FIELDS = '".$row['FIELD_NAME']."'
 			  ";
 			$dataSelectQuery = executeQuery($selectQuery);
 			if(sizeof($dataSelectQuery) == 0)
@@ -74,7 +70,7 @@ if (isset ( $_REQUEST ['type'] ) && $_REQUEST ['type'] == 'verify')
 	else 
 	{
 		$delete = "DELETE FROM PMT_INBOX_FIELDS_SELECT WHERE 
-			ROL_CODE = '".$_REQUEST ['rolID']."' AND ID_INBOX = '".$_REQUEST ['actionInbox_id']."' AND  TYPE = 'Yes' ";
+			ROL_CODE = '".mysql_escape_string($_REQUEST ['rolID'])."' AND ID_INBOX = '".$_REQUEST ['actionInbox_id']."' AND  TYPE = 'Yes' ";
 		executeQuery($delete);
 		
 		
@@ -84,13 +80,13 @@ if (isset ( $_REQUEST ['type'] ) && $_REQUEST ['type'] == 'verify')
 			$idRoles = $value->idRoles;
 			$idField = $value->idField;
 			$idInbox = $value->idInbox;
-			$selectQuery = "SELECT * FROM PMT_INBOX_FIELDS_SELECT WHERE ROL_CODE = '".$_REQUEST ['rolID']."' 
+			$selectQuery = "SELECT * FROM PMT_INBOX_FIELDS_SELECT WHERE ROL_CODE = '".mysql_escape_string($_REQUEST ['rolID'])."' 
 							AND ID_INBOX = '".$_REQUEST ['actionInbox_id']."' AND  TYPE = 'Yes' AND FLD_UID = '".$idField."' ";
 			$dataSelect = executeQuery($selectQuery);
 			if(sizeof($dataSelect) == 0)
 			{
 				$deleteInbox = "DELETE FROM PMT_INBOX_FIELDS WHERE 
-							ROL_CODE = '".$_REQUEST ['rolID']."' AND ID_INBOX = '".$_REQUEST ['actionInbox_id']."' AND ALIAS_TABLE = '' 
+							ROL_CODE = '".mysql_escape_string($_REQUEST ['rolID'])."' AND ID_INBOX = '".$_REQUEST ['actionInbox_id']."' AND ALIAS_TABLE = '' 
 							AND  ID_TABLE = '' AND FIELD_NAME = '".$idField."' ";
 				executeQuery($delete);
 			}
@@ -100,7 +96,6 @@ if (isset ( $_REQUEST ['type'] ) && $_REQUEST ['type'] == 'verify')
 	
 }
 
-//G::pr($array);
 $paging = array ('success' => true, 'total' => $total, 'data' => array_splice ( $array, $start, $limit ), 'response' => 'OK' );
 echo json_encode ( $paging );
 

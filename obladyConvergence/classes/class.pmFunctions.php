@@ -217,12 +217,19 @@ function FredirectTypo3($APP_UID) {
                 /* $url = '../convergenceList/casesHistoryDynaformPage_Ajax.php?ACTIONTYPE=edit&actionAjax=historyDynaformGridPreview&DYN_UID=' . $DYN_UID . '&APP_UID=' . $APP_UID . '&PRO_UID=' . $PRO_UID . '&CURRENTDATETIME=' . $CURRENTDATETIME . '&ACTIONSAVE=1';
                   echo "<script language='javascript'> location.href = '" . $url . "';</script>";
                   die(); */
-                echo "<script language=Javascript>parent.parent.message('Vos changements ont \u00E9t\u00E9 enregistr\u00E9s avec succ\u00E9s');</script>";
-                echo "<script language='javascript'>
+                if(!isset($DATA['FLAG_CONFIRM_EDIT']) || $DATA['FLAG_CONFIRM_EDIT'] == '1')
+                {
+                    echo "<script language=Javascript>parent.parent.message('Vos changements ont \u00E9t\u00E9 enregistr\u00E9s avec succ\u00E9s');</script>";
+                    echo "<script language='javascript'>
                     //parent.Ext.getCmp('gridNewTab').store.reload();
                     //parent.parent.Ext.getCmp('win2').hide();
                     </script>";
-                die();
+                    die();
+                }
+                else
+                {
+                    echo "<script language=Javascript>parent.parent.Ext.getCmp('win2').hide();</script>";
+                }
             }
             if ($DATA['FLAG_ACTION'] == 'actionAjaxRestartCases')
             {
@@ -3340,11 +3347,11 @@ function saveFieldsCSV($idInbox, $fieldsImport, $firstLineHeader) {
     {
         $requireColumn = isset($row['REQUIRED_COLUMN']) ? $row['REQUIRED_COLUMN'] : '';
         $sSQL = "INSERT INTO PMT_CONFIG_CSV_IMPORT (CSV_FIELD_NAME, CSV_COLUMN, CSV_FIRST_LINE_HEADER, ROL_CODE, ID_INBOX, CSV_TYPE, CSV_PIVOT_EDIT, CSV_REQUIRED) VALUES(
-			'" . $row['CSV_FIELD_NAME'] . "',
-			'" . mysql_real_escape_string($row['CSV_COLUMN']) . "',
-			'" . $firstLineHeader . "',
-			'" . $rolUser . "',
-			'" . $idInbox . "',
+            '" . $row['CSV_FIELD_NAME'] . "',
+            '" . mysql_real_escape_string($row['CSV_COLUMN']) . "',
+            '" . $firstLineHeader . "',
+            '" . $rolUser . "',
+            '" . $idInbox . "',
             '" . $row['TYPE_COLUMN'] . "',
             '" . $row['CSV_PIVOT_EDIT'] . "',
             '" . $requireColumn . "')";

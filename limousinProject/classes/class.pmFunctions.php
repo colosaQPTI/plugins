@@ -579,17 +579,30 @@ function limousinProject_identification($porteurId = 0, $tel = '', $portable = '
         echo 'Code Erreur identification = ' . $echo . '--- End Error ---';
     }
 }
-
+// Créer un utilisateur Prestataire Privatif dans PM et Typo
 function limousinProject_createUser($app_id, $role, $pwd) {
     $fields = convergence_getAllAppData($app_id);
     $fields['PASSWORD'] = $pwd;
-    if ( empty($fields['PRENOM_CONTACT']) )
+    // On prend la Raison Social comme prénom pour l'afficher dans Typo
+    // Si la raison social est vide on prend le prénom ou le nom.
+    if ( empty($fields['RAISONSOCIALE']) )
     {
-        $fields['PRENOM_CONTACT'] = $fields['NOM_CONTACT'];
-        // need the both for create account on typo3
+        if ( empty($fields['PRENOM_CONTACT']) )
+        {
+            $fields['RAISONSOCIALE'] = $fields['MAIL'];
+        }
+        else
+        {
+            $fields['RAISONSOCIALE'] = $fields['PRENOM_CONTACT'];
+        }
     }
+    if ( empty($fields['NOM_CONTACT']) )
+    {       
+            $fields['NOM_CONTACT'] = $fields['MAIL'];
+    }
+
     //PMFCreateUser(string userId, string password, string firstname, string lastname, string email, string role)
-    $isCreate = PMFCreateUser($fields['MAIL'], $fields['PASSWORD'], $fields['NOM_CONTACT'], $fields['PRENOM_CONTACT'], $fields['MAIL'], $role);
+    $isCreate = PMFCreateUser($fields['MAIL'], $fields['PASSWORD'], $fields['RAISONSOCIALE'], $fields['NOM_CONTACT'], $fields['MAIL'], $role);
     if ($isCreate == 0)
     {
         return FALSE;
@@ -614,12 +627,12 @@ function limousinProject_createUser($app_id, $role, $pwd) {
                 'username' => $fields['MAIL'],
                 'password' => md5($fields['PASSWORD']),
                 'email' => $fields['MAIL'],
-                'lastname' => $fields['PRENOM_CONTACT'],
-                'firstname' => $fields['NOM_CONTACT'],
+                'lastname' => $fields['NOM_CONTACT'],
+                'firstname' => $fields['RAISONSOCIALE'],
                 'key' => $key,
                 'pmid' => $usr_uid,
                 'usergroup' => $groupId,
-                'cHash' => md5($fields['MAIL'] . '*' . $fields['PRENOM_CONTACT'] . '*' . $fields['NOM_CONTACT'] . '*' . $key)));
+                'cHash' => md5($fields['MAIL'] . '*' . $fields['NOM_CONTACT'] . '*' . $fields['RAISONSOCIALE'] . '*' . $key) ));
         }
     }
     else

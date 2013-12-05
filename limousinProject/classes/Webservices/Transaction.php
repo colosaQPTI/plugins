@@ -14,7 +14,16 @@ class Transaction extends Webservices {
        	//$this->url = "http://extranet.aqoba-preprod.customers.artful.net/api/v09/versement?access_token=99ac21619656c825e788ffb8ac6bfa23f08f4b08";
         $this->url = wsHote_Url . "versement" . wsToken_param;
         $this->wsId = "201";
-		$this->sousMontant = array();				
+		$this->sousMontant = array();		
+		
+		// GET Bouchon
+		//$bouchonFileName = dirname(__FILE__).'/bouchonVersementFailure.txt';
+		// $bouchonFileName = dirname(__FILE__).'/bouchonVersementSuccess.txt';
+        // $handle = fopen($bouchonFileName, "r");
+		// while (!feof($handle)) { 
+			// $this->bouchonWs .= fgets($handle, 4096); 
+		// }
+		
 	} 
     
 	public function call(){	

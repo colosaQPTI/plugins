@@ -123,7 +123,7 @@ function exportXls($title = 'Sample', $data = array(), $subTitle = array(), $pat
             foreach ($line as $field => $value)
             {
                 $coord = PHPExcel_Cell::stringFromColumnIndex($col) . ($row);
-                $worksheet->setCellValue($coord, $value);
+                $worksheet->setCellValueExplicit($coord, $value, PHPExcel_Cell_DataType::TYPE_STRING);
                 if ($currentData == $rowMax)
                 {
                     $colName = PHPExcel_Cell::stringFromColumnIndex($col);

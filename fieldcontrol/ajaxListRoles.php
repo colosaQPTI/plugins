@@ -1,8 +1,5 @@
 <?php
 
-ini_set ( 'error_reporting', E_ALL );
-ini_set ( 'display_errors', True );
-
 G::LoadClass ( 'case' );
 G::LoadClass ( 'configuration' );
 G::loadClass ( 'pmFunctions' );
@@ -30,41 +27,37 @@ $j = 0;
 $total = 0;
 if (isset ( $_POST ['idInbox'] ) && $_POST ['idInbox'] != '') 
 {
-	 $array = Array();
-	 $select = "SELECT ID_TABLE FROM PMT_INBOX_PARENT_TABLE WHERE ID_INBOX = '".$_POST['idInbox']."' AND ROL_CODE  = '" . $_GET ['rolID'] . "' ";
-	 $dataSelect = executeQuery($select);
-	 if(sizeof($dataSelect))
-	 {
-  	 	$query = " SELECT
-    		    ADD_TAB_NAME AS ID,
-    		    ADD_TAB_NAME AS NAME
-    		    FROM PMT_INBOX_FIELDS
-				INNER JOIN ADDITIONAL_TABLES ON (PMT_INBOX_FIELDS.ID_TABLE = ADDITIONAL_TABLES.ADD_TAB_NAME AND ADDITIONAL_TABLES.PRO_UID != '' )
-				WHERE PMT_INBOX_FIELDS.ID_INBOX = '".$_POST['idInbox']."' AND ROL_CODE  = '" . $_GET ['rolID'] . "'
-					  AND ALIAS_TABLE = ID_TABLE AND ID_TABLE = '".$dataSelect[1]['ID_TABLE']."'
-				GROUP BY ADD_TAB_UID";
-	 }
-	 else 
-	 {
-	 	$query = " SELECT
-    		    ADD_TAB_NAME AS ID,
-    		    ADD_TAB_NAME AS NAME
-    		    FROM PMT_INBOX_FIELDS
-				INNER JOIN ADDITIONAL_TABLES ON (PMT_INBOX_FIELDS.ID_TABLE = ADDITIONAL_TABLES.ADD_TAB_NAME AND ADDITIONAL_TABLES.PRO_UID != '' )
-				WHERE PMT_INBOX_FIELDS.ID_INBOX = '".$_POST['idInbox']."' AND ROL_CODE  = '" . $_GET ['rolID'] . "' 
-					  AND ALIAS_TABLE = ID_TABLE 
-				GROUP BY ADD_TAB_UID
-				ORDER BY PRO_UID DESC";
-	 	
-	 }
+	$array = Array();
+	$select = "SELECT ID_TABLE FROM PMT_INBOX_PARENT_TABLE WHERE ID_INBOX = '".$_POST['idInbox']."' AND ROL_CODE  = '" . mysql_escape_string($_GET ['rolID']) . "' ";
+	$dataSelect = executeQuery($select);
+	if(sizeof($dataSelect))
+	{
+	 	$query = " SELECT ADD_TAB_NAME AS ID, ADD_TAB_NAME AS NAME 
+		    FROM PMT_INBOX_FIELDS
+			INNER JOIN ADDITIONAL_TABLES ON (PMT_INBOX_FIELDS.ID_TABLE = ADDITIONAL_TABLES.ADD_TAB_NAME AND ADDITIONAL_TABLES.PRO_UID != '' )
+			WHERE PMT_INBOX_FIELDS.ID_INBOX = '".$_POST['idInbox']."' AND ROL_CODE  = '" . mysql_escape_string($_GET ['rolID']) . "'
+				AND ALIAS_TABLE = ID_TABLE AND ID_TABLE = '".$dataSelect[1]['ID_TABLE']."'
+			GROUP BY ADD_TAB_UID";
+	}
+	else 
+	{
+		$query = " SELECT ADD_TAB_NAME AS ID, ADD_TAB_NAME AS NAME
+		    FROM PMT_INBOX_FIELDS
+			INNER JOIN ADDITIONAL_TABLES ON (PMT_INBOX_FIELDS.ID_TABLE = ADDITIONAL_TABLES.ADD_TAB_NAME AND ADDITIONAL_TABLES.PRO_UID != '' )
+			WHERE PMT_INBOX_FIELDS.ID_INBOX = '".$_POST['idInbox']."' AND ROL_CODE  = '" .  mysql_escape_string($_GET ['rolID']) . "' 
+				AND ALIAS_TABLE = ID_TABLE 
+			GROUP BY ADD_TAB_UID
+			ORDER BY PRO_UID DESC";
+		
+	}
     $fields = executeQuery($query);
-  
+
     if(sizeof($fields))
     {
         foreach($fields as $index)
         {
 		    $query = "SELECT JOIN_QUERY FROM PMT_INBOX_JOIN 
-				  	  WHERE JOIN_ROL_CODE  = '" . $_GET ['rolID'] . "'  AND JOIN_ID_INBOX = '".$_POST['idInbox']."'  ";
+				  	  WHERE JOIN_ROL_CODE  = '" . mysql_escape_string($_GET ['rolID']) . "'  AND JOIN_ID_INBOX = '".$_POST['idInbox']."'  ";
 
 		    $newOptions = executeQuery ( $query );
 		    $innerJoin = isset ( $newOptions [1]['JOIN_QUERY'] ) ? $newOptions [1]['JOIN_QUERY'] : '';
@@ -84,7 +77,6 @@ if (isset ( $_POST ['idInbox'] ) && $_POST ['idInbox'] != '')
 
 }
 
-
 if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '') 
 {
     $total = 0;
@@ -93,7 +85,7 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 	else 
 	{
 		$query = "SELECT JOIN_QUERY FROM PMT_INBOX_JOIN 
-				  WHERE JOIN_ROL_CODE  = '" . $_GET ['rolID'] . "' AND JOIN_ID_INBOX = '".$_REQUEST['idInboxData']."' ";
+				  WHERE JOIN_ROL_CODE  = '" . mysql_escape_string($_GET ['rolID']) . "' AND JOIN_ID_INBOX = '".$_REQUEST['idInboxData']."' ";
 
 		$newOptions = executeQuery ( $query );
 		$innerJoin = isset ( $newOptions [1]['JOIN_QUERY'] ) ? $newOptions [1]['JOIN_QUERY'] : '';
@@ -122,6 +114,7 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 		{
 			$newArray = Array ();
 			$arrayTotalFields = Array ();
+			
 			## Get Names of Tables of Query
     		$queryExplain = "EXPLAIN $sQueryT";
    			$infoTables = executeQuery ( $queryExplain );
@@ -148,7 +141,7 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 			{
 				$metaData = mysql_fetch_field($selectT, $i);
    				if (!$metaData) {
-       		 		echo "No hay información disponible<br />\n";
+       		 		echo "Information not available.<br />\n";
    				}
    				$nameTable = $metaData->table;
    				foreach ($tableNames as $row) 
@@ -161,10 +154,10 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 					if($nameTable == $tableShow || $nameTable == $row['OLD_NAME'])
 					{
 						$arrayTotalFields[] = Array(
-								"FLD_UID" => $metaData->name,
-   	 							"ADD_TAB_UID" => $tableShow,
-      							"ALIAS_TABLE" => $row['OLD_NAME']
-								);
+							"FLD_UID" => $metaData->name,
+							"ADD_TAB_UID" => $tableShow,
+							"ALIAS_TABLE" => $row['OLD_NAME']
+						);
 					}
 				}
     			$newArray[] = $metaData->name;
@@ -173,7 +166,7 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 
 			### data custom columns
 			$select = "SELECT FIELD_NAME FROM PMT_INBOX_FIELDS_SELECT 
-			  	 WHERE ROL_CODE = '".$_GET ['rolID']."' AND ID_INBOX = '".$_REQUEST['idInboxData']."' AND TYPE = 'Yes' 
+			  	 WHERE ROL_CODE = '".mysql_escape_string($_GET ['rolID'])."' AND ID_INBOX = '".$_REQUEST['idInboxData']."' AND TYPE = 'Yes' 
 			  ";
 			$dataSelect = executeQuery($select);
 			foreach($dataSelect as $row)
@@ -189,10 +182,10 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 				if($sw == 0)
 				{
 					$arrayTotalFields[] = Array(
-								"FLD_UID" => $row['FIELD_NAME'],
-   	 							"ADD_TAB_UID" => '',
-      							"ALIAS_TABLE" => ''
-								);
+						"FLD_UID" => $row['FIELD_NAME'],
+						"ADD_TAB_UID" => '',
+						"ALIAS_TABLE" => ''
+					);
 				}
 			}
 	
@@ -207,22 +200,18 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 			$iTotal = 1;
 			$swColorCon = 0;
 			$queryTot = "SELECT FLD_UID FROM PMT_INBOX_FIELDS 
-				  WHERE ROL_CODE  = '" . $_GET ['rolID'] . "'  AND ID_INBOX = '".$_REQUEST['idInboxData']."' ";
+				  WHERE ROL_CODE  = '" . mysql_escape_string($_GET ['rolID']) . "'  AND ID_INBOX = '".$_REQUEST['idInboxData']."' ";
 			$execTot= executeQuery ( $queryTot );
-
 			$totalFields = sizeof($execTot);
-
 			$posField = $totalFields;
-	
 			$total = sizeof($arrayTotalFields);
-	
 			foreach($arrayTotalFields as $index )
 			{
 				$query = "SELECT * FROM PMT_INBOX_FIELDS 
-				 	 WHERE ROL_CODE  = '" . $_GET ['rolID'] . "' AND FLD_UID = '" . $index['FLD_UID'] . "' AND 
+				 	 WHERE ROL_CODE  = '" .mysql_escape_string($_GET['rolID']). "' AND FLD_UID = '" . $index['FLD_UID'] . "' AND 
 				  	 ID_INBOX = '".$_REQUEST['idInboxData']."' AND ID_TABLE = '".$index['ADD_TAB_UID']."' ";
 
-				$newOptions = executeQuery ( $query );
+				$newOptions = executeQuery ( $query ); 
 				if (sizeof ( $newOptions )) 
 				{
 			
@@ -302,8 +291,6 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 				else
 					$indexAux = current($arrayTotalFields);
 
-			//G::pr($index['FLD_UID'].' index   indexAux '.$indexAux['FLD_UID'].' '. ($iTotal).'  '. $total.'  '.$indexAux['ADD_TAB_UID'].'  '.$index['ADD_TAB_UID'].' next ');
-
 				if($indexAux['ADD_TAB_UID'] != $index['ADD_TAB_UID']  && $iTotal  < $total)
 				{
 					$iColor++;
@@ -346,11 +333,7 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 
 			$field = 'POSITION';
 			$array = orderMultiDimensionalArray($array, $field, '');
-		//G::pr($array);
-		
-		
 		}
-		 
 	}
 	catch (Exception $e)
 	{
@@ -359,9 +342,7 @@ if (isset ( $_REQUEST ['idTable'] ) && $_REQUEST ['idTable'] != '')
 		$paging = array ('success' => false, 'response' => $error);
 		echo json_encode ( $paging );
 		die;
-
 	}
-		
 }
 
 $paging = array ('success' => true, 'total' => $total, 'data' => array_splice ( $array, $start, $limit ), 'response' => 'OK' );
@@ -373,22 +354,15 @@ function orderMultiDimensionalArray ($toOrderArray, $field, $inverse = false)
     $position = array();  
     $newRow = array();  
     foreach ($toOrderArray as $key => $row) {  
-
-            $position[$key]  = $row[$field];  
-
-            $newRow[$key] = $row;  
-
+        $position[$key]  = $row[$field];  
+        $newRow[$key] = $row;  
     }  
 
     if ($inverse) {  
-
         arsort($position);  
-
     }  
     else {  
-
         asort($position);  
-
     }  
 
     $returnArray = array();  

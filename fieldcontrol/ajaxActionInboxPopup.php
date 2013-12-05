@@ -16,7 +16,7 @@
                INNER JOIN PMT_INBOX_FIELDS F on (F.ID_INBOX = A.ID_INBOX)
 			   WHERE 1 
 			   AND F.ID_INBOX = '".$_GET['actionInbox_id']."' 
-			   AND F.ROL_CODE = '".$_GET['rolID']."'
+			   AND F.ROL_CODE = '".mysql_escape_string($_GET['rolID'])."'
 			   AND A.ID_ACTION = '".$_GET['idAction']."'
 			   GROUP BY ID
 			   ORDER BY A.POSITION, A.ID";
@@ -24,7 +24,7 @@
 		foreach($aDatos as $valor)
 		{        
 	    	$query = "SELECT PARAMETERS_BY_FIELD, OPERATOR FROM PMT_CONDITION_BY_FIELDS 
-	    	          WHERE ROL_CODE = '".$_GET['rolID']."' 
+	    	          WHERE ROL_CODE = '".mysql_escape_string($_GET['rolID'])."' 
 	    	          AND ID_INBOX = '".$_GET['actionInbox_id']."' 
 	    	          AND ID_ACTION = '".$_GET['idAction']."'
 	    	          AND FLD_UID = '".$valor['NAME_FIELD']."' ";
@@ -49,7 +49,7 @@
                FROM PMT_INBOX_ACTIONS AS A , PMT_ACTIONS AS B
                WHERE 1 
 			   AND A.ID_INBOX = '".$_GET['actionInbox_id']."' 
-			   AND A.ROL_CODE = '".$_GET['rolID']."'
+			   AND A.ROL_CODE = '".mysql_escape_string($_GET['rolID'])."'
 			   AND A.ID_ACTION = B.ID
 			   ORDER BY A.POSITION, A.ID";
 	
@@ -59,7 +59,7 @@
 		{        
 	    	$queryByField = "SELECT PARAMETERS_BY_FIELD FROM  PMT_CONDITION_BY_FIELDS
 	    					 WHERE ID_INBOX = '".$valor['ID_INBOX']."' AND
-	    					 ROL_CODE = '".$_GET['rolID']."' AND 
+	    					 ROL_CODE = '".mysql_escape_string($_GET['rolID'])."' AND 
 	    					 ID_ACTION = '".$valor['ID_ACTION']."' ";
 	    	$dataByField = executeQuery($queryByField);
 	    	if(sizeof($dataByField))
