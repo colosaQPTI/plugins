@@ -19,9 +19,7 @@ function strstr_array( $haystack, $needle ) {
 	}
 }
 
-
 function FDeletePMCases($caseId) {
-		
 	$query1="DELETE FROM wf_".SYS_SYS.".APPLICATION WHERE APP_UID='".$caseId."' ";
 	$apps1=executeQuery($query1);
 	$query2="DELETE FROM wf_".SYS_SYS.".APP_DELAY WHERE APP_UID='".$caseId."'";
@@ -44,10 +42,8 @@ function FDeletePMCases($caseId) {
 	$apps10=executeQuery($query10);
 	$query11="DELETE FROM wf_".SYS_SYS.".APP_CACHE_VIEW WHERE APP_UID='".$caseId."'";
 	$apps11=executeQuery($query11);
-	$query12="DELETE FROM wf_".SYS_SYS.".APP_HISTORY WHERE APP_UID='".$caseId."'";
-	$apps12=executeQuery($query12);
-	             
-
+	/*$query12="DELETE FROM wf_".SYS_SYS.".APP_HISTORY WHERE APP_UID='".$caseId."'";
+	$apps12=executeQuery($query12);*/
 }
 
 function FRegenerateRPT(){
@@ -84,7 +80,6 @@ $tableType = "Report";
 $tableName = '';
 
 // Check if the Table is Report or PM Table
-
 $sqlAddTable = "SELECT * FROM ADDITIONAL_TABLES WHERE ADD_TAB_UID = '$pmTableId' ";
 $resAddTable=executeQuery($sqlAddTable);
 if(sizeof($resAddTable)){
@@ -101,38 +96,41 @@ if(sizeof($resAddTable)){
 }
 
 // Check if the Table is Report or PM Table
-
-
-
 if(count($items)>0){
 	$oCase = new Cases ();
 	foreach($items as $item){
 		$vals = array_keys($item);
 		$APPUID = strstr_array($vals,'APP_UID');	
 		if(isset($item[$APPUID]) && $item[$APPUID] != ''){		
-		
-                    
-                    FDeletePMCases($item[$APPUID]);
-			
-                    if($tableType == "pmTable" && $tableName != ''){
-                        $sqlDelTable = "DELETE FROM ".$tableName." WHERE ".$pmTableFieldAPPUID." = '".$item[$APPUID]."' ";				
-                        $resDelTable=executeQuery($sqlDelTable);
-                    }   
-                     
-                    
+		    FDeletePMCases($item[$APPUID]);
+			$sqlRPTable = "SELECT * FROM ADDITIONAL_TABLES WHERE PRO_UID <> '' AND ADD_TAB_TYPE = 'NORMAL' "; 
+		    $resRPTable=executeQuery($sqlRPTable);
+		    if(sizeof($resRPTable)){
+			    foreach ($resRPTable as $key => $value) {
+			    	$additionalTables = new AdditionalTables();
+			        $table = $additionalTables->load($value['ADD_TAB_UID']);
+			        if ($table['PRO_UID'] != '') {	        	
+			        	$deleteItem = "DELETE FROM ".$value['ADD_TAB_NAME']." WHERE APP_UID = '".$item[$APPUID]."'";
+			        	$rs = executeQuery($deleteItem);
+			     	}
+			    }        	
+		    }
+            if($tableType == "pmTable" && $tableName != ''){
+            	$sqlDelTable = "DELETE FROM ".$tableName." WHERE ".$pmTableFieldAPPUID." = '".$item[$APPUID]."' ";				
+                $resDelTable = executeQuery($sqlDelTable);
+            }   
 		}	
 	}
 	
-	if($tableType == "Report"){
+	/*if($tableType == "Report"){
 		FRegenerateRPT(); // regenerate all RP tables
-	}
+	}*/
 
 	$messageInfo = "Le dossier a été correctement supprimé.";
 }
 else{
 	$messageInfo = "Le dossier n'a pas été supprimé.";
 }	
-
 	
 $paging = array ('success' => true, 'messageinfo' => $messageInfo);
 echo G::json_encode ( $paging );

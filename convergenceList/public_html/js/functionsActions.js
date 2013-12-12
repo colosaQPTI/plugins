@@ -93,7 +93,7 @@ function windowTabs(idField, urlData, appNumber)
         closeAction: 'hide',
         autoDestroy: true,
         maximizable: false,
-        title: 'Liste des formulaires',
+        title: '',
         modal: true,
         loadMask: true,
         items: [{
@@ -145,6 +145,22 @@ function windowTabs(idField, urlData, appNumber)
                         }
                     }]
             }]
+    });
+
+    Ext.Ajax.request({
+        url: '../convergenceList/actions/getNumDossierFromAppUid.php',
+        async: true,
+        params: {
+            app_uid: idField
+        },
+        success: function(result, request) {
+            var response = Ext.util.JSON.decode(result.responseText);
+            if (response.success) {
+                win2.setTitle('Liste des formulaires - Dossier '+ response.num_dossier);
+            }
+            else
+                win2.setTitle('Liste des formulaires');
+        }
     });
 
     win2.show();
@@ -968,6 +984,7 @@ function askConfirm(question, callback) {
         }
     });
 }
+
 function blocageCarte(porteurId) {
 
     askConfirm('Etes-vous sur de vouloir bloquer cette carte ?', function() {
@@ -998,6 +1015,46 @@ function blocageCarte(porteurId) {
             },
             failure: function() {
                 Ext.MessageBox.hide();
+            }
+        });
+
+    });
+
+}
+
+function activerCarte(porteurId, televersement) {
+
+    askConfirm('Etes-vous sur de vouloir activer cette carte ?', function() {
+        Ext.MessageBox.show({
+            msg: 'Mise à jour des données, veuillez patienter...',
+            progressText: 'En cours...',
+            width: 300,
+            wait: true,
+            waitConfig: {
+                interval: 200
+            }
+        });
+        Ext.Ajax.request({
+            url: "../convergenceList/actions/activerCarte.php",
+            params: {
+                porteur_id: porteurId,
+                televersement: televersement
+            },
+            success: function(result) {
+                var response = Ext.util.JSON.decode(result.responseText);
+                if (response.success) {
+                    Ext.MessageBox.hide();
+                    Ext.getCmp('gridNewTab').store.reload();
+                }
+                else {
+                    Ext.MessageBox.hide();
+                    PMExt.warning(_('ID_WARNING'), response.messageinfo);
+                    Ext.getCmp('gridNewTab').store.reload();
+                }
+            },
+            failure: function() {
+                Ext.MessageBox.hide();
+                Ext.getCmp('gridNewTab').store.reload();
             }
         });
 
@@ -1292,7 +1349,7 @@ function reproductionCheque(annuleFlag) {
                 test.hide();
 
                 Ext.MessageBox.show({
-                    title: 'RÔøΩsultat du traitement',
+                    title: 'Résultat du traitement',
                     msg: response.messageinfo,
                     width: 500,
                     fn: function() {
@@ -3103,6 +3160,127 @@ function importCSV(_uidTask) {
                             w.close();
                         }
                     }]
+            })
+        ]
+    });
+    w.show();
+}
+
+function actionExportAffilieAqoba() {
+
+    var _isCheckedOption = '165';
+    var radiosGroup = new Ext.form.RadioGroup({
+        columns: 1, //display the radiobuttons in two columns
+        items: [
+        {boxLabel: 'Cinéma',
+            name: 'radioGroupOption',
+            checked: true,
+            id: '165',
+            listeners: {
+                'change': function() {
+                    _isCheckedOption = '165';
+                }
+            }
+        },
+        {boxLabel: 'Spectacle vivant',
+            name: 'radioGroupOption',
+            checked: false,
+            id: '166',
+            listeners: {
+                'change': function() {
+                    _isCheckedOption = '166';
+                }
+            }
+        },
+        {
+            boxLabel: 'Achat de livres et produits multimédia',
+            name: 'radioGroupOption',
+            checked: false,
+            id: '167',
+            listeners: {
+                'change': function() {
+                    _isCheckedOption = '167';
+                }
+            }
+        },
+        {
+            boxLabel: 'Arts plastiques',
+            name: 'radioGroupOption',
+            checked: false,
+            id: '168',
+            listeners: {
+                'change': function() {
+                    _isCheckedOption = '168';
+                }
+            }
+        },
+        {
+            boxLabel: 'Manifestations ou évènement sportifs',
+            name: 'radioGroupOption',
+            checked: false,
+            id: '169',
+            listeners: {
+                'change': function() {
+                    _isCheckedOption = '169';
+                }
+            }
+        },
+        {
+            boxLabel: 'Adhésion pratique sportive ou artistique',
+            name: 'radioGroupOption',
+            checked: false,
+            id: '170',
+            listeners: {
+                'change': function() {
+                    _isCheckedOption = '170';
+                }
+            }
+        }],
+        listeners: {
+            change: function(el, val) {
+                // console.log(val);
+                _isCheckedOption = val.id; 
+            }
+        }
+    });
+    var w = new Ext.Window({
+        title: 'Export des affiliés',
+        width: 420,
+        height: 350,
+        modal: true,
+        autoScroll: false,
+        maximizable: false,
+        resizable: false,
+        items: [
+            new Ext.FormPanel({
+            id: 'exportTh',
+                width: 420,
+                frame: true,
+            title: 'Exporter la thématique :',
+                autoHeight: false,
+                bodyStyle: 'padding: 10px 10px 0 10px;',
+                labelWidth: 80,
+                defaults: {
+                    anchor: '90%',
+                    allowBlank: false,
+                    msgTarget: 'side'
+                },
+                items: [
+                   radiosGroup                   
+                ],
+            buttons:
+                    [{text: 'Exporter',
+                            handler: function() {
+                    urlData = "../convergenceList/actions/exportAffilies.php";
+                    post(urlData, {thematique: _isCheckedOption});
+                    w.close();
+                            }
+                        },
+                        {text: TRANSLATIONS.ID_CANCEL,
+                handler: function() {
+                    w.close();
+                }
+             }]
             })
         ]
     });

@@ -21,7 +21,6 @@ function strstr_array( $haystack, $needle ) {
 
 
 function FDeletePMCases($caseId) {
-        
     $query1="DELETE FROM wf_".SYS_SYS.".APPLICATION WHERE APP_UID='".$caseId."' ";
     $apps1=executeQuery($query1);
     $query2="DELETE FROM wf_".SYS_SYS.".APP_DELAY WHERE APP_UID='".$caseId."'";
@@ -44,14 +43,13 @@ function FDeletePMCases($caseId) {
     $apps10=executeQuery($query10);
     $query11="DELETE FROM wf_".SYS_SYS.".APP_CACHE_VIEW WHERE APP_UID='".$caseId."'";
     $apps11=executeQuery($query11);
-    $query12="DELETE FROM wf_".SYS_SYS.".APP_HISTORY WHERE APP_UID='".$caseId."'";
-    $apps12=executeQuery($query12);
+    /*$query12="DELETE FROM wf_".SYS_SYS.".APP_HISTORY WHERE APP_UID='".$caseId."'";
+    $apps12=executeQuery($query12);*/
                  
 
 }
 
 function FRegenerateRPT(){
-
     $cnn = Propel::getConnection('workflow');
     $stmt = $cnn->createStatement();    
     $sqlRPTable = "SELECT * FROM ADDITIONAL_TABLES WHERE PRO_UID <> '' AND ADD_TAB_TYPE = 'NORMAL' "; 
@@ -64,11 +62,11 @@ function FRegenerateRPT(){
                 $truncateRPTable = "TRUNCATE TABLE  ".$value['ADD_TAB_NAME']." ";
                 $rs = $stmt->executeQuery($truncateRPTable, ResultSet::FETCHMODE_NUM);              
                 $additionalTables->populateReportTable(
-                        $table['ADD_TAB_NAME'],
-                        pmTable::resolveDbSource($table['DBS_UID']),
-                        $table['ADD_TAB_TYPE'],
-                        $table['PRO_UID'],
-                        $table['ADD_TAB_GRID']
+                    $table['ADD_TAB_NAME'],
+                    pmTable::resolveDbSource($table['DBS_UID']),
+                    $table['ADD_TAB_TYPE'],
+                    $table['PRO_UID'],
+                    $table['ADD_TAB_GRID']
                 );
             }
         }           
@@ -105,38 +103,26 @@ $tableName = '';
 
     if(count($items)>0){
         $oCase = new Cases ();
-    $messageInfo = "";
-    foreach($items as $item){
-        $vals = array_keys($item);
-        $APPUID = strstr_array($vals, 'APP_UID');
-        if (empty($callback))// || call_user_func($canBeDeletedFunc, $APPUID))
-        {
-            if(isset($item[$APPUID]) && $item[$APPUID] != ''){
+        $messageInfo = "";
+        foreach($items as $item){
+            $vals = array_keys($item);
+            $APPUID = strstr_array($vals, 'APP_UID');
+            if (empty($callback))// || call_user_func($canBeDeletedFunc, $APPUID))
+            {
+                if(isset($item[$APPUID]) && $item[$APPUID] != ''){
                     //don't delete in database, just change statut
                     convergence_changeStatut($item[$APPUID], '999', 'Suppression');
-                    /*FDeletePMCases($item[$APPUID]);
-
-                    if($tableType == "pmTable" && $tableName != ''){
-                        $sqlDelTable = "DELETE FROM ".$tableName." WHERE ".$pmTableFieldAPPUID." = '".$item[$APPUID]."' ";              
-                        $resDelTable=executeQuery($sqlDelTable);
-                    }   
-
-                    */
+                }
+                $messageInfo .= "Le dossier <strong>" . $item['NUM_DOSSIER'] . "</strong> a été correctement supprimé.<br/>";
             }
-            $messageInfo .= "Le dossier <strong>" . $item['NUM_DOSSIER'] . "</strong> a été correctement supprimé.<br/>";
-        }
-        else
-        {
-            $callAnswer = array();
-            $callAnswer = call_user_func($callback, $item);
-            if ($callAnswer['check'] == true && isset($item[$APPUID]) && $item[$APPUID] != '')
-                convergence_changeStatut($item[$APPUID], '999', 'Suppression');
-            $messageInfo .= $callAnswer['messageInfo'] . "\n";
-        }
-        
-        /*if($tableType == "Report"){
-            FRegenerateRPT(); // regenerate all RP tables
-        }*/
+            else
+            {
+                $callAnswer = array();
+                $callAnswer = call_user_func($callback, $item);
+                if ($callAnswer['check'] == true && isset($item[$APPUID]) && $item[$APPUID] != '')
+                    convergence_changeStatut($item[$APPUID], '999', 'Suppression');
+                $messageInfo .= $callAnswer['messageInfo'] . "\n";
+            }
         }        
     }
     else{

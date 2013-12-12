@@ -24,12 +24,12 @@ function addWhereInbox($idInbox,$whereTxaField,$rolID)
 	$queryItemFile="INSERT INTO PMT_INBOX_WHERE (IWHERE_UID,IWHERE_QUERY,IWHERE_IID_INBOX,IWHERE_ROL_CODE)
 			VALUES (
 			NULL,
-			'$whereTxaField',
-			'$idInbox',			
-			'$rolID'
+				'$whereTxaField',
+				'$idInbox',			
+				'".mysql_escape_string($rolID)."'
 			)";
-		    executeQuery($queryItemFile);
-		    $res=true;	    
+	executeQuery($queryItemFile);
+	$res=true;	    
 		    
 	header("Content-Type: text/html");
 	$returnStatus = array('success' => $res);
@@ -39,12 +39,12 @@ function addWhereInbox($idInbox,$whereTxaField,$rolID)
 function editWhereInbox($idInbox,$whereTxaField,$whereIDField)
 {
 	$queryItemFile="UPDATE PMT_INBOX_WHERE SET
-			IWHERE_QUERY = '$whereTxaField'			
-			WHERE IWHERE_UID = '$whereIDField' 			
+			IWHERE_QUERY = '$whereTxaField'
+			WHERE IWHERE_UID = '$whereIDField'
 			";
 
-		    executeQuery($queryItemFile);
-		    $res=true;	    
+	executeQuery($queryItemFile);
+	$res=true;	    
 		    
 	header("Content-Type: text/html");
 	$returnStatus = array('success' => $res);
@@ -116,15 +116,15 @@ function addWhereInboxConfigUsers($data,$idInbox,$rolID)
 		$idInboxWhere++;
 		$queryItemFile="INSERT INTO PMT_INBOX_WHERE_USER (IWHERE_USR_ID, IWHERE_USR_QUERY, IWHERE_USR_TABLE, INBOX_ID, ROL_CODE, INBOX_ID_TABLE, INBOX_FIELD_NAME, IWHERE_USR_OPERATOR, IWHERE_USR_PARAMETER)
 			VALUES (
-			'$idInboxWhere',
-			'".mysql_escape_string($whereQuery)."',
-			'$usrTable',
-			'$idInbox',			
-			'$rolID',
-			'$idTable',
-			'$fieldName',
-			'$operator',
-			'$parameterField'
+				'$idInboxWhere',
+				'".mysql_escape_string($whereQuery)."',
+				'$usrTable',
+				'$idInbox',			
+				'".mysql_escape_string($rolID)."',
+				'$idTable',
+				'$fieldName',
+				'$operator',
+				'$parameterField'
 			)";
 		executeQuery($queryItemFile);
 		    
@@ -145,7 +145,7 @@ switch ($method) {
 	
 	case "add":
 		if(isset($_GET['ID']) && $_GET['ID']!='')
-		{										
+		{
 			$ret = addWhereInbox($_GET['ID'],mysql_escape_string($form['whereTxaField']),$form['rolID']);
 	
 		}
@@ -153,7 +153,7 @@ switch ($method) {
 		
 	case "edit":
 		if(isset($_GET['ID']) && $_GET['ID']!='')
-		{																
+		{
 			
 			$ret = editWhereInbox($_GET['ID'],mysql_escape_string($form['whereTxaField']),$form['whereIDField']);
 	
@@ -163,9 +163,9 @@ switch ($method) {
 	case "configUsers":
 		if(isset($_POST['idInbox']) && $_POST['idInbox']!='')
 		{	
-			$sql = "DELETE FROM PMT_INBOX_WHERE_USER WHERE INBOX_ID = '".$_POST['idInbox']."' AND ROL_CODE = '".$_POST['rolID']."' ";
+			$sql = "DELETE FROM PMT_INBOX_WHERE_USER WHERE INBOX_ID = '".$_POST['idInbox']."' AND ROL_CODE = '".mysql_escape_string($_POST['rolID'])."' ";
 			executeQuery($sql);
-			$data = json_decode ( $_POST ['arrayConfigUsers'] );															
+			$data = json_decode ( $_POST ['arrayConfigUsers'] );
 			$ret = addWhereInboxConfigUsers($data,$_POST['idInbox'],$_POST['rolID']);
 		}
 		break;

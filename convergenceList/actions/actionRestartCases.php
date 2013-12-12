@@ -19,7 +19,6 @@ function strstr_array( $haystack, $needle ) {
 	}
 }
 
-
 function FRegeneratePMCases($caseId) {
 	
 	///////////////////////// Regenerate Tables ////////////////////////////////////////	
@@ -65,15 +64,13 @@ function FRegeneratePMCases($caseId) {
 	
 	             
 	///////////////////////// End Regenerate Tables ////////////////////////////////////////
-
 	$auxUsrUID = $_SESSION['USER_LOGGED'];
     $auxUsruname = $_SESSION['USR_USERNAME'];
-	
 	///////////////////////// Route Again the Case /////////////////////////////////////////
+
 	G::LoadClass("case");
 	$oCase = new Cases ();
 	$newFields = $oCase->loadCase ($caseId); 
-
 	$newFields['APP_DATA']['FLG_INITUSERUID'] = $auxUsrUID;
 	$newFields['APP_DATA']['FLG_INITUSERNAME'] = $auxUsruname;
 	$newFields['APP_DATA']['FLAG_ACTION'] = 'actionAjaxRestartCases';
@@ -81,8 +78,8 @@ function FRegeneratePMCases($caseId) {
 	if(isset($newFields['APP_DATA']['FLAGTYPO3'])){
 		unset($newFields['APP_DATA']['FLAGTYPO3']);
 	}		
-	$USR_UID = $newFields['APP_DATA']['USER_LOGGED'];
-	$oCase->updateCase($caseId, $newFields);	
+	$USR_UID = $newFields['APP_DATA']['USER_LOGGED'];	
+	$oCase->updateCase($caseId, $newFields);
 	
 	$queryDelIndex = "SELECT  MAX(DEL_INDEX) AS DEL_INDEX FROM APP_DELEGATION WHERE APP_UID = '".$caseId."'";
 	$DelIndex = executeQuery($queryDelIndex);  
@@ -121,17 +118,6 @@ function FRegeneratePMCases($caseId) {
 	   }
 	}
 	
-	// $oCase->updateCase($caseId, $newFields);
-	
-	// If the user is different
-	/*if($_SESSION['USER_LOGGED'] != $newFields['APP_DATA']['USER_LOGGED']){
-		$arrayUser = userInfo($newFields['APP_DATA']['USER_LOGGED']); 		 
-		$_SESSION['USER_LOGGED'] = $newFields['APP_DATA']['USER_LOGGED'];
-    	$_SESSION['USR_USERNAME'] = $arrayUser['username'];
-	}*/
-	// End If the user is different
-
-	// $resInfo = PMFDerivateCase($caseId, 1,true, $USR_UID);
 	autoDerivate($proUid,$caseId,$USR_UID);
 
 	///////////////////////// End Route Again the Case /////////////////////////////////////
@@ -148,7 +134,7 @@ function FRegenerateRPT(){
 	    	$additionalTables = new AdditionalTables();
 	        $table = $additionalTables->load($value['ADD_TAB_UID']);
 	        if ($table['PRO_UID'] != '') {	        	
-	        	$truncateRPTable = "TRUNCATE TABLE  ".$value['ADD_TAB_NAME']." ";
+	        	$truncateRPTable = "TRUNCATE TABLE ".$value['ADD_TAB_NAME']." ";
 	        	$rs = $stmt->executeQuery($truncateRPTable, ResultSet::FETCHMODE_NUM);    			
 	            $additionalTables->populateReportTable(
 	                    $table['ADD_TAB_NAME'],
@@ -178,7 +164,18 @@ if($items != ''){
 	}		
 	
 	if($tableType == "Report"){
-		//FRegenerateRPT(); // regenerate all RP tables
+		$sqlRPTable = "SELECT * FROM ADDITIONAL_TABLES WHERE PRO_UID <> '' AND ADD_TAB_TYPE = 'NORMAL' "; 
+	    $resRPTable=executeQuery($sqlRPTable);
+	    if(sizeof($resRPTable)){
+		    foreach ($resRPTable as $key => $value) {
+		    	$additionalTables = new AdditionalTables();
+		        $table = $additionalTables->load($value['ADD_TAB_UID']);
+		        if ($table['PRO_UID'] != '') {	        	
+		        	$deleteItem = "DELETE FROM ".$value['ADD_TAB_NAME']." WHERE APP_UID = '".$item[$APPUID]."'";
+		        	$rs = executeQuery($deleteItem);
+		     	}
+		    }        	
+	    }
 	}
 
 	$messageInfo = "The case was Restarted sucessfully!";

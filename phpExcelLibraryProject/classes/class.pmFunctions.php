@@ -215,6 +215,7 @@ function exportXls($title = 'Sample', $data = array(), $subTitle = array(), $pat
                         ->setEnclosure('"')
                         ->setLineEnding("\r\n")
                         ->setSheetIndex(0);
+                $objWriter->save($path . '.csv');
                 break;
 
             default:

@@ -1,8 +1,5 @@
 <?php
 
-ini_set ( 'error_reporting', E_ALL );
-ini_set ( 'display_errors', True );
-
 G::LoadClass ( 'case' );
 G::LoadClass ( 'configuration' );
 G::loadClass ( 'pmFunctions' );
@@ -29,15 +26,13 @@ $total = 0;
 if (isset ( $_REQUEST ['idInboxData'] ) && $_REQUEST ['idInboxData'] != '') 
 {
 	$query = "SELECT * FROM PMT_INBOX_FIELDS 
-				  WHERE ROL_CODE  = '" . $_GET ['rolID'] . "' AND  ID_INBOX = '".$_REQUEST['idInboxData']."' AND ID_TABLE != ''";
+				  WHERE ROL_CODE  = '" . mysql_escape_string($_GET ['rolID']) . "' AND  ID_INBOX = '".$_REQUEST['idInboxData']."' AND ID_TABLE != ''";
 	$newOptions = executeQuery ( $query );
 	$total = sizeof($newOptions);
 	if (sizeof ( $newOptions )) 
 	{
 		foreach($newOptions as $index )
 		{
-		
-		
 			if (isset ( $index ['DESCRIPTION'] ) && $index ['DESCRIPTION'] != '')
 				$valor ['FLD_DESCRIPTION'] = $index ['DESCRIPTION'];
 			if(isset ( $index ['ID_INBOX'] ) && $index ['ID_INBOX'] != '')
@@ -55,22 +50,17 @@ if (isset ( $_REQUEST ['idInboxData'] ) && $_REQUEST ['idInboxData'] != '')
 			$valor['ALIAS_TABLE'] = $index['ALIAS_TABLE'];
 			$swPos = 1;		
 			$valor ['ROL_CODE'] = $_GET ['rolID'];
-			//$valor ['FIELD_NAME'] = $index['ALIAS_TABLE'].'.'.$index['FLD_UID'];
 			$valor ['FIELD_NAME'] = $index['FLD_UID'];
 			$valor ['FLD_UID'] = $index['FLD_UID'];
 			$array[] = $valor;
-			//$itotal++;
 		} 
-
-
 	}
-
 }
 
 if (isset ( $_REQUEST ['type'] ) && $_REQUEST ['type'] == 'gral') 
 {
 	$query = "SELECT * FROM PMT_INBOX_FIELDS 
-				  WHERE ROL_CODE  = '" . $_GET ['rolID'] . "' AND  ID_INBOX = '".$_REQUEST['idInboxData']."' AND ID_TABLE != ''";
+				  WHERE ROL_CODE  = '" . mysql_escape_string($_GET ['rolID']) . "' AND  ID_INBOX = '".$_REQUEST['idInboxData']."' AND ID_TABLE != ''";
 	$newOptions = executeQuery ( $query );
 	$total = sizeof($newOptions);
 	if (sizeof ( $newOptions )) 
@@ -94,22 +84,14 @@ if (isset ( $_REQUEST ['type'] ) && $_REQUEST ['type'] == 'gral')
 			$valor['ALIAS_TABLE'] = $index['ALIAS_TABLE'];
 			$swPos = 1;		
 			$valor ['ROL_CODE'] = $_GET ['rolID'];
-			//$valor ['FIELD_NAME'] = $index['ALIAS_TABLE'].'.'.$index['FLD_UID'];
 			$valor ['FIELD_NAME'] = $index['FLD_UID'];
 			$valor ['FLD_UID'] = $index['FLD_UID'];
 			$array[] = $valor;
-			//$itotal++;
 		} 
-
-
 	}
-
 }
-//G::pr($array);
 $paging = array ('success' => true, 'total' => $total, 'data' => array_splice ( $array, $start, $limit ), 'response' => 'OK' );
 echo json_encode ( $paging );
-
-
 ?>
 
     

@@ -1,14 +1,5 @@
 <?php
 G::loadClass ( 'pmFunctions' );
-/*
-function getProUid($appUid){
-	$sSQL = "SELECT PRO_UID FROM APPLICATION WHERE APP_UID='$appUid'";
-    $aResult = executeQuery($sSQL);
-    $proUid = '';
-    if (isset($aResult[1]['PRO_UID']))
-    	$proUid =$aResult[1]['PRO_UID'];
-    return $proUid;
-}*/
  
 function getTotalDuplicateRecords($reg, $fldNamStat, $fldValStat) {
 
@@ -53,13 +44,12 @@ function deleteDuplicatedCases($appUidElected, $tableName ='') {
 	$aEliminatePossibleCases = isset($_SESSION['ELIMINATE_POSSIBLE_CASES'])?$_SESSION['ELIMINATE_POSSIBLE_CASES']:array();
 	foreach ($aEliminatePossibleCases as $caseId){
 		if($caseId != $appUidElected){
-			deletePMCases($caseId); ### req
+			deletePMCases($caseId, $tableName); ### req
 			$numDeletedCases++;
 			$CurDateTime=date('Y-m-d H:i:s');
 			insertHistoryLogPlugin($appUidElected,$_SESSION['USER_LOGGED'],$CurDateTime,'1',$caseId,'Delete Case');//insertHistoryLogPlugin(father,......child)
 		}	
 	}
-	genDataReport($tableName);
 	unset($_SESSION['ELIMINATE_POSSIBLE_CASES']);
 	return $numDeletedCases;
 }
@@ -166,7 +156,6 @@ function getDataSupprime($reg,$idInbox) {
 		}
 		
 	}
-//G::pr($aData);
    return (array(count($aData), $aData));
 }
  
@@ -225,7 +214,7 @@ function getFieldsforConfigDoublon($idInbox,$proUid) {
 			}
 	}
 	if(!(is_array($aResult) && count($aResult)>0)){
-
+	
 		$oReportTables = new pmTablesProxy();
 	    $aFields['FIELDS'] = array();
 	    $aFields['PRO_UID'] = $proUid;
@@ -238,7 +227,7 @@ function getFieldsforConfigDoublon($idInbox,$proUid) {
 
 		$_dataFields =  array();
 		$pos = 1;
-
+	
 		foreach ($aDynFields as $key => $value) {
 			if($value == 'NUM_DOSSIER')
 				$include = '1';
@@ -319,6 +308,7 @@ function getFieldsforConfigDoublon($idInbox,$proUid) {
 				}
 			}		
 		}
+		
 	}
 		$field = 'FIELD_POSITION';
 		$_dataFields = orderMultiDimensionalArray($_dataFields, $field, '');
@@ -447,7 +437,6 @@ function createCase($appUid, $appData,$uidTask,$jsonSelected,$hiddenUids, $idInb
 			if($i == 0)
 				$selected[] = $row;
 		}
-	
 	}
 	
 	if(sizeof($rowSelected) == 1)
@@ -467,9 +456,8 @@ function createCase($appUid, $appData,$uidTask,$jsonSelected,$hiddenUids, $idInb
 			{
 					$CurDateTime=date('Y-m-d H:i:s');
 					insertHistoryLogPlugin($row['APP_UID'],$_auxUserUid,$CurDateTime,'1',$caseUID,'Suppression','999');
-					deletePMCases($row['APP_UID']);
+					deletePMCases($row['APP_UID'],'');
 			}
-			
 		}
 	}
 	else
@@ -489,7 +477,7 @@ function createCase($appUid, $appData,$uidTask,$jsonSelected,$hiddenUids, $idInb
 			{
 					$CurDateTime=date('Y-m-d H:i:s');
 					insertHistoryLogPlugin($row['APP_UID'],$_auxUserUid,$CurDateTime,'1',$caseUID,'Suppression','999');
-					deletePMCases($row['APP_UID']);
+					deletePMCases($row['APP_UID'],'');
 			}
 		}
 	}
@@ -521,7 +509,7 @@ function createCase($appUid, $appData,$uidTask,$jsonSelected,$hiddenUids, $idInb
 	$_SESSION['USER_LOGGED'] = $_auxUserUid;
     $_SESSION['USR_USERNAME'] = $_auxUserName;
 	$resp = PMFDerivateCase($caseUID, 1,true, $USR_UID);   
-	
+	//genDataReport($tableName);
 	return $resp;
 }
 
@@ -616,7 +604,5 @@ function orderMultiDimensionalArray ($toOrderArray, $field, $inverse = false)
         $returnArray[] = $newRow[$key];  
     }  
     return $returnArray;  
-
 }
-
 ?>

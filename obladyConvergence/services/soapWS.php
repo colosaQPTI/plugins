@@ -1240,7 +1240,7 @@ function getParams($params)
     try {
         
         $sql = 'SELECT '.$params->fields.' FROM '.$params->table.($params->where ? ' WHERE '.$params->where : '').($params->order_by ? ' ORDER BY '.$params->order_by : '').($params->number_of_records ? ' LIMIT '.$params->number_of_records*$params->pagebrowse.','.$params->number_of_records : '');
-        $rs   = $stmt->executeQuery($sql, ResultSet::FETCHMODE_ASSOC);
+        $rs = $stmt->executeQuery($sql, ResultSet::FETCHMODE_ASSOC);
         $rs->next();
 
         $response = array();

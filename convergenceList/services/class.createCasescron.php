@@ -86,6 +86,11 @@ class archivedCasesClassCron {
                         $delete = executeQuery("DELETE FROM wf_" . $this->workspace . ".PMT_IMPORT_CSV_DATA WHERE IMPCSV_IDENTIFY = '$csvIdentify' AND IMPCSV_TABLE_NAME = '$tableName' ");
                         $this->deleteFileCSV($fileCSV);
                         break;
+                    case "ONLY_UPDAT": // Action type to update but not create case, use 1 at last params to update only
+                        $totalCases = $this->importCreateCaseEditCSV($matchFields, $uidTask, $tableName, $firstLineHeader, $informationCSV, $dataDeleteEdit, $csvIdentify, $totCasesCSV, $csvWhereAction, 1);
+                        $delete = executeQuery("DELETE FROM wf_" . $this->workspace . ".PMT_IMPORT_CSV_DATA WHERE IMPCSV_IDENTIFY = '$csvIdentify' AND IMPCSV_TABLE_NAME = '$tableName' ");
+                        $this->deleteFileCSV($fileCSV);
+                        break;
                     case "ADD_TRUNCATE":
                         $totalCases = $this->importCreateCaseCSV($matchFields, $uidTask, $tableName, $firstLineHeader, $informationCSV, $csvIdentify, $totCasesCSV);
                         $delete = executeQuery("DELETE FROM wf_" . $this->workspace . ".PMT_IMPORT_CSV_DATA WHERE IMPCSV_IDENTIFY = '$csvIdentify' AND IMPCSV_TABLE_NAME = '$tableName' ");
@@ -355,8 +360,11 @@ class archivedCasesClassCron {
                         if( $appData[$row['FIELD_NAME']] == ''  || $appData[$row['FIELD_NAME']] == ' ')
                         {
                             $appData[$row['FIELD_NAME']] = $row['FIELD_DEFAULT_VALUE'];
-                            //$appData = array_merge($record, $appData);
                         }
+                    }
+                    if($appData[$row['FIELD_NAME']] !='' && (isset($appData[$row['FIELD_NAME']."_label"]) && $appData[$row['FIELD_NAME']."_label"] ==''))
+                    {
+                        $appData[$row['FIELD_NAME']."_label"] = $label;
                     }
                 }
             }
@@ -618,6 +626,10 @@ class archivedCasesClassCron {
                             //$appData = array_merge($record, $appData);
                         }
                     }
+                    if($appData[$row['FIELD_NAME']] !='' && (isset($appData[$row['FIELD_NAME']."_label"]) && $appData[$row['FIELD_NAME']."_label"] ==''))
+                    {
+                        $appData[$row['FIELD_NAME']."_label"] = $label;
+                    }
                 }
                 foreach ($itemsDeleteEdit as $field)
                 {
@@ -684,7 +696,7 @@ class archivedCasesClassCron {
                     $appDataNew = array_merge($FieldsCase['APP_DATA'], $appDataNew);
                     $FieldsCase['APP_DATA'] = $appDataNew;
                     $oCase->updateCase($index['APP_UID'], $FieldsCase);
-                    executeTriggers($proUid, $index['APP_UID'], $USR_UID);
+                    frexecuteTriggers($proUid, $index['APP_UID'], $USR_UID);
                 }
             }
             elseif ( $onlyUpdate == 0 ) // not create new case if we want juste update already existing cases
@@ -936,8 +948,11 @@ class archivedCasesClassCron {
                         if( $appData[$row['FIELD_NAME']] == ''  || $appData[$row['FIELD_NAME']] == ' ')
                         {
                             $appData[$row['FIELD_NAME']] = $row['FIELD_DEFAULT_VALUE'];
-                            //$appData = array_merge($record, $appData);
                         }
+                    }
+                    if($appData[$row['FIELD_NAME']] !='' && (isset($appData[$row['FIELD_NAME']."_label"]) && $appData[$row['FIELD_NAME']."_label"] ==''))
+                    {
+                        $appData[$row['FIELD_NAME']."_label"] = $label;
                     }
                 }
                 foreach ($itemsDeleteEdit as $field)

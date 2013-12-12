@@ -15,6 +15,7 @@ require_once("plugins/limousinProject/classes/Webservices/Activation.php");
 require_once("plugins/limousinProject/classes/Webservices/Operation.php");
 require_once("plugins/limousinProject/classes/Webservices/Solde.php");
 require_once("plugins/limousinProject/classes/Webservices/Identification.php");
+
 ////////////////////////////////////////////////////
 // limousinProject PM Functions
 //
@@ -23,16 +24,16 @@ require_once("plugins/limousinProject/classes/Webservices/Identification.php");
 // License: LGPL, see LICENSE
 ////////////////////////////////////////////////////
 
-function limousinProject_getMyCurrentDate() {
+function limousinProject_getMyCurrentDate(){
     return G::CurDate('Y-m-d');
 }
 
-function limousinProject_getMyCurrentTime() {
+function limousinProject_getMyCurrentTime(){
     return G::CurDate('H:i:s');
 }
 
 //LOCAL : a transforme dans le moteur de regle
-function convergence_getIncompletErreur($app_id) {
+function convergence_getIncompletErreur($app_id){
     $fields = convergence_getAllAppData($app_id);
     $incomplet = array();
     if ($fields['FINOM'] == '')
@@ -75,7 +76,6 @@ function convergence_getIncompletErreur($app_id) {
 }
 
 function convergence_getMsgErreur($app_id) {
-
     $refus = array();
     $fields = convergence_getAllAppData($app_id);
     if (!isset($fields['GDCERTIFSCOLARITE']) || $fields['GDCERTIFSCOLARITE'] == 0)
@@ -135,7 +135,7 @@ function limousinProject_blocageCarte($porteurId, $statut, $role_user = 'Bénéf
             $active = limousinProject_getBlocage($porteurId, $groupeId);
             if (!empty($active->CODE) && $active->CODE == 'OK')
             {
-                // pas d'erreur c'est lessieur ?
+               // pas d'erreur c'est lessieur ?
             }
             else
             {
@@ -197,18 +197,14 @@ function limousinProject_blocageCarte($porteurId, $statut, $role_user = 'Bénéf
     return $return;
 }
 
-function limousinProject_getBlocage($porteurId, $groupeId) {
-
-// INIT Ws 211
+function limousinProject_getBlocage($porteurId, $groupeId ) {
+    // INIT Ws 211
     $result = null;
     $v = new Blocage();
-
-// SET Params
+    // SET Params
     $v->partenaire = wsPrestaId;
     $v->porteurId = $porteurId;
-
-
-// CALL Ws
+    // CALL Ws
     try
     {
         $v->call();
@@ -224,20 +220,18 @@ function limousinProject_getBlocage($porteurId, $groupeId) {
     {
         $result = $v->errors;
     }
-// RETURN
+    // RETURN
     return $result;
 }
 
-function limousinProject_getDeblocage($porteurId) {
-
-// INIT Ws 211
+function limousinProject_getDeblocage($porteurId ) {
+    // INIT Ws 211
     $result = null;
     $v = new Blocage();
-
-// SET Params
+    // SET Params
     $v->partenaire = wsPrestaId;
-    $v->porteurId = $porteurId; // groupe carte Active typo
-// CALL Ws
+    $v->porteurId = $porteurId;// groupe carte Active typo
+    // CALL Ws
     try
     {
         $v->call();
@@ -255,7 +249,7 @@ function limousinProject_getDeblocage($porteurId) {
         $result = $v->errors;
         var_dump($e->getMessage());
     }
-// RETURN
+    // RETURN
     return $result;
 }
 
@@ -288,7 +282,7 @@ function limousinProject_getDemandeFromUserID($userId) {
     $arrayDemandeInfos = array();
     $queryDemande = "SELECT APP_UID FROM PMT_DEMANDES WHERE USER_ID = '" . $userId . "' AND STATUT = 6 AND THEMATIQUE = 1";
     $resultAppUid = executeQuery($queryDemande);
-    if (sizeof($resultAppUid) == 1)
+    if(sizeof($resultAppUid) == 1)
     {
         $appUid = $resultAppUid[1]['APP_UID'];
         $arrayDemandeInfos = convergence_getAllAppData($appUid, 1);
@@ -300,7 +294,7 @@ function limousinProject_getDemandeFromPorteurID($porterId) {
     $arrayDemandeInfos = array();
     $queryDemande = 'select APP_UID from PMT_DEMANDES where PORTEUR_ID = "' . $porterId . '" and STATUT <> 0 and STATUT <> 999';
     $resultAppUid = executeQuery($queryDemande);
-    if (sizeof($resultAppUid) == 1)
+    if(sizeof($resultAppUid) == 1)
     {
         $appUid = $resultAppUid[1]['APP_UID'];
         $arrayDemandeInfos = convergence_getAllAppData($appUid);
@@ -310,16 +304,16 @@ function limousinProject_getDemandeFromPorteurID($porterId) {
 
 function limousin_addTransactionPriv($codePartenaire, $porteurID, $montant, $libelle, $thematique, $type) {
     $now = date('d-m-Y');
-    $queryInsertTransactionPriv = "INSERT INTO PMT_TRANSACTIONS_PRIV(CODE_PARTENAIRE, PORTEUR_ID, MONTANT, LIBELLE, THEMATIQUE, TYPE, DATE_EMISSION, STATUT) VALUES('" . $codePartenaire . "','" . $porteurID . "','" . $montant . "','" . $libelle . "','" . $thematique . "','" . $type . "','" . $now . "', '16')";
+    $queryInsertTransactionPriv = "INSERT INTO PMT_TRANSACTIONS_PRIV(CODE_PARTENAIRE, PORTEUR_ID, MONTANT, LIBELLE, THEMATIQUE, TYPE, DATE_EMISSION, STATUT) VALUES('".$codePartenaire."','".$porteurID."','".$montant."','".$libelle."','".$thematique."','".$type."','".$now."', '16')";
     executeQuery($queryInsertTransactionPriv);
 }
 
 function limousinProject_isCarteActive($porteurID) {
     $isActive = false;
     $arrayData = array();
-    $query = "SELECT CARTE_STATUT FROM PMT_CHEQUES WHERE CARTE_PORTEUR_ID = '" . $porteurID . "'";
+    $query = "SELECT CARTE_STATUT FROM PMT_CHEQUES WHERE CARTE_PORTEUR_ID = '".$porteurID."'";
     $result = executeQuery($query);
-    if (sizeof($result) == 1)
+    if(sizeof($result) == 1)
     {
         $carteStatut = $result[1]['CARTE_STATUT'];
         $isActive = $carteStatut == 'Active' ? 1 : 0;
@@ -329,9 +323,9 @@ function limousinProject_isCarteActive($porteurID) {
 
 function limousinProject_getDateNaissanceFromPorteurID($porteurID) {
     $dateNaissance = '';
-    $query = "SELECT FI_DATEDENAISSANCE FROM PMT_DEMANDES WHERE STATUT <> 0 AND STATUT <> 999 AND PORTEUR_ID = '" . $porteurID . "'";
+    $query = "SELECT FI_DATEDENAISSANCE FROM PMT_DEMANDES WHERE STATUT <> 0 AND STATUT <> 999 AND PORTEUR_ID = '".$porteurID."'";
     $result = executeQuery($query);
-    if (sizeof($result) == 1)
+    if(sizeof($result) == 1)
     {
         $dateNaissance = $result[1]['FI_DATEDENAISSANCE'];
     }
@@ -339,7 +333,6 @@ function limousinProject_getDateNaissanceFromPorteurID($porteurID) {
 }
 
 function limousinProject_nouvelleTransaction($operation = 0, $porteurId = 0, $sens = 'N', $montant = 0, $sousMontants = array()) {
-
     // INIT Ws 201
     $t = new Transaction();
     $retour = array();
@@ -348,7 +341,6 @@ function limousinProject_nouvelleTransaction($operation = 0, $porteurId = 0, $se
      * 01:Versement,03:Déversement,10: Chargement par coupon recharge,15: Chargement par Transfert de carte à carte,
      * 17: Chargement depuis carte bancaire,20: Virement entrant,21: Virement sortant
      */
-
     // SET Params
     $t->partenaire = wsPrestaId;
     $t->operation = $operation;
@@ -356,11 +348,17 @@ function limousinProject_nouvelleTransaction($operation = 0, $porteurId = 0, $se
     // C -> Chargement ou D -> Dechargement
     $t->sens = $sens;
     $t->montant = $montant;
+    /* Mode Test On */
+    //$t->porteurId = "30280000023";
+    //$t->porteurId = "30280055283"; 30280055364
+    //$t->porteurId = "0009";
+    //$t->sens = "C";
+    //$t->montant = "200";
     foreach ($sousMontants as $rsx => $sm)
     {
         $t->addSousMontant($rsx, $sm);
     }
-
+    /* Mode Test Off */
     // CALL Ws
     try
     {
@@ -374,24 +372,17 @@ function limousinProject_nouvelleTransaction($operation = 0, $porteurId = 0, $se
 }
 
 function limousinProject_nouvelleActionCRM($porteurId = 0, $action = '00', $motif = '') {
-
-// INIT Ws 210
+    // INIT Ws 210
     $a = new ActionCRM();
-
-// SET Params
+    // SET Params
     $a->partenaire = wsPrestaId;
     $a->porteurId = $porteurId;
     $a->action = $action;
-
-
     /* Mode Test On */
-
     /* Mode Test Off */
-
     if (!empty($motif))
         $a->motif = $motif;
-
-// CALL Ws
+    // CALL Ws
     try
     {
         $retour = $a->call();
@@ -399,18 +390,16 @@ function limousinProject_nouvelleActionCRM($porteurId = 0, $action = '00', $moti
     }
     catch (Exception $e)
     {
-// TODO
+        // TODO
         $echo = $a->errors->code;
         echo 'Code Erreur action = ' . $echo . '--- End Error ---';
     }
 }
 
 function limousinProject_getOperations($porteurId = 0, $op = '00', $nbJours = '100') {
-
-// INIT Ws 303
+    // INIT Ws 303
     $o = new Operation();
-
-// SET Params
+    // SET Params
     $o->operation = $op;
     $o->porteurId = $porteurId;
     $o->partenaire = wsPrestaId;
@@ -426,59 +415,59 @@ function limousinProject_getOperations($porteurId = 0, $op = '00', $nbJours = '1
       05: Frais Porteurs (de retraits ou autres),
       06: Frais Programme
      */
-
     /* Mode Test On */
-//$o->porteurId = 30280000023;
+    //$o->porteurId = 30280000023;
     $o->porteurId = 30280055283;
     $o->operation = '02';
     /* Mode Test Off */
-
-// CALL Ws
+    // CALL Ws
     try
     {
-// TODO
+        // TODO
         $retour = $o->call();
         echo 'ok oper => ' . $retour . '--- end retour';
     }
     catch (Exception $e)
     {
-// TODO
+        // TODO
+        //$echo = $e->errors; //. ' : ' . $e->message;
         echo 'Code Erreur operation = ' . $o->errors->code . '--- End Error ---';
+        //var_dump($e);
     }
 }
 
 function limousinProject_getAutorisations() {
-
-// INIT Ws 303
+    // INIT Ws 303
     $a = new Autorisation();
-
-// SET Params
-    $a->partenaire = wsPrestaId;
-
-// CALL Ws
+    // SET Params
+    $a->partenaire = wsPrestaId;   
+    // CALL Ws
     try
     {
-// TODO
+        // TODO
         $retour = $a->call();
         echo 'ok oper => ' . $retour . '--- end retour';
     }
     catch (Exception $e)
     {
-// TODO
+        // TODO
+        //$echo = $e->errors; //. ' : ' . $e->message;
         echo 'Code Erreur operation = ' . $a->errors->code . '--- End Error ---';
+        //var_dump($e);
     }
 }
 
 function limousinProject_getActivation($porteurId = 0) {
-
     // INIT Ws 211
     $result = null;
     $v = new Activation();
-
     // SET Params
     $v->partenaire = wsPrestaId;
     $v->porteurId = $porteurId;
-
+    /* Mode Test On */
+    //$v->porteurId = 30280055364;
+    //$s->porteurId = 30280000023;
+    /* Mode Test Off */
     // CALL Ws
     try
     {
@@ -500,27 +489,27 @@ function limousinProject_getActivation($porteurId = 0) {
 }
 
 function limousinProject_getSolde($porteurId = 0) {
-
-// INIT Ws 304
+    // INIT Ws 304
     $s = new Solde();
 
-// SET Params
+    // SET Params
     $s->partenaire = wsPrestaId;
     $s->porteurId = $porteurId;
 
     /* Mode Test On */
-//$s->porteurId = 30280055364;
-//$s->porteurId = 30280055283;
-//$s->porteurId = '30280000023';
+    //$s->porteurId = 30280055364;
+    //$s->porteurId = 30280055283;
+    //$s->porteurId = '30280000023';
     /* Mode Test Off */
 
-// CALL Ws
+    // CALL Ws
     try
     {
+        // TODOs
         $arraySolde = array();
         $arraySousSoldes = array();
         $obj = $s->call();
-        foreach ($obj->sousSoldes->sousSolde as $sousSolde)
+        foreach($obj->sousSoldes->sousSolde as $sousSolde)
         {
             $attrib = $sousSolde->attributes();
             $attrib = (array) $attrib['reseau'];
@@ -534,17 +523,24 @@ function limousinProject_getSolde($porteurId = 0) {
         $soldeComptable = (array) $obj->soldeComptable;
         $arraySolde['soldeComptable'] = $soldeComptable[0];
         $arraySolde['sousSoldes'] = $arraySousSoldes;
+        //$arraySolde = $obj->sousSoldes->sousSolde[0]->attributes();
+        //$arraySolde = (array) $arraySolde['reseau'];
+        //return $obj->sousSoldes->sousSolde[0]->attributes();
         return $arraySolde;
     }
     catch (Exception $e)
     {
+        // TODO
         return $s;
+        //return $s;
+        // echo 'Code Erreur solde = ' . $echo . '--- End Error ---';
     }
 }
 
-function limousinProject_testSolde($soldeReseau, $montant) {
+function limousinProject_testSolde($soldeReseau, $montant)
+{
     $result = -1;
-    if ($soldeReseau >= $montant)
+    if($soldeReseau >= $montant)
     {
         $result = 1;
     }
@@ -556,29 +552,29 @@ function limousinProject_testSolde($soldeReseau, $montant) {
 }
 
 function limousinProject_identification($porteurId = 0, $tel = '', $portable = '', $mail = '', $numCarte = '') {
-
-// INIT Ws 307
+    // INIT Ws 307
     $i = new Identification();
 
-// SET Params
+    // SET Params
     $i->porteurId = $porteurId;
     $i->telephone = $tel;
     $i->portable = $portable;
     $i->email = $mail;
     $i->numcarte = $numCarte;
 
-// CALL Ws
+    // CALL Ws
     try
     {
         $retour = $i->call();
     }
     catch (Exception $e)
     {
-// TODO
+        // TODO
         $echo = $i->errors->code;
         echo 'Code Erreur identification = ' . $echo . '--- End Error ---';
     }
 }
+
 // Créer un utilisateur Prestataire Privatif dans PM et Typo
 function limousinProject_createUser($app_id, $role, $pwd) {
     $fields = convergence_getAllAppData($app_id);
@@ -708,14 +704,13 @@ function limousinProject_updateAQPORTR($file, $num_dossier) {
  *
  * @return  array   $list_file  liste des fichiers modifiés sur la machine PM en local
  */
-function limousinProject_removeWrapFileAqoba($list_file) {
-
-    if (!empty($list_file))
+function limousinProject_removeWrapFileAqoba($list_file){
+    if(!empty($list_file))
     {
         foreach ($list_file as $file)
         {
             $content = file($file);
-            if (!empty($content))
+            if(!empty($content))
             {
                 $first = array_shift($content);
                 $last = array_pop($content);
@@ -775,19 +770,19 @@ function limousinProject_importFromFileTransaction($file)
     }
 }
 
-function limousinProject_updateFromAQPORTREJ($file) {
-//on récupère le contenu du fichier
+function limousinProject_updateFromAQPORTREJ($file){
+    //on récupère le contenu du fichier
     $content = file($file);
     $data = array();
-    if (!empty($content))
+    if(!empty($content))
     {
-        foreach ($content as $line)
+        foreach($content as $line)
         {
             $code_erreurs = trim(substr($line, 1123));
             $porter_id = trim(substr($line, 29, 12));
             $q = 'select APP_UID from PMT_DEMANDES where PORTEUR_ID = "' . $porter_id . '" and STATUT = 7';
             $r = executeQuery($q);
-            if (!empty($r[1]['APP_UID']))
+            if(!empty($r[1]['APP_UID']))
             {
                 convergence_changeStatut($r[1]['APP_UID'], 41, 'Erreur dans le fichier AQ_PORT_R code :' . $code_erreurs);
                 $code_err = '"' . strtr(trim($code_erreurs), array(' ' => '","')) . '"';
@@ -838,8 +833,8 @@ function limousinProject_explicationStatut_callback($app_data) {
 }
 
 function limousinProject_readLineFromAQCARTE($datas) {
-
-//INIT
+    
+    //INIT
     $err = array();
     foreach ($datas as $line)
     {
@@ -945,24 +940,20 @@ function limousinProject_showPdf($app_uid) {
     }
     $path = PATH_DOCUMENT . $app_uid . PATH_SEP . 'outdocs' . PATH_SEP . $result[1]['APP_DOC_UID'] . '_' . $result[1]['DOC_VERSION'];
     $file = $path . '.pdf';
-
-
     if (file_exists($file))
-    {//TODO
-//OUPUT HEADERS
-        $fileContent = file_get_contents($file);
-
-        header("Pragma: public");
-        header("Expires: 0");
-        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-        header("Cache-Control: private", false);
-        header("Content-Type: application/pdf");
-        header('Content-Disposition: attachment; filename="' . $result[1]['CON_VALUE'] . '.pdf";');
-        header('Content-Length: ' . strlen($fileContent));
-        header("Content-Transfer-Encoding: binary");
-
-
-        echo $fileContent;
+    {
+      //TODO
+      //OUPUT HEADERS
+      $fileContent = file_get_contents($file);
+      header("Pragma: public");
+      header("Expires: 0");
+      header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+      header("Cache-Control: private",false);
+      header("Content-Type: application/pdf");
+      header('Content-Disposition: attachment; filename="' . $result[1]['CON_VALUE'] . '.pdf";');
+      header('Content-Length: ' . strlen($fileContent));
+      header("Content-Transfer-Encoding: binary");
+      echo $fileContent;
     }
     return;
 }
@@ -975,8 +966,8 @@ function limousinProject_getSituationLabel($situation) {
 
 function limousinProject_getCartePorteurId($porteur_id) {
 
-// on check qu'il y ai bien une carte produite pour ce porteur id
-    $qExist = 'select count(UID) as nb from PMT_CHEQUES where CARTE_PORTEUR_ID = "' . mysql_escape_string($porteur_id) . '" AND CODE_EVENT IN(14,10)';
+    // on check qu'il y ai bien une carte produite pour ce porteur id
+    $qExist = 'select count(UID) as nb from PMT_CHEQUES where CARTE_PORTEUR_ID = "' . mysql_escape_string($porteur_id) . '" AND CODE_EVENT = 14';    
     $rExist = executeQuery($qExist);
     $nbID = intval($rExist[1]['nb']);
     if (!empty($nbID) && $nbID > 0)
@@ -992,14 +983,14 @@ function limousinProject_getErrorAqoba($code, $service) {
 
     $qError = "select LABEL_E_AQ from PMT_CODE_ERREUR_AQOBA where CODE_E_AQ = '" . $code . "'  AND SERVICE_E_AQ = '" . $service . "'";
     $rError = executeQuery($qError);
-    if (!empty($rError[1]['LABEL_E_AQ']))
+    if(!empty($rError[1]['LABEL_E_AQ']))
         return $rError[1]['LABEL_E_AQ'];
     else
         return "Une erreur inconnue c'est produite !!! code : $code, service : $service";
 }
 
 function limousinProject_updateUsergroupTypo($userInfo, $porteurid, $groupId) {
-//appel du ws pour modifier le usergroup dans typo3
+    //appel du ws pour modifier le usergroup dans typo3
     ini_set("soap.wsdl_cache_enabled", "0");
     $hostTypo3 = 'http://' . HostName . '/typo3conf/ext/pm_webservices/serveur.php?wsdl';
     $pfServer = new SoapClient($hostTypo3);
@@ -1015,30 +1006,43 @@ function limousinProject_updateUsergroupTypo($userInfo, $porteurid, $groupId) {
     return $ret;
 }
 
-function limousinProject_activationCarte($porteurId, $statut, $role_user = 'Bénéficiaires') {
+function limousinProject_activationCarte($porteurId, $statut, $role_user = 'Bénéficiaires', $televersement = TRUE) {
     $return = TRUE;
     if (!empty($porteurId) && $statut == 1)
     {
         // on regarde si le porteurid fourni est correct et on remonte le cas echeant les infos de la demande
         $exist = limousinProject_getCartePorteurId($porteurId);
-        if (!empty($exist) && ($exist['USER_ID'] == $_SESSION['USER_LOGGED'] || $role_user != 'Bénéficiaires'))
+        $role_permit = array( "PROCESSMAKER_ADMIN", "Gestionnaires Adéquation", "Encadrants" );
+        if ( !empty($exist) && ($exist['USER_ID'] == $_SESSION['USER_LOGGED'] || in_array($role_user, $role_permit)) )
         {
             //on appel le WS d'activation de la carte, on ajoute un groupe utilsateur carte active dans le fe_user Typo3
             //et mise a jour de la table des carte PMT_CHEQUES comme quoi elle est activée
             $active = limousinProject_getActivation($porteurId);
-            if (!empty($active->CODE) && $active->CODE == 'OK')
+            if ( !empty($active->CODE) && $active->CODE == 'OK' )
             {
-                // on appel le WS de televersement des montants
-                //$sousMontants = array(165 => "800", "800", "1000", "800", "400", "1200");
-                $sousMontants = limousinProject_getMontantRsxByCodeOper($exist['CODE_OPERATION']);
-                $totalMontants = limousinProject_getMontantByCodeOper($exist['CODE_OPERATION']);
-                $transaction = array();
-                $transaction = limousinProject_nouvelleTransaction('01', $porteurId, 'C', $totalMontants, $sousMontants);
-                if (!empty($transaction['errors']))
-                {
-                    //on récupére le label du code erreur de transaction
-                    $erreur = limousinProject_getErrorAqoba($transaction['errors'], 'WS201') . ' (code' . $transaction['errors'] . ' du WS201)';
-                    $return = 'erreur';
+                // si $televersement à FALSE, alors c'est une simple activation de carte sans chargement
+                if ( $televersement )
+                {                    
+                    // on appel le WS de televersement des montants
+                    if ( !empty($exist['CODE_OPERATION']) )
+                    {
+                        $sousMontants = limousinProject_getMontantRsxByCodeOper($exist['CODE_OPERATION']);
+                        $totalMontants = limousinProject_getMontantByCodeOper($exist['CODE_OPERATION']);
+                        $transaction = array( );
+                        $transaction = limousinProject_nouvelleTransaction('01', $porteurId, 'C', $totalMontants, $sousMontants);
+                        if ( !empty($transaction['errors']) )
+                        {
+                            //on récupére le label du code erreur de transaction
+                            $erreur = limousinProject_getErrorAqoba($transaction['errors'], 'WS201') . ' (code' . $transaction['errors'] . ' du WS201)';
+                            $return = 'erreur';
+                        }
+                    }
+                    else
+                    {
+                        // pas de code opération donc pas de montant connu
+                        $erreur = 'Montant et code opération inconnus pour le chargement de la carte.';
+                        $return = 'erreur';
+                    }
                 }
             }
             else
@@ -1095,7 +1099,7 @@ function limousinProject_activationCarte($porteurId, $statut, $role_user = 'Bén
             if ($role_user == 'Bénéficiaires')
                 $queryDemande = "SELECT APP_UID FROM PMT_DEMANDES WHERE USER_ID = '" . $_SESSION['USER_LOGGED'] . "' AND STATUT <> 0 AND STATUT <> 999";
             else // cas où l'activation de carte est faite par un gestionnaire ou autre, et que le porteur id n'est pas valide
-                $queryDemande = "SELECT APP_UID FROM PMT_DEMANDES WHERE CARTE_PORTEUR_ID = '" . $porteurId . "' AND STATUT <> 0 AND STATUT <> 999";
+                $queryDemande = "SELECT APP_UID FROM PMT_DEMANDES WHERE PORTEUR_ID = '" . $porteurId . "' AND STATUT <> 0 AND STATUT <> 999";
             $resultAppUid = executeQuery($queryDemande);
             if (sizeof($resultAppUid) == 1)
             {
@@ -1106,7 +1110,7 @@ function limousinProject_activationCarte($porteurId, $statut, $role_user = 'Bén
         if (!empty($exist))
             insertHistoryLogPlugin($exist['APPLICATION'], $_SESSION['USER_LOGGED'], date('Y-m-d H:i:s'), '0', '', "Erreur lors de l'activation de la carte : " . $erreur, $exist['STATUT']);
     }
-    return $return;
+    return array( 'success' => $return, 'messageInfo' => $erreur );
 }
 
 function limousinProject_getThematiqueFromPartenaire($userId) {
@@ -1141,20 +1145,20 @@ function limousinProject_getThematiqueFromPartenaire($userId) {
 
 function limousinProject_getPartenaireInfoForTicket($userId) {
     $partenaireInfo = '';
-    $query = "SELECT RAISONSOCIALE, CP, VILLE FROM PMT_PRESTATAIRE WHERE STATUT = 1 AND USER_ID ='" . $userId . "'";
+    $query = "SELECT RAISONSOCIALE, CP, VILLE FROM PMT_PRESTATAIRE WHERE STATUT = 1 AND USER_ID ='".$userId."'";
     $result = executeQuery($query);
-    if (isset($result))
+    if(isset($result))
     {
         $raison = $result[1]['RAISONSOCIALE'];
         $cp = $result[1]['CP'];
         $ville = $result[1]['VILLE'];
-        if (isset($raison))
+        if(isset($raison))
         {
             $partenaireInfo .= $raison;
         }
-        if (isset($cp) && isset($ville))
+        if(isset($cp) && isset($ville))
         {
-            $partenaireInfo .= '<br/>' . $cp . ' ' . $ville;
+            $partenaireInfo .= '<br/>'.$cp.' '.$ville;
         }
     }
     return $partenaireInfo;
@@ -1162,9 +1166,9 @@ function limousinProject_getPartenaireInfoForTicket($userId) {
 
 function limousinProject_getPartenaireIdFromPartenaire($userId) {
     $partenaireId = '';
-    $query = "SELECT PARTENAIRE_UID FROM PMT_PRESTATAIRE where STATUT=1 AND USER_ID ='" . $userId . "'";
+    $query = "SELECT PARTENAIRE_UID FROM PMT_PRESTATAIRE where STATUT=1 AND USER_ID ='".$userId."'";
     $result = executeQuery($query);
-    if (isset($result))
+    if(isset($result))
     {
         $partenaireId = $result[1]['PARTENAIRE_UID'];
     }
@@ -1275,6 +1279,67 @@ function limousinProject_getLibelleFromCodeReseau($codeReseau)
         $libelle = $result[1]['LIBELLE'];
     }
     return $libelle;
+}
+
+function limousinProject_actionDeleteCases_callback($item) {
+    $appUid = $item['APP_UID'];
+    $result = array( );
+    $result['check'] = true;
+    $sqlGetEtabFromAppUid = "SELECT RNE FROM PMT_ETABLISSEMENT WHERE APP_UID = '" . $appUid . "'";
+    $resultGetEtab = executeQuery($sqlGetEtabFromAppUid);
+    if ( isset($resultGetEtab[1]['RNE']) && $resultGetEtab[1]['RNE'] != '' )
+    {
+        $codeEtab = $resultGetEtab[1]['RNE'];
+        $sqlCheckEtab = "SELECT NUM_DOSSIER FROM PMT_DEMANDES WHERE RNE = '" . $codeEtab . "' AND STATUT != '0' AND STATUT != '999'";
+        $resultCheckEtab = executeQuery($sqlCheckEtab);
+        if ( isset($resultCheckEtab[1]['NUM_DOSSIER']) && $resultCheckEtab[1]['NUM_DOSSIER'] != '' )
+        {
+            $result['check'] = false;
+            $result['messageInfo'] = "L'établissement " . $item['NUM_DOSSIER'] . " de code RNE $codeEtab n'a pas été supprimé car il est rattaché à une ou plusieur demandes.";
+        }
+        else
+        {
+            $result['messageInfo'] = "L'établissement " . $item['NUM_DOSSIER'] . " a été correctement supprimé.";
+        }
+    }
+    return $result;
+}
+
+function limousinProject_getAffilieAqoba($thematique) {
+
+    if(!empty($thematique))
+    {
+        // recherche des thématiques et champs associé pour le préstataire
+        $arrayThematique = array( );
+        $queryTh = 'SELECT PRESTA_NAMEFIELD, LIBELLE 
+                    FROM PMT_THEMATIQUES AS T
+                        INNER JOIN PMT_RSXTHEMATIQ_MM_PRESTAFIELDTHEMATIQ AS R
+                        ON (R.MM_CODE_RESEAU = T.CODE_RESEAU)
+                    WHERE T.CODE_RESEAU ="' . $thematique . '"';
+        $resultTh = executeQuery($queryTh);
+        if ( count($resultTh) > 1 )
+        {
+            foreach ( $resultTh as $liste )
+            {
+                $arrayThematique[] = $liste['PRESTA_NAMEFIELD'] . ' = 1';
+            }
+            $whereThematique = ' AND (' . implode(' OR ', $arrayThematique) . ')';
+        }
+        else
+            $whereThematique = ' AND ' . $resultTh[1]['PRESTA_NAMEFIELD'] . ' = 1';
+
+    $path = 'Affiliés - ' . $resultTh[1]['LIBELLE'];
+    }
+    else
+    {
+        $whereThematique = '';
+        $path = 'Affiliés - Toutes thématiques';
+    }
+    $queryListePresta = "SELECT `NUM_TPE`, `RAISONSOCIALE` FROM PMT_PRESTATAIRE WHERE upper(TYPE_PRESTA) LIKE 'BANCAIRE' AND STATUT = 1" . $whereThematique;
+    $resultListePresta = executeQuery($queryListePresta);
+    $headerLine = array('ID commerçant','Raison Sociale');
+    array_unshift($resultListePresta, $headerLine);
+    exportXls('', $resultListePresta, array( ), $path, 'csv');     
 }
 
 ?>

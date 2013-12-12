@@ -1,6 +1,4 @@
 <?php
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', True); 
 G::LoadClass ( 'case' );
 G::LoadClass ( 'pmFunctions' );
 $form=$_POST;
@@ -21,17 +19,17 @@ function addActionInbox($idInbox,$idAction,$nameAction,$pmFunction,$parametersFu
 {
 	$queryItemFile="INSERT INTO PMT_INBOX_ACTIONS (ID_INBOX,ID_ACTION,NAME_ACTION,ID_PM_FUNCTION,PARAMETERS_FUNCTION,ROL_CODE,SENT_FUNCTION_PARAMETERS,POSITION)
 			VALUES (
-			'$idInbox',
-			'$idAction',
-			'$nameAction',
-			'$pmFunction',
-			'$parametersFunction',
-			'$rolID',
-			'$sentParameters',
-			'$positionField'
+				'$idInbox',
+				'$idAction',
+				'$nameAction',
+				'$pmFunction',
+				'$parametersFunction',
+				'".mysql_escape_string($rolID)."',
+				'$sentParameters',
+				'$positionField'
 			)";
-		    executeQuery($queryItemFile);
-		    $res=true;	    
+	executeQuery($queryItemFile);
+	$res=true;	    
 		    
 	header("Content-Type: text/html");
 	$returnStatus = array('success' => $res);
@@ -46,14 +44,13 @@ function editActionInbox($idInbox,$idAction,$nameAction,$pmFunction,$parametersF
 			ID_PM_FUNCTION = '$pmFunction',
 			PARAMETERS_FUNCTION = '$parametersFunction',
 			SENT_FUNCTION_PARAMETERS = '$sentParameters'
-			WHERE ROL_CODE = '$rolID' 
+			WHERE ROL_CODE = '".mysql_escape_string($rolID)."'
 			AND ID_INBOX = '$idInbox'
-			AND ID = '$actionInboxID'
-			";
+			AND ID = '$actionInboxID'";
 
-		    executeQuery($queryItemFile);
-		    $res=true;	    
-		    
+	executeQuery($queryItemFile);
+	$res=true;	    
+
 	header("Content-Type: text/html");
 	$returnStatus = array('success' => $res);
 
@@ -70,23 +67,23 @@ function addDragDropActions($data,$rolID)
 			$parametersFunction = $value->parametersFunction;
 			$sentParameters = $value->sentFunctionParameters;
 			
-			$queryPos = "SELECT max(POSITION) AS POSITION FROM PMT_INBOX_ACTIONS WHERE ROL_CODE = '" . $rolID . "' AND ID_INBOX = '" . $idInbox ."'";
+			$queryPos = "SELECT max(POSITION) AS POSITION FROM PMT_INBOX_ACTIONS WHERE ROL_CODE = '" . mysql_escape_string($rolID) . "' AND ID_INBOX = '" . $idInbox ."'";
 			$position = executeQuery ( $queryPos );
 			$positionField = $position [1] ['POSITION'];
 			$positionField = $positionField + 1;
 
 			$queryItemFile="INSERT INTO PMT_INBOX_ACTIONS (ID_INBOX,ID_ACTION,NAME_ACTION,ID_PM_FUNCTION,PARAMETERS_FUNCTION,ROL_CODE,SENT_FUNCTION_PARAMETERS,POSITION)
-			VALUES (
-			'$idInbox',
-			'$idAction',
-			'$nameAction',
-			'$pmFunction',
-			'$parametersFunction',
-			'$rolID',
-			'$sentParameters',
-			'$positionField'
-			)";
-		    executeQuery($queryItemFile);
+				VALUES (
+					'$idInbox',
+					'$idAction',
+					'$nameAction',
+					'$pmFunction',
+					'$parametersFunction',
+					'".mysql_escape_string($rolID)."',
+					'$sentParameters',
+					'$positionField'
+				)";
+	    	executeQuery($queryItemFile);
 		    		
 			$res = true;
 		
@@ -121,7 +118,7 @@ function addConditionByFields($data,$rolID)
 			VALUES (
 			'$idfield',
 			'$idTable',
-			'$rolID',
+			'".mysql_escape_string($rolID)."',
 			'$idInbox',
 			'$idAction',
 			'$nameAction',
@@ -147,11 +144,8 @@ switch ($method) {
 	case "add":
 		if(isset($_GET['ID']) && $_GET['ID']!='')
 		{							
-			$select = "SELECT NAME, 
-								   DESCRIPTION , 
-								   PM_FUNCTION , 
-								   PARAMETERS_FUNCTION 
-								   FROM PMT_ACTIONS WHERE ID = '".$form['idAction']."'";
+			$select = "SELECT NAME, DESCRIPTION, PM_FUNCTION, PARAMETERS_FUNCTION 
+						FROM PMT_ACTIONS WHERE ID = '".$form['idAction']."'";
 			
 			$querySelect = executeQuery($select);
 			if (sizeof($querySelect) > 0)
@@ -159,7 +153,7 @@ switch ($method) {
 				$nameAction = $querySelect[1]['NAME'];
 				$pmFunction = $querySelect[1]['PM_FUNCTION'];
 			}
-			$queryPos = "SELECT max(POSITION) AS POSITION FROM PMT_INBOX_ACTIONS WHERE ROL_CODE = '" . $form ['rolID'] . "' 
+			$queryPos = "SELECT max(POSITION) AS POSITION FROM PMT_INBOX_ACTIONS WHERE ROL_CODE = '" . mysql_escape_string($form ['rolID']) . "' 
 			AND  ID_INBOX = '" . $form ['idInbox'] . "' ";
 			$position = executeQuery ( $queryPos );
 			$positionField = $position [1] ['POSITION'];
@@ -173,11 +167,8 @@ switch ($method) {
 	case "edit":
 		if(isset($_GET['ID']) && $_GET['ID']!='')
 		{							
-			$select = "SELECT NAME, 
-							DESCRIPTION , 
-							PM_FUNCTION , 
-							PARAMETERS_FUNCTION 
-							FROM PMT_ACTIONS WHERE ID = '".$form['idAction']."'";
+			$select = "SELECT NAME, DESCRIPTION, PM_FUNCTION, PARAMETERS_FUNCTION 
+						FROM PMT_ACTIONS WHERE ID = '".$form['idAction']."'";
 			
 				$querySelect = executeQuery($select);
 				if (sizeof($querySelect) > 0)
@@ -194,11 +185,10 @@ switch ($method) {
 		
 		if(isset($_GET['ID']) && $_GET['ID']!='')
 		{
-			$delQuery = "DELETE FROM PMT_INBOX_ACTIONS WHERE ROL_CODE = '" . $form ['rolID'] . "' AND ID_INBOX = '" . $form ['idInbox'] ."'  ";
+			$delQuery = "DELETE FROM PMT_INBOX_ACTIONS WHERE ROL_CODE = '" . mysql_escape_string($form ['rolID']) . "' AND ID_INBOX = '" . $form ['idInbox'] ."'  ";
 			$delete = executeQuery ($delQuery);
 		}
 		$data = json_decode ( $_POST ['arrayActionsInbox'] );
-		
 		$ret = addDragDropActions($data,$form['rolID']);
 		break;
 	
@@ -206,7 +196,7 @@ switch ($method) {
 		
 		if(isset($_GET['ID']) && $_GET['ID']!='')
 		{
-			$delQuery = "DELETE FROM PMT_CONDITION_BY_FIELDS WHERE ROL_CODE = '" . $form ['rolID'] . "' AND ID_INBOX = '" . $form ['idInbox'] ."' AND ID_ACTION = '" . $form ['idAction'] . "' ";
+			$delQuery = "DELETE FROM PMT_CONDITION_BY_FIELDS WHERE ROL_CODE = '" . mysql_escape_string($form ['rolID']) . "' AND ID_INBOX = '" . $form ['idInbox'] ."' AND ID_ACTION = '" . $form ['idAction'] . "' ";
 			$delete = executeQuery ($delQuery);
 		}
 		$data = json_decode ( $_POST ['arrayFieldsAction'] );

@@ -1,6 +1,4 @@
 <?php 
-ini_set ( 'error_reporting', E_ALL );
-ini_set ( 'display_errors', True );   
     G::LoadClass('case');
     G::LoadClass('configuration');
     G::loadClass('pmFunctions');
@@ -86,20 +84,22 @@ ini_set ( 'display_errors', True );
 					
 					if(count($selectVerification) == 0)
 					{
-						$sQuery = " INSERT INTO PMT_ACTIONS (NAME, 
-															DESCRIPTION,
-															PM_FUNCTION,
-															PARAMETERS_FUNCTION,
-															NAME_PLUGIN,
-															ROWS_AFFECT)
-											VALUES ('$actionName', 
-													'".mysql_real_escape_string($actionDescription)."',
-													'$pmFunction',
-													'$parametersFunction',
-													'$pluginName',
-													'$rowsAffect'
-													)
-					       ";
+						$sQuery = " INSERT INTO 
+										PMT_ACTIONS (
+											NAME, 
+											DESCRIPTION,
+											PM_FUNCTION,
+											PARAMETERS_FUNCTION,
+											NAME_PLUGIN,
+											ROWS_AFFECT)
+										VALUES (
+											'$actionName', 
+											'".mysql_real_escape_string($actionDescription)."',
+											'$pmFunction',
+											'$parametersFunction',
+											'$pluginName',
+											'$rowsAffect'
+										)";
 						$aDatos = executeQuery ($sQuery);
 						$res = true;
 					}

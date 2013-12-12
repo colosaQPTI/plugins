@@ -11,7 +11,7 @@
 	$sQuery = "SELECT A.*
                FROM PMT_INBOX_FIELDS AS A 
                WHERE A.ID_INBOX = '".$_GET['actionInbox_id']."' 
-			   AND A.ROL_CODE = '".$_GET['rolID']."'"; 
+			   AND A.ROL_CODE = '".mysql_escape_string($_GET['rolID'])."'"; 
     $aDatos = executeQuery ($sQuery);
 
 	$array = Array();
