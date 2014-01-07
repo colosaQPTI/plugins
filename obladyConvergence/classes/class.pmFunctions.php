@@ -3673,27 +3673,88 @@ function chgrpr($path, $group) {
     else
         return FALSE;
 }
+
 /**
- * Permet de récupérer les date des semaines précedant une date
- *
- * $MoinsNSemaine       @int        Nombre de semaine avant la date, 0 pour la semaine courante
- * $dateReferente       @string     Date à partir de laquelle on effectue la recherche
- *
- * $dateSemaine         @array      Contient les dates de début et fin de semaine voulue
- */
+* Permet de récupérer les dates des semaines précedant une date
+*
+* $MoinsNSemaine       @int        Nombre de semaine avant la date, 0 pour la semaine courante
+* $dateReferente       @string     Date à partir de laquelle on effectue la recherche
+*
+* $dateSemaine         @array      Contient les dates de début et fin de semaine voulue
+*/
 function convergence_getDateLastWeek($MoinsNSemaine = 0, $dateReferente = NULL) {
 
     // INIT
-    (!$dateReferente ? $dateReferente = date('d-m-Y') : $dateReferente);
-    $MoinsNSemaine++;
-    $n = (string) $MoinsNSemaine;
-    // on récupère les dates, second Sunday car dans le format anglais les semaine commence par Dimanche.
+    (!$dateReferente ? $dateReferente = date('d-m-Y') : $dateReferente = date('d-m-Y', strtotime($dateReferente)));
+    //dans le format anglais les semaine commence par Dimanche donc si le jour de ref est un dimanche, pose problème
+    $date = explode('-', $dateReferente);
+    if ( date('w', mktime(0, 0, 0, $date[1], $date[0], $date[2])) == 0 )
+        $dateReferente = date('d-m-Y', mktime(0, 0, 0, $date[1], $date[0] - 1, $date[2]));
+    $n = ( string ) $MoinsNSemaine;
+
+    $lundi = date('d-m-Y', strtotime('monday this week' . $dateReferente));
+    $dimanche = date('d-m-Y', strtotime('sunday this week' . $dateReferente));
     $dateSemaine = array(
-        'Lundi' => date('d-m-Y', strtotime('Monday -' . $n . ' week ' . $dateReferente)),
-        'Dimanche' => date('d-m-Y', strtotime('second Sunday -' . $n . ' week ' . $dateReferente)));
+        'Lundi' => date('d-m-Y', strtotime('Monday -' . $n . ' week ' . $lundi)),
+        'Dimanche' => date('d-m-Y', strtotime('Sunday -' . $n . ' week ' . $dimanche)) );
 
     // RETURN
     return $dateSemaine;
+}
+
+/**
+ * Permet de récupérer les dates des n semaines précedant une date
+ *
+ * $NSemaine        @int        Nombre de semaine
+ * $dateReferente   @string     Date à partir de laquelle on effectue la recherche
+ *
+ * $dateSemaine     @array      Contient les dates de début et fin de période voulue
+ */
+function convergence_getDateXLastWeek($NSemaine = 0, $dateReferente = NULL) {
+
+    // INIT
+    (!$dateReferente ? $dateReferente = date('d-m-Y') : $dateReferente = date('d-m-Y', strtotime($dateReferente)));
+    //dans le format anglais les semaines commence par Dimanche donc si le jour de ref est un dimanche, pose problème, on prend le samedi précédent.
+    $date = explode('-', $dateReferente);
+    if ( date('w', mktime(0, 0, 0, $date[1], $date[0], $date[2])) == 0 )
+        $dateReferente = date('d-m-Y', mktime(0, 0, 0, $date[1], $date[0] - 1, $date[2]));
+    $n = ( string ) $NSemaine;
+
+    $lundi = date('d-m-Y', strtotime('monday this week' . $dateReferente));
+    $dimanche = date('d-m-Y', strtotime('sunday this week' . $dateReferente));
+    $dateSemaine = array(
+        'Lundi' => date('d-m-Y', strtotime('Monday -' . $n . ' week ' . $lundi)),
+        'Dimanche' => date('d-m-Y', strtotime('Sunday -1 week ' . $dimanche)) );
+
+    // RETURN
+    return $dateSemaine;
+}
+
+// TODO a tester
+function convergence_getQuinzaine($dateReferente = NULL) {
+
+    // INIT
+    $periode = array( );
+    (!$dateReferente ? $dateReferente = date('d-m-Y') : $dateReferente = date('d-m-Y', strtotime($dateReferente)));
+    //calcule de la quinzaine voulu en fonction de $dateReferente
+    $date = explode('-', $dateReferente);
+    $periode['date'] = $date;
+    // Attention, tester janvier / decembre
+    if ( $date[0] < 16 )
+    { // Seconde quinzaine
+        $jourSeize = mktime(0, 0, 0, $date[1] - 1, 16, $date[2]);
+        $nbJoursDansMois = date("t", $jourSeize);
+        $periode['premierJour'] = date("d-m-Y", $jourSeize);
+        $periode['dernierJour'] = date("d-m-Y", mktime(0, 0, 0, $date[1] - 1, $nbJoursDansMois, $date[2]));
+    }
+    else
+    { // Première quinzaine
+        $periode['premierJour'] = date("d-m-Y", mktime(0, 0, 0, $date[1], 1, $date[2]));
+        $periode['dernierJour'] = date("d-m-Y", mktime(0, 0, 0, $date[1], 15, $date[2]));
+    }
+
+
+    return $periode;
 }
 
 function convergence_getDateCreateDemande($num_dossier) {

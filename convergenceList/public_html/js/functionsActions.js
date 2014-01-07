@@ -1254,6 +1254,14 @@ function exporterRMHFileF() {
     post(urlData, {items: idField});
 }
 
+function exporterXlsFile(file) {
+    if (file) {
+        type = 'npai';
+        urlData = "../convergenceList/actions/exportXlsFile.php";
+        post(urlData, {file: file});
+    }
+}
+
 function exportDossierListeProd() {
 
     idField = myApp.addTab_inside();

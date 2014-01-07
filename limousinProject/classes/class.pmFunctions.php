@@ -209,7 +209,7 @@ function limousinProject_getBlocage($porteurId, $groupeId ) {
     {
         $v->call();
         // Si la carte est bien activée, on met à jour la table des cartes PMT_CHEQUES
-        $query = 'update PMT_CHEQUES SET CARTE_STATUT = "Bloquée" where CARTE_PORTEUR_ID= "' . mysql_escape_string($porteurId) . '"';
+        $query = 'update PMT_CHEQUES SET CARTE_STATUT = "Bloquée", DATE_BLOCAGE = "' . date('Y-m-d') . '" where CARTE_PORTEUR_ID= "' . mysql_escape_string($porteurId) . '"';
         $resQuery = executeQuery($query);
         // Puis on change le usergroup dans Typo3 en Carte activé
         $data = limousinProject_getDemandeFromPorteurID($porteurId);
@@ -236,7 +236,7 @@ function limousinProject_getDeblocage($porteurId ) {
     {
         $v->call();
         // Si la carte est bien activée, on met à jour la table des cartes PMT_CHEQUES
-        $query = 'update PMT_CHEQUES SET CARTE_STATUT = "Active" where CARTE_PORTEUR_ID= "' . mysql_escape_string($porteurId) . '"';
+        $query = 'update PMT_CHEQUES SET CARTE_STATUT = "Active", DATE_ACTIVE = "' . date('Y-m-d') . '" where CARTE_PORTEUR_ID= "' . mysql_escape_string($porteurId) . '"';
         $resQuery = executeQuery($query);
         // Puis on change le usergroup dans Typo3 en Carte activé
         $data = limousinProject_getDemandeFromPorteurID($porteurId);
@@ -301,10 +301,10 @@ function limousinProject_getDemandeFromPorteurID($porterId) {
     }
     return $arrayDemandeInfos;
 }
-
-function limousin_addTransactionPriv($codePartenaire, $porteurID, $montant, $libelle, $thematique, $type) {
+// Ajout de numDossier en paramètre pour avoir une relation lors des remboursement avec la report table
+function limousin_addTransactionPriv($codePartenaire, $porteurID, $montant, $libelle, $thematique, $type, $numDossier) {
     $now = date('d-m-Y');
-    $queryInsertTransactionPriv = "INSERT INTO PMT_TRANSACTIONS_PRIV(CODE_PARTENAIRE, PORTEUR_ID, MONTANT, LIBELLE, THEMATIQUE, TYPE, DATE_EMISSION, STATUT) VALUES('".$codePartenaire."','".$porteurID."','".$montant."','".$libelle."','".$thematique."','".$type."','".$now."', '16')";
+    $queryInsertTransactionPriv = "INSERT INTO PMT_TRANSACTIONS_PRIV(CODE_PARTENAIRE, PORTEUR_ID, MONTANT, LIBELLE, THEMATIQUE, TYPE, DATE_EMISSION, STATUT, DOSSIER) VALUES('" . $codePartenaire . "','" . $porteurID . "','" . $montant . "','" . $libelle . "','" . $thematique . "','" . $type . "','" . $now . "', '16', '" . $numDossier . "')";
     executeQuery($queryInsertTransactionPriv);
 }
 
@@ -1215,50 +1215,6 @@ function limousinProject_getMontantByCodeOper($code_oper) {
     return $montantTotal;
 }
 
-function limousinProject_getFileEtatTransaction($path = '/var/tmp/Etat_Transaction_TPE_Hebdo', $ext = 'xlsx', $MoinsNSemaine = 0, $dateReferente = NULL) {
-    $calendrier = array();
-    $calendrier = convergence_getDateLastWeek($MoinsNSemaine, $dateReferente);
-    G::pr($calendrier);
-    die;
-    /* SELECT a.NUMERO, a.`ID_COMMERCANT`, a.`ID_PORTEUR`, a.`CODE_PARTENAIRE`, t.UID as NUM_OPERATION, CONVERT(DATE_FORMAT(STR_TO_DATE(t.DATE_EFFECTIVE, '%Y%m%d'), '%d/%m/%Y') USING utf8) AS DATE_TRANSACTION,  t.C_RAISON_SOCIALE as NOM_PRESTA,
-      t.NUMERO,
-      IF(t.SENS_MONTANT_NET = 'D',
-      CONCAT(FORMAT((t.MONTANT_NET/POW(10,t.NB_DECIMAL_MONTANT_NET)), t.NB_DECIMAL_MONTANT_NET), ' €'),
-      CONCAT('-', FORMAT((t.MONTANT_NET/POW(10,t.NB_DECIMAL_MONTANT_NET)), t.NB_DECIMAL_MONTANT_NET), ' €'))
-      AS MONTANT,
-      CONCAT(FORMAT((SUM(t.MONTANT_NET)/POW(10,t.NB_DECIMAL_MONTANT_NET)), t.NB_DECIMAL_MONTANT_NET), ' €') as TOTAL,
-      SUM(t.MONTANT_NET) as net
-      FROM PMT_TRANSACTIONS as t join PMT_AUTORISATIONS as a on (t.NUMERO = a.`NUMERO`)
-      WHERE STR_TO_DATE(t.DATE_EFFECTIVE, '%Y%m%d') > STR_TO_DATE('16-09-2013', '%d-%m-%Y')
-      AND STR_TO_DATE(t.DATE_EFFECTIVE, '%Y%m%d') < STR_TO_DATE('22-09-2013', '%d-%m-%Y') group by ID_COMMERCANT order by `ID_COMMERCANT` */
-    $requeteTransaction = "SELECT UID as NUM_OPERATION,
-                                CONVERT(DATE_FORMAT(STR_TO_DATE(DATE_EFFECTIVE, '%Y%m%d'), '%d/%m/%Y') USING utf8) AS DATE_TRANSACTION,
-                                C_RAISON_SOCIALE as NOM_PRESTA,
-                                NUMERO,
-                                IF(SENS_MONTANT_NET = 'D',
-                                    CONCAT(FORMAT((MONTANT_NET/POW(10,NB_DECIMAL_MONTANT_NET)), NB_DECIMAL_MONTANT_NET), ' €'),
-                                    CONCAT('-', FORMAT((MONTANT_NET/POW(10,NB_DECIMAL_MONTANT_NET)), NB_DECIMAL_MONTANT_NET), ' €'))
-                                AS MONTANT
-                            FROM PMT_TRANSACTIONS
-                            WHERE STR_TO_DATE(DATE_EFFECTIVE, '%Y%m%d') > STR_TO_DATE('" . $calendrier['Lundi'] . "', '%d-%m-%Y')
-                                AND STR_TO_DATE(DATE_EFFECTIVE, '%Y%m%d') < STR_TO_DATE('" . $calendrier['Dimanche'] . "', '%d-%m-%Y')";
-    $resultTransaction = executeQuery($requeteTransaction);
-    if (!empty($requeteTransaction))
-    {
-        $subTitle = array_keys($resultTransaction[1]);
-        $title = 'Etat des Transactions TPE du ' . $calendrier['Lundi'] . ' au ' . $calendrier['Dimanche'];
-        exportXls($title, $resultTransaction, $subTitle, $path, $ext, 0);
-        // RETURN
-        $calendrier['File'] = $path . $ext;
-        return $calendrier;
-    }
-    else
-    {
-        // RETURN
-        return NULL;
-    }
-}
-
 function limousinProject_updateEtabNameFromRNE($rne)
 {
     $query = "SELECT NOM FROM PMT_ETABLISSEMENT WHERE RNE='".$rne."'";
@@ -1337,9 +1293,315 @@ function limousinProject_getAffilieAqoba($thematique) {
     }
     $queryListePresta = "SELECT `NUM_TPE`, `RAISONSOCIALE` FROM PMT_PRESTATAIRE WHERE upper(TYPE_PRESTA) LIKE 'BANCAIRE' AND STATUT = 1" . $whereThematique;
     $resultListePresta = executeQuery($queryListePresta);
-    $headerLine = array('ID commerçant','Raison Sociale');
+    $headerLine = array('ID commercant','Raison Sociale');
     array_unshift($resultListePresta, $headerLine);
     exportXls('', $resultListePresta, array( ), $path, 'csv');     
+}
+
+function limousinProject_getFileEtatSoldeHebdo($path = '/var/tmp/etat_SOLDE_hebdo_', $ext = 'xls', $dateReferente = NULL) {
+    // INIT
+    $calendrier = array( );
+    $path .= date('Y-m-d');
+
+    // On récupère le Dimanche précédent
+    $calendrier = convergence_getDateLastWeek(1, $dateReferente);
+    $calendrier['File'] = limousinProject_getFileEtatSolde($path, $calendrier['Dimanche'], $ext);
+    return $calendrier;
+}
+
+function limousinProject_getFileEtatSoldeQuinzaine($path = '/var/tmp/solde_CARTES_quinz_', $ext = 'xls', $dateReferente = NULL) {
+    // INIT
+    $calendrier = array( );
+    $path .= date('Y-m-d');
+
+    // On récupère la quinzaine précédente
+    $calendrier = convergence_getQuinzaine($dateReferente);
+    $calendrier['File'] = limousinProject_getFileEtatSolde($path, $calendrier['dernierJour'], $ext);
+    return $calendrier;
+}
+
+function limousinProject_getFileEtatSolde($path, $endDate, $ext = 'xls', $subTitle = '(Annexe 3)') {
+
+    // INIT
+    $pathFile = '';
+    $header = array( );
+    $datas = array( );
+    $footer = array( );
+
+    // Données
+    // 1 - On récupère la liste des cartes actives ou bloquées avec leur montant de chargement à la création selon le CODE_OPERATION
+    $requeteTransaction = "SELECT c.CARTE_PORTEUR_ID, c.CARTE_NUM,
+                                DATE_FORMAT(c.DATE_CREATION,'%d/%m/%Y') AS DATE_CREATION,
+                                '' AS DATE_VALIDITE,
+                                IF(e.MONTANT_EMIS IS NOT NULL, e.MONTANT_EMIS, 0) AS MONTANT_EMIS,
+                                CONCAT(
+                                    FORMAT(
+                                        (IF(sEMIS IS NOT NULL, sEMIS, 0) - IF(sTPE IS NOT NULL, sTPE, 0) - IF(sTPI IS NOT NULL, sTPI, 0)),
+                                        2),
+                                    ' €') AS SOLDE,
+                                IF(t.TPE IS NOT NULL, t.TPE, 0) as TPE,
+                                IF(tp.TPI IS NOT NULL, tp.TPI, 0) as TPI, '' AS SOLDE_BLQ, c.DATE_BLOCAGE
+                           FROM `PMT_CHEQUES` AS c
+                                LEFT JOIN (
+                                    SELECT PORTEUR_ID,
+                                        CONCAT(FORMAT(SUM(REPLACE(MONTANT,',','.')), 2), ' €') AS TPI,
+                                        SUM(REPLACE(MONTANT,',','.')) AS sTPI
+                                    FROM PMT_TRANSACTIONS_PRIV
+                                    WHERE STR_TO_DATE(DATE_EMISSION, '%d-%m-%Y') < STR_TO_DATE('" . $endDate . "', '%d-%m-%Y')
+                                    GROUP BY PORTEUR_ID) AS tp
+                                ON (c.CARTE_PORTEUR_ID = tp.PORTEUR_ID)
+                                LEFT JOIN (
+                                    SELECT ID_PORTEUR,
+                                        CONCAT(FORMAT(SUM(MONTANT_NET)/100, 2), ' €') AS TPE,
+                                        SUM(MONTANT_NET)/100 AS sTPE
+                                    FROM PMT_TRANSACTIONS
+                                    WHERE STR_TO_DATE(DATE_EFFECTIVE, '%Y%m%d') < STR_TO_DATE('" . $endDate . "', '%d-%m-%Y')
+                                    GROUP BY ID_PORTEUR) AS t
+                                ON (c.CARTE_PORTEUR_ID = t.ID_PORTEUR)
+                                LEFT JOIN (
+                                    SELECT PORTEUR_ID, CODE_OPERATION
+                                    FROM PMT_DEMANDES
+                                    WHERE STATUT != 0) AS d
+                                ON (c.CARTE_PORTEUR_ID = d.PORTEUR_ID)
+                                LEFT JOIN (
+                                    SELECT NUM_OPER,
+                                        CONCAT(FORMAT(SUM(MONTANT_INITIAL), 2), ' €') AS MONTANT_EMIS,
+                                        SUM(MONTANT_INITIAL) AS sEMIS
+                                    FROM PMT_THEMATIQUES
+                                    GROUP BY `NUM_OPER`) AS e
+                                ON (e.NUM_OPER = d.CODE_OPERATION)
+                           WHERE c.CARTE_STATUT IN('Active','Bloquée')";
+    $resultTransaction = executeQuery($requeteTransaction);
+    $datas = array_values($resultTransaction);
+    unset($resultTransaction);
+    if ( !empty($datas) )
+    {
+        // Début du fichier
+        $header['title'] = 'SOLDE des cartes au ' . $endDate;
+        $header['subTitle'] = $subTitle;
+        $header['colTitle'] = array( "Porteur ID", 'N° de carte', "Date d'émission", 'Date de validité',
+            "Montant à l'émission", 'Solde', 'Total Rbt TPE', 'Total Rbt TPI', 'Total Carte annulés',
+            "Date d'annulation", 'CTRL'
+        );
+        // Total
+        // 2 - Renseigner les champs CTRL, Solde bloqué si date de blocage. calculer les totaux
+        $totalEmis = 0;
+        $totalSolde = 0;
+        $totalTPE = 0;
+        $totalTPI = 0;
+        $totalAnomalie = 0;
+        foreach ( $datas as $k => $value )
+        {
+            $datas[$k]['CTRL'] = 0;
+            $totalEmis += floatval($value['MONTANT_EMIS']);
+            $totalTPE += floatval($value['TPE']);
+            $totalTPI += floatval($value['TPI']);
+            if ( floatval($value['SOLDE']) < 0 )
+            {
+                $datas[$k]['CTRL'] = 1;
+                $datas[$k]['SOLDE'] = '0 €';
+                $totalAnomalie++;
+            }
+            else
+            {
+                $totalSolde += floatval($value['SOLDE']);
+            }
+            // carte bloquée ?
+            if ( floatval($value['SOLDE']) >= 0 && !empty($value['DATE_BLOCAGE']) )
+                $datas[$k]['SOLDE_BLQ'] = floatval($value['SOLDE']);
+        }
+        $footer[] = array( 'nbColRight' => 3, 'Total', number_format($totalEmis, 2, '.', ' ') . ' €', number_format($totalSolde, 2, '.', ' ') . ' €', number_format($totalTPE, 2, '.', ' ') . ' €', number_format($totalTPI, 2, '.', ' ') . ' €' );
+        $footer[] = array( 'Quantité anomalie', $totalAnomalie );
+        $pathFile = phpExcelLibraryProject_exportCompta($header, $datas, $footer, $path, $ext);
+    }
+    unset($datas);
+    return $pathFile;
+}
+
+function limousinProject_getFileEtatTransaction($path = '/var/tmp/transac_TPE_hebdo_', $ext = 'xls', $dateReferente = NULL) {
+
+    // INIT
+    $calendrier = array( );
+    $header = array( );
+    $datas = array( );
+    $path .= date('Y-m-d');
+    // Période
+    $calendrier = convergence_getDateLastWeek(1, $dateReferente);
+    // Données
+    $requeteTransaction = "SELECT IF(CODE_OPERATION = '445', '452', IF(CODE_OPERATION IS NULL, '452', CODE_OPERATION)) AS num_oper,
+                   'TPE' AS typeTCs, r.RAISONSOCIALE AS nom_presta, ID_TRANSACTION AS numTCs,
+                    DATE_FORMAT(STR_TO_DATE(t.DATE_EFFECTIVE,'%Y%m%d'),'%d/%m/%Y') AS date,
+                    CONCAT(FORMAT((MONTANT_NET/100), 2), ' €') AS montant
+            FROM PMT_TRANSACTIONS AS t
+            LEFT JOIN
+            	(SELECT PORTEUR_ID, CODE_OPERATION
+                 FROM PMT_DEMANDES
+                 WHERE STATUT != 0) AS d
+            ON (t.ID_PORTEUR = d.PORTEUR_ID)
+            LEFT JOIN
+            	(SELECT NUM_TPE, RAISONSOCIALE
+                FROM PMT_PRESTATAIRE
+                WHERE STATUT != 0) AS r
+            ON (t.ID_COMMERCANT = r.NUM_TPE)
+            WHERE STR_TO_DATE(t.DATE_EFFECTIVE, '%Y%m%d') > STR_TO_DATE('" . $calendrier['Lundi'] . "', '%d-%m-%Y')
+                  AND STR_TO_DATE(t.DATE_EFFECTIVE, '%Y%m%d') < STR_TO_DATE('" . $calendrier['Dimanche'] . "', '%d-%m-%Y')
+            GROUP BY numTCs";
+    $resultTransaction = executeQuery($requeteTransaction);
+    $datas = array_values($resultTransaction);
+    unset($resultTransaction);
+    if ( !empty($datas) )
+    {
+        // Début du fichier
+        $header['title'] = 'TRANSACTIONS TPE du ' . $calendrier['Lundi'] . ' au ' . $calendrier['Dimanche'];
+        $header['subTitle'] = '(Annexe 1)';
+        $header['colTitle'] = array( "N d'opération", 'Type de transaction', 'Nom prestataire', 'N de transaction', 'Date de transaction', 'Montant accepté' );
+        // Total
+        $total = 0;
+        foreach ( $datas as $value )
+        {
+            $total += floatval($value['montant']);
+        }
+        $footer[] = array( 'Total', number_format($total, 2, '.', ' ') . ' €' );
+        $calendrier['Montant'] = $total;
+        $calendrier['nbTCs'] = count($datas);
+
+        $calendrier['File'] = phpExcelLibraryProject_exportCompta($header, $datas, $footer, $path, $ext);
+    }
+    unset($datas);
+    return $calendrier;
+}
+
+function limousinProject_getFileEtatTransactionPriv($path = '/var/tmp/transac_TPI_quinz_', $ext = 'xls', $dateReferente = NULL) {
+
+    // INIT
+    $calendrier = array( );
+    $header = array( );
+    $datas = array( );
+    $path .= date('Y-m-d');
+    // Période de quinzaine précédente
+    $calendrier = convergence_getQuinzaine($dateReferente);
+    // Données
+    $requeteTransaction = "SELECT IF(CODE_OPERATION = '445', '452', IF(CODE_OPERATION IS NULL, '452', CODE_OPERATION)) AS num_oper,
+                    IF(t.TYPE = 'VOUCHER', 'Voucher', 'TPI') AS typeTCs, r.RAISONSOCIALE AS nom_presta, UID AS numTCs,
+                    DATE_FORMAT(STR_TO_DATE(t.DATE_EMISSION,'%d-%m-%Y'),'%d/%m/%Y') AS date,
+                    CONCAT(REPLACE(t.MONTANT,',','.'), ' €') AS montant
+            FROM PMT_TRANSACTIONS_PRIV AS t
+            LEFT JOIN
+            	(SELECT PORTEUR_ID, CODE_OPERATION
+                 FROM PMT_DEMANDES
+                 WHERE STATUT != 0) AS d
+            ON (t.PORTEUR_ID = d.PORTEUR_ID)
+
+            LEFT JOIN
+            	(SELECT PARTENAIRE_UID, RAISONSOCIALE
+                FROM PMT_PRESTATAIRE
+                WHERE STATUT != 0) AS r
+            ON (t.CODE_PARTENAIRE = r.PARTENAIRE_UID)
+            WHERE STR_TO_DATE(t.DATE_EMISSION, '%d-%m-%Y') > STR_TO_DATE('" . $calendrier['premierJour'] . "', '%d-%m-%Y')
+                  AND STR_TO_DATE(t.DATE_EMISSION, '%d-%m-%Y') < STR_TO_DATE('" . $calendrier['dernierJour'] . "', '%d-%m-%Y')
+            GROUP BY numTCs";
+    $resultTransaction = executeQuery($requeteTransaction);
+    $datas = array_values($resultTransaction);
+    unset($resultTransaction);
+    if ( !empty($datas) )
+    {
+        // Début du fichier
+        $header['title'] = 'TRANSACTIONS INTERNET du ' . $calendrier['premierJour'] . ' au ' . $calendrier['dernierJour'];
+        $header['subTitle'] = '(Annexe 2)';
+        $header['colTitle'] = array( "N° d'opération", 'Type de transaction', 'Nom prestataire', 'N° de transaction', 'Date de transaction', 'Montant accepté' );
+        // Total
+        $total = 0;
+        foreach ( $datas as $value )
+        {
+            $total += floatval($value['montant']);
+        }
+        $footer[] = array( 'Total', number_format($total, 2, '.', ' ') . ' €' );
+        $calendrier['nbTCs'] = count($datas);
+        $calendrier['File'] = phpExcelLibraryProject_exportCompta($header, $datas, $footer, $path, $ext);
+    }
+    unset($datas);
+    return $calendrier;
+}
+
+function limousinProject_getFileLotDeVirement($appuid, $path = '/var/tmp/Lot_de_Virement_quinz_', $ext = 'xls', $dateReferente = NULL, $codeOper = '445') {
+
+    // INIT
+    $calendrier = array( );
+    $listeTPI = array( ); // Liste des NUM_DOSSIER des transaction privatif et voucher dont il faut modifier le statut.
+    $header = array( );
+    $footer = array( );
+    $datas = array( );
+    $path .= date('Y-m-d');
+    $fields = convergence_getAllAppData($appuid);
+    $appNumber = $fields['APP_NUMBER'];
+    // Période de quinzaine précédente
+    $calendrier = convergence_getQuinzaine($dateReferente);
+    $periodeLibel = $calendrier['premierJour'] . '-' . $calendrier['dernierJour'];
+    // un fichier par dispositif, dans PM 445 correspond à Culture et Sport, car Adequation nous à communiquer le 452 qu'après la mise en prod >(
+    ($codeOper == '445') ? $cdope = '452' : $cdope = $codeOper;
+    // on récupère la liste des thématiques correspondant au dispositifs
+    $queryTh = 'SELECT CODE_RESEAU FROM PMT_THEMATIQUES WHERE NUM_OPER = ' . intval($codeOper);
+    $resultTh = executeQuery($queryTh);
+    $whereTh = '';
+    if ( !empty($resultTh) )
+    {
+        foreach ( $resultTh as $reseau )
+          {
+          $thema[] = intval($reseau['CODE_RESEAU']);
+        }
+        $whereTh = 'AND THEMATIQUE IN(' . implode(',', $thema) . ') ';
+    }
+    // Données
+    $requeteTransaction = "SELECT '' AS nolot, '6' AS cdenr, '" . $cdope . "' AS cdope,
+                           '" . date('d/m/y') . "' AS datemvt, '" . date('d/m/y') . "' AS datrec, '" . date('H:i:s') . "' AS hhrec,
+                           tp.CODE_PARTENAIRE,
+                           '0' AS grppai, '0' AS fcdcn, p.RAISONSOCIALE,
+                           '???' AS CDEMT, CODE_GUICHET, CODE_BANQUE, COMPTE, CLE,
+                           '???' AS RMDOM, SUM(REPLACE(MONTANT,',','.')) AS MTVIR,
+                           '???' AS NUMFAC, '0' AS NODPO, '' AS MSGB, '' AS MSGD, '' AS MSGS,
+                           CONCAT('" . $appNumber . " ', CODE_PARTENAIRE, ' " . $periodeLibel . "')  AS LIBEL, '' AS LOTOK,
+                           UID
+                           FROM PMT_TRANSACTIONS_PRIV tp
+                           LEFT JOIN (
+                                    SELECT CODE_GUICHET, CODE_BANQUE, COMPTE, CLE, RAISONSOCIALE, PARTENAIRE_UID
+                                    FROM PMT_PRESTATAIRE
+                                    WHERE STATUT != 0) AS p
+                           ON (p.PARTENAIRE_UID = tp.CODE_PARTENAIRE)
+                           WHERE STR_TO_DATE(DATE_EMISSION, '%d-%m-%Y') > STR_TO_DATE('" . $calendrier['premierJour'] . "', '%d-%m-%Y')
+                             AND STR_TO_DATE (DATE_EMISSION, '%d-%m-%Y') < STR_TO_DATE('" . $calendrier['dernierJour'] . "', '%d-%m-%Y')
+                             " . $whereTh . "
+                           GROUP BY tp.CODE_PARTENAIRE";
+    $resultTransaction = executeQuery($requeteTransaction);
+    $datas = array_values($resultTransaction);
+    unset($resultTransaction);
+    if ( !empty($datas) )
+    {
+        $recap_temp = array( );
+        // on conserve les informations pour le récapitulatif des remboursements TPE et TPI en fin de mois dans une table
+        foreach ( $datas as $k => $field )
+        {            
+            $recap_temp[] = '(' . $cdope . ',' . $appNumber . ',NOW(),"TPI","' . $field['RAISONSOCIALE'] . '",' . $field['MTVIR'] . ')';
+            //$listeTPI[$field['TYPE']][] = $field['DOSSIER'];
+            $listeTPI[] = $field['UID'];
+            //unset($datas[$k]['TYPE'], $datas[$k]['DOSSIER']);
+            unset($datas[$k]['UID']);
+        }
+        $insert = implode(',', $recap_temp);
+        $queryInsert = 'INSERT INTO PMT_TEMP_RECAP_RMB (CODE_OPER, NUM_LOT, DATE_VIR, TYPE_TRANSAC, NOM_PRESTA, MONTANT_RMB) VALUES %s';
+        executeQuery(sprintf($queryInsert, $insert));
+        // Début du fichier
+        /* $header['colTitle'] = array( 'nolot', 'cdenr', 'cdope', 'date mvt', 'datrec', 'hhrec', 'codpre',
+          'grppai', 'fcdcn', 'IDENT', 'CDEMT', 'CODGUI', 'CODBAN', 'NOCPT', 'CLERIB',
+          'RMDOM', 'MTVIR', 'NUMFAC', 'NODPO', 'MSGB', 'MSGD', 'MSGS', 'LIBEL', 'LOTOK' ); */
+        $calendrier['File'] = phpExcelLibraryProject_exportCompta($header, $datas, $footer, $path, $ext);
+        $calendrier['nbPartenaire'] = count($datas);
+        // Mettre au statut en cours de remboursement les TPI
+        $rmbTPI = '(' . implode(',', $listeTPI) . ')';
+        $queryUpdate = 'UPDATE PMT_TRANSACTIONS_PRIV SET STATUT = "9" WHERE UID IN %s';
+        executeQuery(sprintf($queryUpdate, $rmbTPI));
+    }
+    unset($datas);
+    return $calendrier;
 }
 
 ?>

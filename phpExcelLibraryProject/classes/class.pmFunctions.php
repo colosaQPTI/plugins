@@ -1,4 +1,5 @@
 <?php
+
 /**
  * class.phpExcelLibraryProject.pmFunctions.php
  *
@@ -16,9 +17,11 @@
 
 /** Include PHPExcel */
 require_once ('Classes/PHPExcel.php');
+
 function phpExcelLibraryProject_getMyCurrentDate() {
     return G::CurDate('Y-m-d');
 }
+
 function phpExcelLibraryProject_getMyCurrentTime() {
     return G::CurDate('H:i:s');
 }
@@ -139,7 +142,7 @@ function exportXls($title = 'Sample', $data = array(), $subTitle = array(), $pat
     }
 
 // Rename worksheet
-    $objPHPExcel->getActiveSheet()->setTitle($title);
+   $objPHPExcel->getActiveSheet()->setTitle($title);
 // Set active sheet index to the first sheet, so Excel opens this as the first sheet
     $objPHPExcel->setActiveSheetIndex(0);
 // Save Excel 2007 file
@@ -229,7 +232,7 @@ function exportXls($title = 'Sample', $data = array(), $subTitle = array(), $pat
         exit;
 }
 
-function exportComptaTransac($header = array( ), $datas = array( ), $footer = array( ), $path = '/var/tmp/sample', $ext = 'xls') {
+function phpExcelLibraryProject_exportCompta($header = array( ), $datas = array( ), $footer = array( ), $path = '/var/tmp/sample', $ext = 'xls') {
 
     // INIT
 // Create new PHPExcel object
@@ -322,10 +325,10 @@ function exportComptaTransac($header = array( ), $datas = array( ), $footer = ar
         $worksheet->setCellValue($coord, $header['title']);
         $worksheet->getStyle($coord)->applyFromArray($styleTitle);
         $row++;
-        if ( !empty($header['subTtitle']) )
+        if ( !empty($header['subTitle']) )
         {
             $coord = PHPExcel_Cell::stringFromColumnIndex(0) . ($row);
-            $worksheet->setCellValue($coord, $header['subTtitle']);
+            $worksheet->setCellValue($coord, $header['subTitle']);
             $row++;
         }
     }
@@ -333,7 +336,7 @@ function exportComptaTransac($header = array( ), $datas = array( ), $footer = ar
     {
         $col = 0;
         $startHeader = PHPExcel_Cell::stringFromColumnIndex($col) . $row;
-        foreach ( $subTitle as $k => $value )
+        foreach ( $header['colTitle'] as $k => $value )
         {
             $coord = PHPExcel_Cell::stringFromColumnIndex($col) . ($row);
             $worksheet->setCellValue($coord, $value);
@@ -369,23 +372,32 @@ function exportComptaTransac($header = array( ), $datas = array( ), $footer = ar
         $rowDatas = $startDatas . ':' . PHPExcel_Cell::stringFromColumnIndex($col - 1) . ($row - 1);
         $worksheet->getStyle($rowDatas)->applyFromArray($styleDatas);
     }
-
     if ( !empty($footer) )
-    {
-        $row++; // un saut de ligne
-        $col = $nbCol - count($footer);
-        $startFooter = PHPExcel_Cell::stringFromColumnIndex($col) . $row;
-        foreach ( $footer as $value )
+    {        
+        foreach ( $footer as $footerRow )
         {
-            $coord = PHPExcel_Cell::stringFromColumnIndex($col) . ($row);
-            $worksheet->setCellValueExplicit($coord, $value, PHPExcel_Cell_DataType::TYPE_STRING);
-            $colName = PHPExcel_Cell::stringFromColumnIndex($col);
-            $worksheet->getColumnDimension($colName)->setAutoSize(true);
-            $col++;
-        }
-        $rowFooter = $startFooter . ':' . PHPExcel_Cell::stringFromColumnIndex($col - 1) . ($row);
-        $worksheet->getStyle($rowFooter)->applyFromArray($styleFooter);
+            $row++;
+            $nbColRight = 0;
+            if ( !empty($footerRow['nbColRight']) )
+            {
+                $nbColRight = intval($footerRow['nbColRight']);
+                unset($footerRow['nbColRight']);
+            }
+            $col = $nbCol - (count($footerRow) - 1) - $nbColRight;
+            $startFooter = PHPExcel_Cell::stringFromColumnIndex($col) . $row;
+            foreach ( $footerRow as $value )
+            {
+                $coord = PHPExcel_Cell::stringFromColumnIndex($col) . ($row);
+                $worksheet->setCellValueExplicit($coord, $value, PHPExcel_Cell_DataType::TYPE_STRING);
+                $colName = PHPExcel_Cell::stringFromColumnIndex($col);
+                $worksheet->getColumnDimension($colName)->setAutoSize(true);
+                $col++;
+            }
+            $rowFooter = $startFooter . ':' . PHPExcel_Cell::stringFromColumnIndex($col - 1) . ($row);
+            $worksheet->getStyle($rowFooter)->applyFromArray($styleFooter);
+        }                       
     }
+
 // Rename worksheet
     $objPHPExcel->getActiveSheet()->setTitle('Transactions');
 // Set active sheet index to the first sheet, so Excel opens this as the first sheet
@@ -413,5 +425,7 @@ function exportComptaTransac($header = array( ), $datas = array( ), $footer = ar
             $objWriter->save($path . '.xls');
             break;
     }
+    unset($objPHPExcel);
+    unset($objWriter);
+    return $path . '.' . $ext;
 }
-
