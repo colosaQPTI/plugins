@@ -3765,7 +3765,19 @@ function convergence_getDateCreateDemande($num_dossier) {
     $date = $res[1]['APP_CREATE_DATE'];
     return $date;
 }
-
+function convergence_getListeOperation() {
+    $sqlOper = 'SELECT DISTINCT(NUM_OPER) FROM PMT_LISTE_OPER';
+    $resOper = executeQuery($sqlOper);
+    $listOper = array( );
+    if ( !empty($resOper) )
+    {
+        foreach ( $resOper as $operation )
+        {
+            $listOper[] = intval($operation['NUM_OPER']);
+        }
+    }
+    return $listOper;
+}
 
 ######### GLOBAL : function validate browser #########
 function browser_detection_Convergence($which_test, $test_excludes = '', $external_ua_string = '')
@@ -4412,5 +4424,6 @@ function conv_validateRole($userName){
     
     return true;
     }
-    
+
+
 }
