@@ -1256,7 +1256,6 @@ function exporterRMHFileF() {
 
 function exporterXlsFile(file) {
     if (file) {
-        type = 'npai';
         urlData = "../convergenceList/actions/exportXlsFile.php";
         post(urlData, {file: file});
     }

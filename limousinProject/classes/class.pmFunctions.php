@@ -1645,4 +1645,84 @@ function limousinProject_getFileLotDeVirement($appuid, $path = '/var/tmp/Lot_de_
     return $listeFichier;
 }
 
+function limousinProject_getFileEtatRecapRmb($appuid, $path = '/var/tmp/recap_mensuel_', $ext = 'xls', $dateReferente = NULL) {
+
+   // INIT
+    $calendrier = array( ); // contient la période
+    $listeFichier = array( ); // liste des fichier à retourner
+    $totalMail = 0;
+    $fields = convergence_getAllAppData($appuid);
+    $appNumber = $fields['APP_NUMBER'];
+    unset($fields);
+
+    // on récupère la liste des dispositifs, un code opération par dispositif dans Convergence
+    $listeCodeOper = convergence_getListeOperation();
+    foreach ( $listeCodeOper as $codeOper )
+    {
+        $header = array( );
+        $datas = array( );
+        $footer = array( );
+        // un fichier par dispositif, dans PM 445 correspond à Culture et Sport, car Adequation nous à communiquer le 452 qu'après la mise en prod >(
+        ($codeOper == '445') ? $num_oper = '452' : $num_oper = $codeOper;
+        $pathFile = $path . $num_oper . '_' . date('Y-m-d');
+        // Données
+        $requeteRecap = "SELECT CODE_OPER, NUM_LOT, DATE_FORMAT(DATE_VIR, '%d/%m/%Y') AS DATE_VIR, TYPE_TRANSAC, NOM_PRESTA, MONTANT_RMB FROM PMT_TEMP_RECAP_RMB WHERE CODE_OPER = '".$num_oper."'";
+        $resultRecap = executeQuery($requeteRecap);
+        $datas = array_values($resultRecap);
+        unset($resultRecap);
+        // Total
+        $total = 0;
+        $nbTPE = 0;
+        $totalTPE = 0;
+        $nbTPI = 0;
+        $totalTPI = 0;
+        if ( !empty($datas) )
+        {
+            // Début du fichier
+            $moisPrecedent = date('m/Y', strtotime('-1 month'));
+            $header['title'] = 'Virements émis du mois '.$moisPrecedent;
+            $header['subTitle'] = ' ';
+            $header['colTitle'] = array( "N° d'opération", 'N° lot de virement', 'date virement', 'type transaction', 'Nom prestataire', 'Montant remboursé' );
+            foreach ( $datas as $key => $value )
+            {
+                $typeTrans = $value['TYPE_TRANSAC'];
+                $montantRmb = $value['MONTANT_RMB'];
+                $total += floatval($montantRmb);
+                switch($typeTrans)
+                {
+                    case 'TPI' : $totalTPI += floatval($montantRmb); $nbTPI++; break;
+                    case 'TPE' : $totalTPE += floatval($montantRmb); $nbTPE++; break;
+                }
+                $datas[$key]['MONTANT_RMB'] = number_format($value['MONTANT_RMB'], 2, '.', ' '). ' €';
+            }
+            $footer[] = array( 'nbColRight' => 1, 'Total TPE', number_format($totalTPE, 2, '.', ' ') . ' €');
+            $footer[] = array( 'nbColRight' => 1, 'Total TPI', number_format($totalTPI, 2, '.', ' ') . ' €');
+            $footer[] = array( 'Total à remb', number_format($total, 2, '.', ' ') . ' €');
+            $listeFichier[] = phpExcelLibraryProject_exportCompta($header, $datas, $footer, $pathFile, $ext);
+            $queryInsertRecapOper = "INSERT INTO PMT_RECAP_MENSUEL_OPER (NUM_DOSSIER, STATUT, DATE_PAIEMENT, MONTANT_MENSUEL, NB_TRANS_TPE, MONTANT_TPE, NB_TRANS_TPI, MONTANT_TPI, PATHFILE_RECAP_MENSUEL) ".
+                                    " VALUES (".$appNumber.", 17, null, ".$total.", ".$nbTPE.", ".$totalTPE.", ".$nbTPI.", ".$totalTPI.", '".end($listeFichier)."') ";
+            executeQuery($queryInsertRecapOper);
+        }
+        $totalMail += $total;
+    }
+    unset($datas);
+    $aFields = array('Month' => $moisPrecedent, 'Montant' => number_format($totalMail, 2, '.', ' '));
+    PMFSendMessage($appuid, 'quentin@oblady.fr', 'quentin@oblady.fr', '', '','Mise à jour du compte de cantonnement BeLim ', 'mailMensuel.html',$aFields, $listeFichier);
+    return $listeFichier;
+}
+
+function limousinProject_getPathfileSoldeForRecapMensuel()
+{
+    $queryPathfileSolde = "SELECT PATHFILE_SOLDE_QZ FROM PMT_LOT_VIREMENT ORDER BY DATE_LANCEMENT DESC LIMIT 2";
+    $resultPathfileSolde = executeQuery($queryPathfileSolde);
+    if(!empty($resultPathfileSolde))
+    {
+        if(!empty($resultPathfileSolde[1]) && !empty($resultPathfileSolde[2]))
+        {
+            $pathFileSolde['PATHFILE_SOLDE_QZ1'] = $resultPathfileSolde[2]['PATHFILE_SOLDE_QZ'];
+            $pathFileSolde['PATHFILE_SOLDE_QZ2'] = $resultPathfileSolde[1]['PATHFILE_SOLDE_QZ'];
+        }
+    }
+    return $pathFileSolde;
+}
 ?>
