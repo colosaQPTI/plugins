@@ -387,7 +387,6 @@ function frExecuteTriggersCase($processId, $currentTask , $fcaseUID,$userId,$tas
 	            				WHERE APP_UID = '".$fcaseUID."' AND DEL_INDEX = '".$indexCase."' ";
 	          	$queryuPDel = executeQuery($queryuPDel);
 	          	## end update app_delegation
-
 			}
 				
 		}
@@ -432,26 +431,25 @@ function getStepsByTask($task){
 	
 function executeTriggersMon($process, $appUid, $stepUid, $time='BEFORE', $task){
   
-  $type = getStepType($stepUid);
-  //$type = '';
-  $oCase = new Cases();
-  $Fields = $oCase->loadCase($appUid);  
-  if($stepUid == -1 || $stepUid == -2){
-  	$obj = 'ASSIGN_TASK';
-  }else{
-  	$obj = 'DYNAFORM';  	
-  }
+    $type = getStepType($stepUid);
+    //$type = '';
+    $oCase = new Cases();
+    $Fields = $oCase->loadCase($appUid);  
+     if($stepUid == -1 || $stepUid == -2){
+  	    $obj = 'ASSIGN_TASK';
+    }else{
+  	    $obj = 'DYNAFORM';  	
+    }
   
-  $triggers = $oCase->loadTriggers ( $task, $obj, $stepUid, $time );
-   if($stepUid == -1 || $stepUid == -2)
-   {
+    $triggers = $oCase->loadTriggers ( $task, $obj, $stepUid, $time );
+    if($stepUid == -1 || $stepUid == -2)
+    {
    		$type = 'ASSIGN_TASK';
-   		G::pr($triggers);
-   }
-  // G::pr($task.' task '. $type.' type '. $stepUid.' step '. $time.' time ');
-  $Fields['APP_DATA'] = $oCase->ExecuteTriggers($task, $type , $stepUid, $time, $Fields['APP_DATA'] );  
-  $oCase->updateCase($appUid, $Fields);
-  return true;
+    }
+    // G::pr($task.' task '. $type.' type '. $stepUid.' step '. $time.' time ');
+    $Fields['APP_DATA'] = $oCase->ExecuteTriggers($task, $type , $stepUid, $time, $Fields['APP_DATA'] );  
+    $oCase->updateCase($appUid, $Fields);
+    return true;
 }
 
 function getStepType($step){
@@ -501,16 +499,56 @@ function getQueryForSimpleSearch($idInbox='',$fieldName='', $fieldValue,$all=tru
 					$fieldSelectQuery = $fieldSelectQuery.', '.$index['QUERY_SELECT'];
 				$contSelect++;
 			} 
-			$newNameFielData = explode('AS',$fieldSelectQuery);
-			$newNameField1 = trim($newNameFielData[0]);
+			$newNameFielData = explode(' AS ',$fieldSelectQuery);
+			$newNameField1 = '';
 			if(sizeof($newNameFielData) <= 1)
 			{
-				$newNameFielData = explode('as',$fieldSelectQuery);
-				$newNameField2 = trim($newNameFielData[0]);
+				$newNameFielData = explode(' as ',$fieldSelectQuery);
+				$newNameField2 = '';
+				$totArray = sizeof($newNameFielData);
+				if(sizeof($newNameFielData) > 2 )
+				{				
+					$i = 1;
+					foreach($newNameFielData as $row)
+					{
+						if($i < $totArray)
+						{
+							if($i+1 != $totArray)
+								$newNameField2 .= ' '.$row.' as';
+							else
+							$newNameField2 .= ' '.$row;
+						}
+						$i++;
+					}
+					
+				}
+				else
+					$newNameField2 = trim($newNameFielData[0]);
 				$newNameField = $newNameField2;
 			}
 			else 
+			{
+				$totArray = sizeof($newNameFielData);
+				if(sizeof($newNameFielData) > 2 )
+				{				
+					$i = 1;
+					foreach($newNameFielData as $row)
+					{
+						if($i < $totArray)
+						{
+							if($i+1 != $totArray)
+								$newNameField1 .= ' '.$row.' AS';
+							else
+							$newNameField1 .= ' '.$row;
+						}
+						$i++;
+					}
+					
+				}
+				else
+					$newNameField1 = trim($newNameFielData[0]);
 				$newNameField = $newNameField1;
+			}
 		}
 	
 		
@@ -563,15 +601,55 @@ function getQueryForMultipleSearch($idInbox='',$fieldValue){
 		foreach($datafieldSelect as $index)
 		{
 			$newNameFielData = explode('AS',$index['QUERY_SELECT']);
-			$newNameField1 = trim($newNameFielData[0]);
+			$newNameField1 = '';
 			if(sizeof($newNameFielData) <= 1)
 			{
-				$newNameFielData = explode('as',$index['QUERY_SELECT']);
-				$newNameField2 = trim($newNameFielData[0]);
+				$newNameFielData = explode(' as ',$index['QUERY_SELECT']);
+				$newNameField2 = '';
+				$totArray = sizeof($newNameFielData);
+				if(sizeof($newNameFielData) > 2 )
+				{				
+					$i = 1;
+					foreach($newNameFielData as $row)
+					{
+						if($i < $totArray)
+						{
+							if($i+1 != $totArray)
+								$newNameField2 .= ' '.$row.' as';
+							else
+							$newNameField2 .= ' '.$row;
+						}
+						$i++;
+					}
+					
+				}
+				else
+					$newNameField2 = trim($newNameFielData[0]);
 				$newNameField = $newNameField2;
 			}
 			else 
+			{
+				$totArray = sizeof($newNameFielData);
+				if(sizeof($newNameFielData) > 2 )
+				{				
+					$i = 1;
+					foreach($newNameFielData as $row)
+					{
+						if($i < $totArray)
+						{
+							if($i+1 != $totArray)
+								$newNameField1 .= ' '.$row.' AS';
+							else
+							$newNameField1 .= ' '.$row;
+						}
+						$i++;
+					}
+					
+				}
+				else
+					$newNameField1 = trim($newNameFielData[0]);
 				$newNameField = $newNameField1;
+			}
 			
 			$sPartWhere.=" OR ".$newNameField." LIKE '%".mysql_real_escape_string($fieldValue)."%' ";
 		} 

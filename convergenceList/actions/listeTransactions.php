@@ -15,7 +15,7 @@ function getData($porteurId)
              " CONVERT(DATE_FORMAT(STR_TO_DATE(DATE_COMPENSATION, '%Y%m%d'), '%d/%m/%Y') USING utf8) AS DATE_VALIDATION, ".
              " '' AS DATE_ENVOI, '' AS DATE_REMBOURSEMENT, 'Remboursé' AS TITLE, CONCAT(FORMAT((MONTANT_NET/100), 2), ' €') AS MONTANT ".
              " FROM PMT_TRANSACTIONS t ".
-             " WHERE ID_PORTEUR = '".$porteurId."' ";             
+             " WHERE ID_PORTEUR = '".$porteurId."' ";
     $result = executeQuery($query);
     if (is_array($result) && count($result) > 0)
     {

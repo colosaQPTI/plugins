@@ -67,7 +67,6 @@ function FRegeneratePMCases($caseId) {
 	$auxUsrUID = $_SESSION['USER_LOGGED'];
     $auxUsruname = $_SESSION['USR_USERNAME'];
 	///////////////////////// Route Again the Case /////////////////////////////////////////
-
 	G::LoadClass("case");
 	$oCase = new Cases ();
 	$newFields = $oCase->loadCase ($caseId); 
@@ -117,7 +116,15 @@ function FRegeneratePMCases($caseId) {
 			# end execute Triggers task Ini
 	   }
 	}
-	
+	// If the user is different
+	/*if($_SESSION['USER_LOGGED'] != $newFields['APP_DATA']['USER_LOGGED']){
+		$arrayUser = userInfo($newFields['APP_DATA']['USER_LOGGED']); 		 
+		$_SESSION['USER_LOGGED'] = $newFields['APP_DATA']['USER_LOGGED'];
+    	$_SESSION['USR_USERNAME'] = $arrayUser['username'];
+	}*/
+	// End If the user is different
+
+	//$resInfo = PMFDerivateCase($caseId, 1,true, $USR_UID);
 	autoDerivate($proUid,$caseId,$USR_UID);
 
 	///////////////////////// End Route Again the Case /////////////////////////////////////
@@ -164,6 +171,7 @@ if($items != ''){
 	}		
 	
 	if($tableType == "Report"){
+		//FRegenerateRPT(); // regenerate all RP tables
 		$sqlRPTable = "SELECT * FROM ADDITIONAL_TABLES WHERE PRO_UID <> '' AND ADD_TAB_TYPE = 'NORMAL' "; 
 	    $resRPTable=executeQuery($sqlRPTable);
 	    if(sizeof($resRPTable)){

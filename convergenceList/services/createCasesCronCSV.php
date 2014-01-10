@@ -407,7 +407,7 @@
 	       
 	        if($whereDelete != '')
 	        {
-	            genDataReport($tableName);
+	            //genDataReport($tableName);
 	        	$query = "SELECT APP_UID FROM $tableName WHERE $whereDelete AND APP_UID NOT IN ( $idCasesGenerate ) "; //print($query.'  '); 
 	        	$deleteData = executeQuery($query);
 	        	if(sizeof($deleteData))
@@ -416,7 +416,7 @@
 	        		{	
 	        			$CurDateTime=date('Y-m-d H:i:s');
 	        			insertHistoryLogPlugin($index['APP_UID'],$_SESSION['USER_LOGGED'],$CurDateTime,'1',$index['APP_UID'],'Delete Case');
-	        			deletePMCases($index['APP_UID']); 
+	        			deletePMCases($index['APP_UID'],$tableName); 
 	        		}
 	        		
 	        	}
@@ -1093,7 +1093,7 @@
 	       
 	        if($whereDelete != '')
 	        {
-	            genDataReport($tableName);
+	            //genDataReport($tableName);
 	        	$query = "SELECT APP_UID FROM $tableName WHERE $whereDelete AND APP_UID NOT IN ( $idCasesGenerate ) "; //print($query.'  '); 
 	        	$deleteData = executeQuery($query);
 	        	if(sizeof($deleteData))
@@ -1102,7 +1102,7 @@
 	        		{	
 	        			$CurDateTime=date('Y-m-d H:i:s');
 	        			insertHistoryLogPlugin($index['APP_UID'],$_SESSION['USER_LOGGED'],$CurDateTime,'1',$index['APP_UID'],'Delete Case');
-	        			deletePMCases($index['APP_UID']); 
+	        			deletePMCases($index['APP_UID'],$tableName); 
 	        		}
 	        		
 	        	}
@@ -1153,7 +1153,7 @@ function genDataReport ($tableName){
     }
 }
 
-function deletePMCases($caseId) {
+function deletePMCases($caseId,$tableName) {
 	
 	$query1="DELETE FROM wf_".SYS_SYS.".APPLICATION WHERE APP_UID='".$caseId."' ";
 	$apps1=executeQuery($query1);
@@ -1177,6 +1177,8 @@ function deletePMCases($caseId) {
 	$apps10=executeQuery($query10);
 	$query11="DELETE FROM wf_".SYS_SYS.".APP_CACHE_VIEW WHERE APP_UID='".$caseId."'";
 	$apps11=executeQuery($query11);
-	$query12="DELETE FROM wf_".SYS_SYS.".APP_HISTORY WHERE APP_UID='".$caseId."'";
-	$apps12=executeQuery($query12);
+	/*$query12="DELETE FROM wf_".SYS_SYS.".APP_HISTORY WHERE APP_UID='".$caseId."'";
+	$apps12=executeQuery($query12);*/
+	$query13="DELETE FROM wf_".SYS_SYS.$tableName." WHERE APP_UID='".$caseId."'";
+    $apps13=executeQuery($query13);
 }

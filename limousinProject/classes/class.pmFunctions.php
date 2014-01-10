@@ -1646,10 +1646,9 @@ function limousinProject_getFileLotDeVirement($appuid, $path = '/var/tmp/Lot_de_
 }
 
 function limousinProject_getFileEtatRecapRmb($appuid, $path = '/var/tmp/recap_mensuel_', $ext = 'xls', $dateReferente = NULL) {
-
    // INIT
     $calendrier = array( ); // contient la période
-    $listeFichier = array( ); // liste des fichier à retourner
+    $listeFichier = array( ); // liste des fichier à envoyer par mail
     $totalMail = 0;
     $fields = convergence_getAllAppData($appuid);
     $appNumber = $fields['APP_NUMBER'];
@@ -1699,16 +1698,25 @@ function limousinProject_getFileEtatRecapRmb($appuid, $path = '/var/tmp/recap_me
             $footer[] = array( 'nbColRight' => 1, 'Total TPI', number_format($totalTPI, 2, '.', ' ') . ' €');
             $footer[] = array( 'Total à remb', number_format($total, 2, '.', ' ') . ' €');
             $listeFichier[] = phpExcelLibraryProject_exportCompta($header, $datas, $footer, $pathFile, $ext);
-            $queryInsertRecapOper = "INSERT INTO PMT_RECAP_MENSUEL_OPER (NUM_DOSSIER, STATUT, DATE_PAIEMENT, MONTANT_MENSUEL, NB_TRANS_TPE, MONTANT_TPE, NB_TRANS_TPI, MONTANT_TPI, PATHFILE_RECAP_MENSUEL) ".
-                                    " VALUES (".$appNumber.", 17, null, ".$total.", ".$nbTPE.", ".$totalTPE.", ".$nbTPI.", ".$totalTPI.", '".end($listeFichier)."') ";
+            // Insertion dans la PM Table PMT_RECAP_MENSUEL_OPER par code opération
+            $queryInsertRecapOper = "INSERT INTO PMT_RECAP_MENSUEL_OPER (NUM_DOSSIER, CODE_OPER, STATUT, DATE_PAIEMENT, MONTANT_MENSUEL, NB_TRANS_TPE, MONTANT_TPE, NB_TRANS_TPI, MONTANT_TPI, PATHFILE_RECAP_MENSUEL) ".
+                                    " VALUES (".$appNumber.", ".$num_oper.", 17, null, ".$total.", ".$nbTPE.", ".$totalTPE.", ".$nbTPI.", ".$totalTPI.", '".end($listeFichier)."') ";
             executeQuery($queryInsertRecapOper);
         }
         $totalMail += $total;
     }
     unset($datas);
+    // Vidage de la table PMT_TEMP_RECAP_RMB après utilisation
+    $queryTruncateTempRecapRmb = "DELETE FROM PMT_TEMP_RECAP_RMB"; // TRUNCATE TABLE PMT_TEMP_RECAP_RMB doesn't works ... -_-'
+    executeQuery($queryTruncateTempRecapRmb);
+    // Récupération des soldes de carte à la quinzaine pour le récap mensuel
+    $soldesQZ = limousinProject_getPathfileSoldeForRecapMensuel();
+    // Envoi du mail
+    $listeFichier = array_merge($listeFichier, array_values($soldesQZ));
     $aFields = array('Month' => $moisPrecedent, 'Montant' => number_format($totalMail, 2, '.', ' '));
     PMFSendMessage($appuid, 'quentin@oblady.fr', 'quentin@oblady.fr', '', '','Mise à jour du compte de cantonnement BeLim ', 'mailMensuel.html',$aFields, $listeFichier);
-    return $listeFichier;
+    // On retourne les soldes pour affectation des variables ProcessMaker et champs de la Report Table
+    return $soldesQZ;
 }
 
 function limousinProject_getPathfileSoldeForRecapMensuel()

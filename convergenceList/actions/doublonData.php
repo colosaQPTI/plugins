@@ -1,5 +1,14 @@
 <?php
 G::loadClass ( 'pmFunctions' );
+/*
+function getProUid($appUid){
+	$sSQL = "SELECT PRO_UID FROM APPLICATION WHERE APP_UID='$appUid'";
+    $aResult = executeQuery($sSQL);
+    $proUid = '';
+    if (isset($aResult[1]['PRO_UID']))
+    	$proUid =$aResult[1]['PRO_UID'];
+    return $proUid;
+}*/
  
 function getTotalDuplicateRecords($reg, $fldNamStat, $fldValStat) {
 
@@ -50,6 +59,7 @@ function deleteDuplicatedCases($appUidElected, $tableName ='') {
 			insertHistoryLogPlugin($appUidElected,$_SESSION['USER_LOGGED'],$CurDateTime,'1',$caseId,'Delete Case');//insertHistoryLogPlugin(father,......child)
 		}	
 	}
+	//genDataReport($tableName);
 	unset($_SESSION['ELIMINATE_POSSIBLE_CASES']);
 	return $numDeletedCases;
 }

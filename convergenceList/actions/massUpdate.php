@@ -28,27 +28,27 @@ foreach($items as $item){
         $data = executeQuery($query);
         $index = $data[1]['DEL_INDEX'];
         $queryDel = "SELECT USR_UID, TAS_UID, PRO_UID, DEL_THREAD_STATUS FROM APP_DELEGATION WHERE APP_UID = '".$item['APP_UID']."' AND DEL_INDEX = '".$index."' ";
-	    $resDel = executeQuery($queryDel);
-	    $taskIni = '';
-	    $process = '';
-	    $statusCase = '';
-	    if(sizeof($resDel))
-	    {
-	        $taskIni = $resDel[1]['TAS_UID'];
-	        $process = $resDel[1]['PRO_UID'];
-	        $statusCase = $resDel[1]['DEL_THREAD_STATUS'];
-	        if($resDel[1]['USR_UID'] == ""){
-	        	$queryuPDel = "UPDATE APP_DELEGATION SET USR_UID = '".$_SESSION['USER_LOGGED']."' 
-	        	WHERE APP_UID = '".$item['APP_UID']."' AND DEL_INDEX = '".$index."' ";
-	        	$queryuPDel = executeQuery($queryuPDel);
-	        	$userId = $_SESSION['USER_LOGGED'];
-	        }
-	        else
-	        {
-	        	$userId = $resDel[1]['USR_UID'];
-	        }
-	    }
-		
+        $resDel = executeQuery($queryDel);
+        $taskIni = '';
+        $process = '';
+        $statusCase = '';
+        if(sizeof($resDel))
+        {
+            $taskIni = $resDel[1]['TAS_UID'];
+            $process = $resDel[1]['PRO_UID'];
+            $statusCase = $resDel[1]['DEL_THREAD_STATUS'];
+            if($resDel[1]['USR_UID'] == ""){
+                $queryuPDel = "UPDATE APP_DELEGATION SET USR_UID = '".$_SESSION['USER_LOGGED']."' 
+                WHERE APP_UID = '".$item['APP_UID']."' AND DEL_INDEX = '".$index."' ";
+                $queryuPDel = executeQuery($queryuPDel);
+                $userId = $_SESSION['USER_LOGGED'];
+            }
+            else
+            {
+                $userId = $resDel[1]['USR_UID'];
+            }
+        }
+        
         if ($statusCase != 'CLOSED')
         {
              foreach ($champsArray as $champsItem)

@@ -293,7 +293,7 @@ class archivedCasesClassCron {
                         ## Control label type field suggest
                         if($row['FIELD_TYPE'] == 'suggest')
                         {
-                            $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME']]) ? $appData[$row['FIELD_NAME']] : '';                              
+                            $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME']]) ? $appData[$row['FIELD_NAME']] : '';
                         }
                         ## end Control label type field suggest
                         if ($appData[$row['FIELD_NAME'] . "_label"] == "")
@@ -360,6 +360,7 @@ class archivedCasesClassCron {
                         if( $appData[$row['FIELD_NAME']] == ''  || $appData[$row['FIELD_NAME']] == ' ')
                         {
                             $appData[$row['FIELD_NAME']] = $row['FIELD_DEFAULT_VALUE'];
+                            //$appData = array_merge($record, $appData);
                         }
                     }
                     if($appData[$row['FIELD_NAME']] !='' && (isset($appData[$row['FIELD_NAME']."_label"]) && $appData[$row['FIELD_NAME']."_label"] ==''))
@@ -555,10 +556,9 @@ class archivedCasesClassCron {
                         ## Control label type field suggest
                         if($row['FIELD_TYPE'] == 'suggest')
                         {
-                            $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME']]) ? $appData[$row['FIELD_NAME']] : '';                              
+                            $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME']]) ? $appData[$row['FIELD_NAME']] : '';
                         }
                         ## end Control label type field suggest
-    
                         if ($appData[$row['FIELD_NAME'] . "_label"] == "")
                         {
                             $i = $row['FIELD_DEFAULT_VALUE'];
@@ -880,7 +880,7 @@ class archivedCasesClassCron {
                         ## Control label type field suggest
                         if($row['FIELD_TYPE'] == 'suggest')
                         {
-                            $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME']]) ? $appData[$row['FIELD_NAME']] : '';                              
+                            $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME']]) ? $appData[$row['FIELD_NAME']] : '';
                         }
                         ## end Control label type field suggest
                         if ($appData[$row['FIELD_NAME'] . "_label"] == "")
@@ -948,6 +948,7 @@ class archivedCasesClassCron {
                         if( $appData[$row['FIELD_NAME']] == ''  || $appData[$row['FIELD_NAME']] == ' ')
                         {
                             $appData[$row['FIELD_NAME']] = $row['FIELD_DEFAULT_VALUE'];
+                            //$appData = array_merge($record, $appData);
                         }
                     }
                     if($appData[$row['FIELD_NAME']] !='' && (isset($appData[$row['FIELD_NAME']."_label"]) && $appData[$row['FIELD_NAME']."_label"] ==''))

@@ -22,6 +22,7 @@ function convergence_getUserRole($usr_uid) {
         $role = $result[1]['USR_ROLE'];
     return $role;
 }
+
 //GLOBAL : mise a jour du statut et du coup ajout d'une ligne dans les logs.
 function convergence_changeStatut($app_uid, $statut, $labelLog = '') {
 
@@ -48,6 +49,7 @@ function convergence_changeStatut($app_uid, $statut, $labelLog = '') {
         die();
     }
 }
+
 //GLOBAL : mise a jour du statut sans ajout d'une ligne dans les logs.
 function convergence_changeStatutWithoutHistory($app_uid, $statut) {
 
@@ -66,18 +68,21 @@ function convergence_changeStatutWithoutHistory($app_uid, $statut) {
         die();
     }
 }
+
 //GLOBAL : ajouter une ligne dans le compteur des PND  // appeler quand on classe PND
 function convergence_insertCompteurPND($dossier) {
 
     $insert = "INSERT INTO PMT_CPTPND (DOSSIER) VALUES ('$dossier')";
     $resultInsData = executeQuery($insert);
 }
+
 //GLOBAL : supprimer une ligne dans le compteur des PND  // appeler quand on enleve des PND
 function convergence_deleteCompteurPND($dossier) {
 
     $delete = "DELETE FROM PMT_CPTPND WHERE DOSSIER = '$dossier'";
     $resultInsData = executeQuery($delete);
 }
+
 //GLOBAL : mise a jour de donnee de demande
 function convergence_updateDemande($app_uid, $data) {
 
@@ -100,6 +105,7 @@ function convergence_updateDemande($app_uid, $data) {
         die();
     }
 }
+
 //GLOBAL : Insertio ndes données dans l'historique
 
 function insertHistoryLogPlugin($APP_UID, $USR_UID, $CURRENTDATETIME, $VERSION, $NEWAPP_UID, $ACTION, $STATUT = "") {
@@ -136,6 +142,7 @@ function insertHistoryLogPlugin($APP_UID, $USR_UID, $CURRENTDATETIME, $VERSION, 
         convergence_updateDemande($APP_UID, $data);
     }
 }
+
 //GLOBAL : update history apres edition pour avoir le nouveau statut
 function updateHistoryLogStatus($app_uid, $statut) {
 
@@ -148,6 +155,7 @@ function updateHistoryLogStatus($app_uid, $statut) {
     else
         return 1;
 }
+
 function FredirectTypo3($APP_UID) {
 
     $caseInstance = new Cases();
@@ -217,12 +225,19 @@ function FredirectTypo3($APP_UID) {
                 /* $url = '../convergenceList/casesHistoryDynaformPage_Ajax.php?ACTIONTYPE=edit&actionAjax=historyDynaformGridPreview&DYN_UID=' . $DYN_UID . '&APP_UID=' . $APP_UID . '&PRO_UID=' . $PRO_UID . '&CURRENTDATETIME=' . $CURRENTDATETIME . '&ACTIONSAVE=1';
                   echo "<script language='javascript'> location.href = '" . $url . "';</script>";
                   die(); */
-                echo "<script language=Javascript>parent.parent.message('Vos changements ont \u00E9t\u00E9 enregistr\u00E9s avec succ\u00E9s');</script>";
-                echo "<script language='javascript'>
-                //parent.Ext.getCmp('gridNewTab').store.reload();
-                //parent.parent.Ext.getCmp('win2').hide();
-                </script>";
-                die();
+                if(!isset($DATA['FLAG_CONFIRM_EDIT']) || $DATA['FLAG_CONFIRM_EDIT'] == '1')
+                {
+                    echo "<script language=Javascript>parent.parent.message('Vos changements ont \u00E9t\u00E9 enregistr\u00E9s avec succ\u00E9s');</script>";
+                    echo "<script language='javascript'>
+                    //parent.Ext.getCmp('gridNewTab').store.reload();
+                    //parent.parent.Ext.getCmp('win2').hide();
+                    </script>";
+                    die();
+                }
+                else
+                {
+                    echo "<script language=Javascript>parent.parent.Ext.getCmp('win2').hide();</script>";
+                }
             }
             if ($DATA['FLAG_ACTION'] == 'actionAjaxRestartCases')
             {
@@ -253,6 +268,7 @@ function FredirectTypo3($APP_UID) {
         }
     }
 }
+
 ### unsetSessionVars ($words, $var) -req
 function unsetSessionVars($words = 'FLAG') {
     //$words = 'FLAG|FLAG_ACTION';
@@ -278,6 +294,7 @@ function unsetSessionVars($words = 'FLAG') {
         unset($_SESSION[$value]);
     }
 }
+
 function unsetCasesFlag($words = 'FLAG', $APP_DATA) {
     //$words = 'FLAG|FLAG_ACTION';
     $aVarSession = array();
@@ -304,6 +321,7 @@ function unsetCasesFlag($words = 'FLAG', $APP_DATA) {
     }
     return $APP_DATA;
 }
+
 //GLOBAL : fonction pour creer un fe_user Typo3 a la confirmation de creation de compte dans PM
 function userSettingsPlugin($groupId, $urlTypo3 = 'http://172.17.20.29:8081/') {
     $res = "";
@@ -354,6 +372,7 @@ function userSettingsPlugin($groupId, $urlTypo3 = 'http://172.17.20.29:8081/') {
 
     return $res;
 }
+
 //GLOBAL : Recupère toutes les données des chanmps dans le case passé en paramètre
 function convergence_getAllAppData($app_id, $upper = 0) {
 
@@ -372,6 +391,7 @@ function convergence_getAllAppData($app_id, $upper = 0) {
 
     return $fields['APP_DATA'];
 }
+
 //Global permet de récupérer le CODE_OPER en fonction du code du chéquier
 function convergence_getCodeOperation($code) {
     $query = 'SELECT NUM_OPER FROM PMT_LISTE_OPER, PMT_TYPE_CHEQUIER WHERE PMT_LISTE_OPER.CODE_OPER = PMT_TYPE_CHEQUIER.CODE_OPER AND PMT_TYPE_CHEQUIER.CODE_CD = ' . $code;
@@ -383,6 +403,7 @@ function convergence_getCodeOperation($code) {
     else
         return 0;
 }
+
 /*
  * GLOBALS
  * Fonction qui renvoi la possibilité que le cas soit un doublon avec un autre.
@@ -467,6 +488,7 @@ function make_dedoublonage($process, $app_id, $debug = 0, $lv = 1, $dm = 1) {
     }
     return $doublon;
 }
+
 //GLobaL : return all the app_uid for the doublon
 function getAllDoublon($process, $app_id) {
 
@@ -503,19 +525,21 @@ function getAllDoublon($process, $app_id) {
 
     return '';
 }
+
 //GLOBAL
 function convergence_getFrenchDate() {
     return date('d/m/Y');
 }
+
 //GLOBAL
 function convergence_getAS400Date() {
     return G::CurDate('d.m.Y');
 }
+
 //GLOBAL
 function convergence_getOutputDocument($app_id, $doc_id) {
 
     $aAttachFiles = array();
-
     $outDocQuery = 'SELECT AD.APP_DOC_UID, AD.DOC_VERSION, C.CON_VALUE AS FILENAME
     FROM APP_DOCUMENT AD, CONTENT C
     WHERE AD.APP_UID="' . $app_id . '" AND AD.DOC_UID="' . $doc_id . '" AND
@@ -523,7 +547,6 @@ function convergence_getOutputDocument($app_id, $doc_id) {
     SELECT MAX(DOC_VERSION) FROM APP_DOCUMENT WHERE APP_UID="' . $app_id . '" AND
     DOC_UID="' . $doc_id . '" AND APP_DOC_STATUS="ACTIVE")
     AND AD.APP_DOC_UID = C.CON_ID AND C.CON_CATEGORY = "APP_DOC_FILENAME"';
-
     $outDoc = executeQuery($outDocQuery);
     if (!empty($outDoc))
     {
@@ -536,17 +559,18 @@ function convergence_getOutputDocument($app_id, $doc_id) {
                 $outDoc[1]['APP_DOC_UID'] . '_' . $outDoc[1]['DOC_VERSION'];
         $filename = $outDoc[1]['FILENAME'];
         $aAttachFiles[$filename . '.pdf'] = $path . '.pdf';
-        $aAttachFiles[$filename . '.doc'] = $path . '.doc';
+        //$aAttachFiles[$filename . '.doc'] = $path . '.doc';
     }
-
     return $aAttachFiles;
 }
+
 //GLOBAL
 function convergence_getNameUser($userID) {
 
     $user = userInfo($userID);
     return $user['firstname'] . ' ' . $user['lastname'];
 }
+
 //GLOBAL
 function convergence_getNamePresta($prestaID) {
 
@@ -559,6 +583,7 @@ function convergence_getNamePresta($prestaID) {
     else
         return '';
 }
+
 //GLOBAL
 function convergence_getCPVille($villeID) {
     if ($villeID != '')
@@ -575,6 +600,7 @@ function convergence_getCPVille($villeID) {
     else
         return '';
 }
+
 //GLOBAL
 function convergence_annuleCheque($chequeID) {
 
@@ -587,6 +613,7 @@ function convergence_annuleCheque($chequeID) {
     else
         return '';
 }
+
 //GLOBAL
 function convergence_annuleChequier($commandeID) {
 
@@ -602,7 +629,6 @@ function convergence_annuleChequier($commandeID) {
 
 //GLOBAL
 function convergence_concatFiles($files, $where_exclude) {
-
     //si plusieurs fichiers on les concatenent
     if (is_array($files) && count($files) > 1)
     {
@@ -665,7 +691,6 @@ function convergence_concatFiles($files, $where_exclude) {
     $resultFile = '/tmp/temp_concat_' . time() . '.pdf';
     $a = exec('gs -q -dBATCH -dNOPAUSE -dSAFER -sDEVICE=pdfwrite -sOutputFile=' . $resultFile . ' -dBATCH ' . implode(' ', $concatFile));
 
-
     $return = file_get_contents($resultFile);
     unlink($resultFile);
 
@@ -720,6 +745,7 @@ function convergence_getFileByFtp($remote_dir = '/.', $remote_bkp = '', $pattern
     }
     return $files_liste;
 }
+
 /* * *
  *      Récupère un fichier depuis le serveur Ftp distant pour l'uploader
  *
@@ -734,7 +760,6 @@ function convergence_getFileByFtp($remote_dir = '/.', $remote_bkp = '', $pattern
  * @return      string  $files_liste    le chemin du fichier récupéré
  * */
 function convergence_uploadFileByFtp($remote_file = '', $local_dir = '/var/tmp/') {
-
     if ($remote_file != '')
     {
         //INIT
@@ -754,6 +779,7 @@ function convergence_uploadFileByFtp($remote_file = '', $local_dir = '/var/tmp/'
     }
     return FALSE;
 }
+
 /* * *
  *      Dépose un fichier sur le server ftp distant
  *
@@ -790,6 +816,7 @@ function convergence_putFileByFtp($local_file = '', $remote_dir = '/', $remote_b
     }
     return FALSE;
 }
+
 //GLOBAL
 // $useCodeOper à 0 si on ne veux pas tenir compte de $onlyThisCodeOper, des code opération en générale, du code oper dans le nom du fichier et un seul fichier pour tout le dispositif
 function convergence_exportToAS400($process_id, $file_base, $code, $liste = null, $makeRetourProdTxtForRecette = 0, $onlyThisCodeOper = 0, $useCodeOper = 1) {
@@ -852,7 +879,7 @@ function convergence_exportToAS400($process_id, $file_base, $code, $liste = null
             $whereCodeOper = '';
         $dateFile = date("YmdHis");
         if ($useCodeOper == 1)
-            $file = $file_base . $codeOper . '_' . $dateFile . '.txt';
+            $file = $file_base . $codeOper . '.txt';
         else
             $file = $file_base;
 
@@ -877,7 +904,6 @@ function convergence_exportToAS400($process_id, $file_base, $code, $liste = null
                     }
                     if ($field['REQUIRED'] == 'no' || ($field['REQUIRED'] == 'yes' && isset($row[$field['FIELD_NAME']]) && $row[$field['FIELD_NAME']] != ''))
                     {
-
                         switch ($field['AS400_TYPE'])
                         {
                             case 'Integer':
@@ -900,11 +926,12 @@ function convergence_exportToAS400($process_id, $file_base, $code, $liste = null
                                 $dateOut = date_format($dateIn, $field['AS400_TYPE']);
                                 $line .= substr(str_pad($dateOut, $field['LENGTH'], $token), 0, $field['LENGTH']);
                                 break;
-                            case 'Decimal'://0000000.00
-                                $char = array('.', ',');
-                                $count = count(explode('.', $row[$field['FIELD_NAME']]));
-                                ($count > 1) ? $dec = $row[$field['FIELD_NAME']] : $dec = $row[$field['FIELD_NAME']] . '00';
-                                $line .= substr(str_pad(str_replace($char, '', $dec), $field['LENGTH'], 0, STR_PAD_LEFT), 0, $field['LENGTH']);
+                            case 'Decimal'://0000000.00                                
+                                $value = str_replace(' ', '', $row[$field['FIELD_NAME']]);
+                                $value = str_replace(',', '.', $value);
+                                $count = count(explode('.', $value));
+                                ($count > 1) ? $dec = $value : $dec = $value . '00';
+                                $line .= substr(str_pad(str_replace('.', '', $dec), $field['LENGTH'], 0, STR_PAD_LEFT), 0, $field['LENGTH']);
                                 break;
                             case 'Telephone':
                                 $char = array('-', '.', ' ');
@@ -954,8 +981,8 @@ function convergence_exportToAS400($process_id, $file_base, $code, $liste = null
                                 $string = strtoupper(removeAllAccents($row[$field['FIELD_NAME']]));
                                 $line .= substr(str_pad($string, $field['LENGTH'], $token), 0, $field['LENGTH']);
                                 break;
-                            default:
-                                $line .= substr(str_pad($row[$field['FIELD_NAME']], $field['LENGTH'], $token), 0, $field['LENGTH']);
+                            default:                               
+                                $line .= mb_substr(str_pad_unicode($row[$field['FIELD_NAME']], $field['LENGTH'], $token), 0, $field['LENGTH']);
                                 break;
                         }
                     }
@@ -983,7 +1010,7 @@ function convergence_exportToAS400($process_id, $file_base, $code, $liste = null
         if ($useCodeOper == 0)
             break;
     }
-    /*     * *** autogenrate a sample file of return from as400 for test on debug mode***** */
+    /*     * *** autogenerate a sample file of return production from as400 for test on debug mode***** */
     if ($makeRetourProdTxtForRecette == 1)
     {
         $nameFile = '/var/tmp/autogenerateForRetourProd_' . $code . '.txt';
@@ -1037,22 +1064,60 @@ function convergence_exportToAS400($process_id, $file_base, $code, $liste = null
         return $nb_result;
     }
 }
+
 function removeAllAccents($str, $encoding = 'utf-8') {
 
     // transformer les caractères accentués en entités HTML
     $str = htmlentities($str, ENT_NOQUOTES, $encoding);
     // remplacer les entités HTML pour avoir juste le premier caractères non accentués
     // Exemple : "&ecute;" => "e", "&Ecute;" => "E", "Ã " => "a" ...
-    $str = preg_replace('#&([A-za-z])(?:acute|grave|cedil|circ|orn|ring|slash|th|tilde|uml);#', '\1', $str);
+    $str = preg_replace('#&([A-Za-z])(?:acute|grave|cedil|circ|orn|ring|slash|th|tilde|uml);#', '\1', $str);
     // Remplacer les ligatures tel que : Œ, Æ ...
     // Exemple "Å“" => "oe"
-    $str = preg_replace('#&([A-za-z]{2})(?:lig);#', '\1', $str);
+    $str = preg_replace('#&([A-Za-z]{2})(?:lig);#', '\1', $str);
     // Supprimer tout le reste
     $str = preg_replace('#&[^;]+;#', '', $str);
     // Conserve les lettres et chiffre uniquement
     $str = preg_replace('/[^a-zA-Z0-9]+/i', ' ', $str);
     return $str;
 }
+
+function str_pad_unicode($str, $pad_len, $pad_str = ' ', $dir = STR_PAD_RIGHT) {
+    mb_internal_encoding('utf-8');
+    $str_len = mb_strlen($str);
+    $pad_str_len = mb_strlen($pad_str);
+    if ( !$str_len && ($dir == STR_PAD_RIGHT || $dir == STR_PAD_LEFT) )
+    {
+        $str_len = 1;
+    }
+    if ( !$pad_len || !$pad_str_len || $pad_len <= $str_len )
+    {
+        return $str;
+    }
+
+    $result = null;
+    $repeat = ceil($str_len - $pad_str_len + $pad_len);
+    if ( $dir == STR_PAD_RIGHT )
+    {
+        $result = $str . str_repeat($pad_str, $repeat);
+        $result = mb_substr($result, 0, $pad_len);
+    }
+    else if ( $dir == STR_PAD_LEFT )
+    {
+        $result = str_repeat($pad_str, $repeat) . $str;
+        $result = mb_substr($result, -$pad_len);
+    }
+    else if ( $dir == STR_PAD_BOTH )
+    {
+        $length = ($pad_len - $str_len) / 2;
+        $repeat = ceil($length / $pad_str_len);
+        $result = mb_substr(str_repeat($pad_str, $repeat), 0, floor($length))
+                . $str
+                . mb_substr(str_repeat($pad_str, $repeat), 0, ceil($length));
+    }
+    return $result;
+}
+
 /* * **** //GLOBAL
  *  Met le statut En cours de production sur les demandes pour les export de production de chèques
  *
@@ -1067,6 +1132,7 @@ function convergence_updateAllStatutDemandes($app_uid, $statutTo) {
         }
     }
 }
+
 /* * **** //GLOBAL
  * Supprime le falg à reproduire après le lancement en production de la demande
  *
@@ -1092,6 +1158,7 @@ function convergence_updateAllReproductionDemandes($app_uid, $flagTo) {
         }
     }
 }
+
 /* * **** //GLOBAL
  *  Met le statut En cours de remboursement sur les demandes pour les export de remboursement
  *
@@ -1106,6 +1173,7 @@ function convergence_updateAllStatutRemboursement($app_uid, $statutTo) {
         }
     }
 }
+
 function convergence_getDossiers($res, $table, $export = true) {
     if ($export == true)
     {
@@ -1122,6 +1190,7 @@ function convergence_getDossiers($res, $table, $export = true) {
     $liste = implode(',', $unique);
     return $liste;
 }
+
 // n'est plus utilisé, mais après modification, peut servir pour les réédition, même num_titre et bconstante
 function convergence_checkReproduction($line_import) {
     $repro = 0;
@@ -1153,6 +1222,7 @@ function convergence_checkReproduction($line_import) {
     }
     return 0;
 }
+
 /*      Récupère toutes les données de chaque fichier importé depuis le serveur Ftp pour
  * les fusionner en un seul afin d'être traité par la function importFromAS400 facilement
  *
@@ -1173,7 +1243,6 @@ function convergence_concatImportFile($list_file, $app_uid) {
         $handle = fopen($new_file, 'w+');
         $w = fwrite($handle, $globalContent);
         fclose($handle);
-
         return $new_file;
     }
     else
@@ -1237,6 +1306,7 @@ function convergence_importFromAS400($process_uid, $app_id = '', $childProc = 0,
 
         $select = executeQuery($query_fields);
         $mode = 'r';
+        $file = basename($filePath);
         $ftic = fopen($filePath, $mode);
         $data = array();
         $logField = array();
@@ -1312,14 +1382,7 @@ function convergence_importFromAS400($process_uid, $app_id = '', $childProc = 0,
         } // fin du fichier d'import
         if ($childProc != 1) // pour ne pas écrire 2 fois le fichier des logs
         {
-            $sPath = 'SELECT PATH_FILE FROM PMT_LISTE_OPER GROUP BY PATH_FILE';
-            $rPath = executeQuery($sPath);
-            $file = 'logImportAS400';
-            if (!empty($rPath))
-                $path = $rPath[1]['PATH_FILE'] . '/LOG/' . $file . '_' . date("YmdHis") . '_log.txt';
-            else
-                $path = '/var/tmp/' . $file . '_' . date("YmdHis") . '_log.txt';
-
+            $path = '/var/tmp/' . $file . '_' . date("YmdHis") . '_log.txt'; // log toujours ecrit en local, à déplacer selon les besoins dans le process
             if (!empty($logField))
             {
                 $Log .= "Liste des erreurs survenues lors de l’intégration :\r\n";
@@ -1345,6 +1408,7 @@ function convergence_importFromAS400($process_uid, $app_id = '', $childProc = 0,
         ////autre méthode
     }
 }
+
 /* * ***
  * Teste la validitée des champs importés
  *
@@ -1399,35 +1463,35 @@ function convergence_checkFieldLog($value, $params, $type) {
                     $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format 'E-mail' attendu";
                 }
                 break;
-            /* case 'Date':  // ^(0[1-9]|1\d|2\d|3[0-1])[\/\.-]?(0[1-9]|1[0-2])[\/\.-]?(\d{4})$
-              if (preg_match('#^(0[1-9]|1\d|2\d|3[0-1])[\/\.-]?(0[1-9]|1[0-2])[\/\.-]?(\d{4})$#', $value, $match) == 1)
-              {
-              if (!checkdate($match[2], $match[1], $match[3]))
-              {
-              $log[] = "la valeur '$value' du champ date '$field' n'existe pas dans le calendrier";
-              }
-              }
-              else
-              {
-              $log[] = "le format date du champ '$field' est invalide";
-              }
-              break;
-              case 'Yesno':
-              if (strtoupper($value) != 'O' && strtoupper($value) != 'N')
-              $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format 'O / N'";
-              break;
-              case 'OuiNon':
-              if (strtolower($value) != 'oui' && strtolower($value) != 'non')
-              $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format 'oui / non'";
-              break;
-              case 'binaire':
-              if ($value != 1 && $value != 0)
-              $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format '1 / 0'";
-              break;
-              case 'AI':
-              if ($value != 'A' && $value != 'I')
-              $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format Actif/Inactif 'A / I'";
-              break; */
+            /*case 'Date':  // ^(0[1-9]|1\d|2\d|3[0-1])[\/\.-]?(0[1-9]|1[0-2])[\/\.-]?(\d{4})$
+                if (preg_match('#^(0[1-9]|1\d|2\d|3[0-1])[\/\.-]?(0[1-9]|1[0-2])[\/\.-]?(\d{4})$#', $value, $match) == 1)
+                {
+                    if (!checkdate($match[2], $match[1], $match[3]))
+                    {
+                        $log[] = "la valeur '$value' du champ date '$field' n'existe pas dans le calendrier";
+                    }
+                }
+                else
+                {
+                    $log[] = "le format date du champ '$field' est invalide";
+                }
+                break;
+            case 'Yesno':
+                if (strtoupper($value) != 'O' && strtoupper($value) != 'N')
+                    $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format 'O / N'";
+                break;
+            case 'OuiNon':
+                if (strtolower($value) != 'oui' && strtolower($value) != 'non')
+                    $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format 'oui / non'";
+                break;
+            case 'binaire':
+                if ($value != 1 && $value != 0)
+                    $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format '1 / 0'";
+                break;
+            case 'AI':
+                if ($value != 'A' && $value != 'I')
+                    $log[] = "la valeur '$value' du champs '$field' ne correspond pas au format Actif/Inactif 'A / I'";
+                break;*/
             case 'NCommande':
                 $val = $value + 0;
                 $val = "$val";
@@ -1469,6 +1533,7 @@ function convergence_checkFieldLog($value, $params, $type) {
         return 1;
     }
 }
+
 /* * ***
  * Execution d'un nouveau process suite à un import de l'AS400
  *
@@ -1508,6 +1573,7 @@ function new_case_for_import($line, $config) {
 //G::header('Location: ../../cases/' . $nextStep['PAGE']);
 //G::header('Location: ../../cases/open?APP_UID=' . $_SESSION['APPLICATION'].'&DEL_INDEX='.$_SESSION['INDEX']);
 }
+
 /* * *
  * Mise a jour de DATE_PROD dans PMT_LISTE_PROD et des dossiers produits
  *
@@ -1526,6 +1592,7 @@ function convergence_updateDateProd($num_prod, $update) {
         die();
     }
 }
+
 //GLOBAL Inutilisé, voir pour la supprimer
 function convergence_updateListeProd($app_id, $res) {
     $field = convergence_getAllAppData($app_id);
@@ -1547,6 +1614,7 @@ function convergence_updateListeProd($app_id, $res) {
         die();
     }
 }
+
 //GLOBAL
 function convergence_getNumDossier($app_id) {
     try
@@ -1561,6 +1629,7 @@ function convergence_getNumDossier($app_id) {
         die();
     }
 }
+
 function convergence_getPathDispositif() {
     try
     {
@@ -1575,6 +1644,7 @@ function convergence_getPathDispositif() {
         die();
     }
 }
+
 function convergence_setVnForRmh() {
     $ret = 0;
     $sql = 'DELETE FROM PMT_VN_FOR_RMH';
@@ -1595,12 +1665,14 @@ function convergence_setVnForRmh() {
     }
     return $ret;
 }
+
 function convergence_unsetVnForRmh() {
     $sql = 'DELETE FROM PMT_VN_FOR_RMH';
     $res = executeQuery($sql);
     $sqlUpdate = 'update PMT_CHEQUES set STATUT="10" where ETAT_TITRE < 300 and STATUT = "15"';
     $resU = executeQuery($sqlUpdate);
 }
+
 //GLOBAL
 function convergence_updateListeRemboursement($app_id, $res) {
     $field = convergence_getAllAppData($app_id);
@@ -1620,6 +1692,7 @@ function convergence_updateListeRemboursement($app_id, $res) {
         die();
     }
 }
+
 //convergence_InsertLineImport(@@LINE_IMPORT,@@CONFIG_IMPORT);
 //GLOBAL
 function convergence_InsertLineImport($line, $config) {
@@ -1646,6 +1719,7 @@ function convergence_InsertLineImport($line, $config) {
         die();
     }
 }
+
 //GLOBAL
 /* * ***** Met à jour les titres lors des remboursements effectués par l'AS400 via le fichier importé RMB ************* */
 function convergence_updateTitreRmb($line, $config, $uid_rmb = '') {
@@ -1673,6 +1747,7 @@ function convergence_updateTitreRmb($line, $config, $uid_rmb = '') {
         die();
     }
 }
+
 /* * *
  * Function à utiliser après un import de production de chèques dans le Workflow
  *   - Update du statut de la demande de 7 à 6 pour 'Produit'
@@ -1705,10 +1780,10 @@ function convergence_changeStatutFromImport($data, $statut = 6) {
                     $rComplement = executeQuery($qComplement);
                     insertHistoryLogPlugin($rComplement[1]['APP_UID'], $_SESSION['USER_LOGGED'], date('Y-m-d H:i:s'), '0', '', "Chéquier de Complément N°" . $value . " produit", 6);
                 }
-                /* else
-                  {
-                  convergence_changeStatut($result[1]['APP_UID'], $statut, 'Retour de production Chéquier N°' . $value);
-                  } */
+                /*else
+                {
+                    convergence_changeStatut($result[1]['APP_UID'], $statut, 'Retour de production Chéquier N°' . $value);
+                }*/
             }
         }
         catch (Exception $e)
@@ -1719,6 +1794,7 @@ function convergence_changeStatutFromImport($data, $statut = 6) {
         }
     }
 }
+
 //GLOBAL
 function modifyAdresseofDemande($app_uid, $case_uid_demande, $callback = '') {
     //je recupere mes valeurs courantes
@@ -1751,6 +1827,7 @@ function modifyAdresseofDemande($app_uid, $case_uid_demande, $callback = '') {
     else
         insertHistoryLogPlugin($case_uid_demande, $_SESSION['USER_LOGGED'], date('Y-m-d H:i:s'), '0', '', $new_params['action'], $new_params['status']);
 }
+
 //GLOBAL
 function modifyDateExpedition($app_uid, $case_uid_liste_prod) {
     //jerecupere mes valeurs courantes
@@ -1763,6 +1840,7 @@ function modifyDateExpedition($app_uid, $case_uid_liste_prod) {
 
     $oCase->updateCase($case_uid_liste_prod, $Fields);
 }
+
 //GLOBAL
 function modifyDateVirement($app_uid, $case_uid_liste_rmbt) {
     //je recupere mes valeurs courantes
@@ -1785,6 +1863,7 @@ function modifyDateVirement($app_uid, $case_uid_liste_rmbt) {
         }
     }
 }
+
 /* * ***
  *  Fonction récupérant le nombre de dossier traité pour un export
  *
@@ -1865,6 +1944,7 @@ function convergence_countCaseToProduct($statut, $codeOper, $detailChequier = 1)
     }
     return $msg;
 }
+
 /* * ***
  *  Fonction pour vérifier si la demande n'as pas déjà était faite, par un même bénéficiaire
  *
@@ -1888,6 +1968,7 @@ function convergence_justeOneDemande($user, $porcess_id) {
     }
     return 1;
 }
+
 // Récupère le champs UID généré par l'auto-incrémentation pour le conserver lors d'une édition ou de le générer
 function convergence_keepAutoIncrement($table, $field, $value) {
     $qInsert = 'INSERT INTO ' . strtoupper($table) . ' (' . strtoupper($field) . ') VALUES (' . $value . ')';
@@ -1896,20 +1977,19 @@ function convergence_keepAutoIncrement($table, $field, $value) {
     $r = executeQuery($q);
     return $r[1]['UID'];
 }
+
 ## disable user conection web services
 function pmDisableUser($userName) {
     $ret = 1;
     //$IP = $_SERVER['HTTP_HOST'];
     $pfServer = new SoapClient('http://' . HostName . '/typo3conf/ext/pm_webservices/serveur.php?wsdl');
     $ret = $pfServer->disableAccount(array('username' => $userName));
-
-
     return $ret;
 }
+
 ## end disable user conection web services
 ## actions import CSV
 function getDataCSV($firstLineCsvAs = 'on') {
-
     set_include_path(PATH_PLUGINS . 'convergenceList' . PATH_SEPARATOR . get_include_path());
     require_once 'classes/class.parseCSV.php';
     $csv = new parseCSV();
@@ -1920,6 +2000,7 @@ function getDataCSV($firstLineCsvAs = 'on') {
     $_SESSION['CSV_FILE_NAME'] = $_FILES['form']['name']['CSV_FILE'];
     return $data;
 }
+
 function getProUid($tableName) {
     $sSQL = "SELECT * FROM ADDITIONAL_TABLES WHERE ADD_TAB_NAME ='$tableName'";
     $aResult = executeQuery($sSQL);
@@ -1938,45 +2019,42 @@ function getProUid($tableName) {
     }
     return $proUid;
 }
+
 function getRolUserImport() {
     require_once ("classes/model/Users.php");
     $oUser = new Users();
     $oDetailsUser = $oUser->load($_SESSION ['USER_LOGGED']);
     return $oDetailsUser['USR_ROLE'];
 }
+
 function genDataReport($tableName) {
     G::loadClass('pmTable');
     G::loadClass('pmFunctions');
     require_once 'classes/model/AdditionalTables.php';
-
     // Check if the Table is Report or PM Table
     $tableType = "Report";
     $sqlAddTable = "SELECT * FROM ADDITIONAL_TABLES WHERE ADD_TAB_NAME = '$tableName' ";
     $resAddTable = executeQuery($sqlAddTable);
-    if (sizeof($resAddTable))
-    {
-        if ($resAddTable[1]['PRO_UID'] == '')
-        {
+    if (sizeof($resAddTable)) {
+        if ($resAddTable[1]['PRO_UID'] == '') {
             $tableType = "pmTable";
         }
     }
-    if ($tableType == "Report")
-    {
+    if ($tableType == "Report") {
         $cnn = Propel::getConnection('workflow');
         $stmt = $cnn->createStatement();
         $additionalTables = new AdditionalTables();
         $oPmTable = $additionalTables->loadByName($tableName);
         $table = $additionalTables->load($oPmTable['ADD_TAB_UID']);
-        if ($table['PRO_UID'] != '')
-        {
+        if ($table['PRO_UID'] != '') {
             $truncateRPTable = "TRUNCATE TABLE  " . $tableName . " ";
             $rs = $stmt->executeQuery($truncateRPTable, ResultSet::FETCHMODE_NUM);
             $additionalTables->populateReportTable($table['ADD_TAB_NAME'], pmTable::resolveDbSource($table['DBS_UID']), $table['ADD_TAB_TYPE'], $table['PRO_UID'], $table['ADD_TAB_GRID'], $table['ADD_TAB_UID']);
         }
     }
 }
-function deletePMCases($caseId,$tableName) {
 
+function deletePMCases($caseId,$tableName) {
     $query1 = "DELETE FROM wf_" . SYS_SYS . ".APPLICATION WHERE APP_UID='" . $caseId . "' ";
     $apps1 = executeQuery($query1);
     $query2 = "DELETE FROM wf_" . SYS_SYS . ".APP_DELAY WHERE APP_UID='" . $caseId . "'";
@@ -2004,6 +2082,7 @@ function deletePMCases($caseId,$tableName) {
     $query13="DELETE FROM wf_".SYS_SYS.$tableName." WHERE APP_UID='".$caseId."'";
     $apps13=executeQuery($query13);
 }
+
 function getDynaformFields($jsonFieldsCSV, $tableName) {
 
     require_once PATH_CONTROLLERS . 'pmTablesProxy.php';
@@ -2013,29 +2092,24 @@ function getDynaformFields($jsonFieldsCSV, $tableName) {
     $dynFields = array();
     $dynFields = $oReportTables->_getDynafields($proUid, 'xmlform', 0, 10000, null);
     $aDynFields = array();
-    foreach ($dynFields['rows'] as $row)
-    {
+    foreach ($dynFields['rows'] as $row) {
         $aDynFields[strtoupper($row['FIELD_NAME'])] = $row['FIELD_NAME'];
     }
     $_dataFields = array();
-    foreach ($aDynFields as $key => $value)
-    {
+    foreach ($aDynFields as $key => $value) {
         $record = array("FIELD_NAME" => $value, "FIELD_DESC" => $key, "COLUMN_CSV" => 'Select...');
         $_dataFields[] = $record;
     }
     return (array(sizeof($_dataFields), array_values($_dataFields)));
 }
-function getConfigCSV($data, $idInbox, $firstLineHeader = "") {
 
+function getConfigCSV($data, $idInbox, $firstLineHeader = "") {
     $rolUser = getRolUserImport();
     $query = "SELECT * FROM PMT_CONFIG_CSV_IMPORT WHERE ROL_CODE = '" . $rolUser . "' AND ID_INBOX = '" . $idInbox . "'";
     $aData = executeQuery($query);
-    if (sizeof($aData))
-    {
-        for ($i = 0; $i < count($data); $i++)
-        {
-            foreach ($aData As $key => $row)
-            {
+    if (sizeof($aData)) {
+        for ($i = 0; $i < count($data); $i++) {
+            foreach ($aData as $key => $row) {
                 //G::pr($data[$i]['FIELD_NAME']." --- ".$row['CSV_FIELD_NAME']);
                 if ($data[$i]['FIELD_NAME'] == $row['CSV_FIELD_NAME'])
                 {
@@ -2046,7 +2120,6 @@ function getConfigCSV($data, $idInbox, $firstLineHeader = "") {
                         if($row['CSV_FIRST_LINE_HEADER'] == $firstLineHeader) 
                             $data[$i]['COLUMN_CSV'] = $row['CSV_COLUMN'];
                     }
-
                     if (!empty($row['CSV_TYPE']))
                     {
                         $data[$i]['COLUMN_TYPE'] = $row['CSV_TYPE'];
@@ -2065,23 +2138,21 @@ function getConfigCSV($data, $idInbox, $firstLineHeader = "") {
     }
     return $data;
 }
-function _convert($content) {
-    if (!mb_check_encoding($content, 'UTF-8') OR !($content === mb_convert_encoding(mb_convert_encoding($content, 'UTF-32', 'UTF-8'), 'UTF-8', 'UTF-32')))
-    {
 
+function _convert($content) {
+    if (!mb_check_encoding($content, 'UTF-8') OR !($content === mb_convert_encoding(mb_convert_encoding($content, 'UTF-32', 'UTF-8'), 'UTF-8', 'UTF-32'))) {
         $content = mb_convert_encoding($content, 'UTF-8');
 
-        if (mb_check_encoding($content, 'UTF-8'))
-        {
+        if (mb_check_encoding($content, 'UTF-8')) {
             // log('Converted to UTF-8');
-        }
-        else
-        {
+        } 
+        else {
             // log('Could not converted to UTF-8');
         }
     }
     return $content;
 }
+
 /* * * add by Nico for log file
  * This function create a log file and remove wrong data import
  *
@@ -2098,7 +2169,6 @@ function createLog($dataCSV, $items, $tableName, $firstLineHeader, $dataEdit = '
     //$sPath = 'SELECT PATH_FILE FROM PMT_LISTE_OPER GROUP BY PATH_FILE';
     //$rPath = executeQuery($sPath);
     $file = $_SESSION['CSV_FILE_NAME'];
-
     (array) $ftemp = explode('.', $file);
     //if (!empty($rPath))
     //    $path = $rPath[1]['PATH_FILE'] . '/LOG/' . $ftemp[0] . '_' . date("YmdHis") . '_log.txt';
@@ -2106,7 +2176,6 @@ function createLog($dataCSV, $items, $tableName, $firstLineHeader, $dataEdit = '
     // TODO voir pour le chemin en define
     $path = '/var/tmp/import_' . $ftemp[0] . '_' . date("YmdHis") . '_log.txt';
     $Log = 'Le fichier ' . $file . ' a été intégré le ' . date("d/m/Y à H:i:s") . ".\r\n\n\n";
-
     $nbcurrentLine = $nbAnomalie = $nbCreate = $nbModif = 0;
     foreach ($dataCSV as $row)
     {
@@ -2223,9 +2292,9 @@ function createLog($dataCSV, $items, $tableName, $firstLineHeader, $dataEdit = '
     fwrite($handle, $Log);
     fclose($handle);
     $dataCSV = array_merge((array) $dataCSV); // on ré-indexe le tableau
-
     return $dataCSV;
 }
+
 function dataDynaforms($resultDynaform,$proUid)
 {
     ini_set('memory_limit', '256M');
@@ -2233,7 +2302,6 @@ function dataDynaforms($resultDynaform,$proUid)
     foreach($resultDynaform As $rowDynaform)
     {
         $dynaform = new Form($proUid . PATH_SEP . $rowDynaform['DYN_UID'], PATH_DYNAFORM , SYS_LANG , false);
-        
         foreach ($dynaform->fields as $fieldName => $field) 
         {
             if( $field->type == 'dropdown' || $field->type == 'radiogroup' || $field->type == 'checkgroup' || $field->type == 'listbox' || $field->type == 'yesno' || $field->type == 'suggest')
@@ -2278,7 +2346,6 @@ function dataDynaforms($resultDynaform,$proUid)
                         $data[] = $rowData;
                     }
                 }
-                
                 $record = array (
                         "FIELD_NAME" => $field->name, 
                         "FIELD_LABEL" => $field->label,
@@ -2295,24 +2362,21 @@ function dataDynaforms($resultDynaform,$proUid)
                         );
                 $_dataForms[] = $record;
             }
-            
         }
     }
     return $_dataForms;
 }
+
 function createFileTmpCSV($csv, $csv_file) {
-    if ($csv != '')
-    {
+    if ($csv != '') {
         $sPathName = PATH_DOCUMENT . "csvTmp";
         if (!is_dir($sPathName))
             G::verifyPath($sPathName, true);
-        if (!$handle = fopen($sPathName . "/" . $csv_file, "w"))
-        {
+        if (!$handle = fopen($sPathName . "/" . $csv_file, "w")) {
             echo "Cannot open file";
             exit;
         }
-        if (fwrite($handle, utf8_decode($csv)) === FALSE)
-        {
+        if (fwrite($handle, utf8_decode($csv)) === FALSE) {
             echo "Cannot write to file";
             exit;
         }
@@ -2324,6 +2388,7 @@ function createFileTmpCSV($csv, $csv_file) {
         //fclose($handle);
     }
 }
+
 function importCreateCase($jsonMatchFields,$uidTask, $tableName,$firstLineHeader, $typeAction)
 {
     G::LoadClass('case');
@@ -2494,7 +2559,6 @@ function importCreateCase($jsonMatchFields,$uidTask, $tableName,$firstLineHeader
                 {
                     if($row['FIELD_DEFAULT_VALUE'] == '')
                         $row['FIELD_DEFAULT_VALUE'] = 0;
-                        
                     if($row['FIELD_TYPE'] != 'yesno')
                     { 
                         $appData[$row['FIELD_NAME']."_label"] = isset($appData[$row['FIELD_NAME']."_label"]) ? $appData[$row['FIELD_NAME']."_label"]:'';
@@ -2570,11 +2634,12 @@ function importCreateCase($jsonMatchFields,$uidTask, $tableName,$firstLineHeader
                         if( $appData[$row['FIELD_NAME']] == '' || $appData[$row['FIELD_NAME']] == ' ' )
                         {
                             $appData[$row['FIELD_NAME']] = $row['FIELD_DEFAULT_VALUE'];
+                            //$appData = array_merge($record, $appData);
                         }
-                        if($appData[$row['FIELD_NAME']] !='' && (isset($appData[$row['FIELD_NAME']."_label"]) && $appData[$row['FIELD_NAME']."_label"] ==''))
-                        {
-                            $appData[$row['FIELD_NAME']."_label"] = $label;
-                        }
+                    }
+                    if($appData[$row['FIELD_NAME']] !='' && (isset($appData[$row['FIELD_NAME']."_label"]) && $appData[$row['FIELD_NAME']."_label"] ==''))
+                    {
+                    	$appData[$row['FIELD_NAME']."_label"] = $label;
                     }
                 }
             }
@@ -2620,7 +2685,7 @@ function importCreateCase($jsonMatchFields,$uidTask, $tableName,$firstLineHeader
         }
         $totalCases++;
     }
-     genDataReport($tableName);
+    //  genDataReport($tableName);
     # create file tmp
     createFileTmpCSV($csv,$csv_file);   
     # end create file tmp 
@@ -2628,6 +2693,7 @@ function importCreateCase($jsonMatchFields,$uidTask, $tableName,$firstLineHeader
     unset($_SESSION['REQ_DATA_CSV']);
     return $totalCases;
 }
+
 function importCreateCaseDelete($jsonMatchFields,$uidTask, $tableName,$firstLineHeader,$dataDeleteEdit)
 {
     G::LoadClass('case');
@@ -2707,14 +2773,14 @@ function importCreateCaseDelete($jsonMatchFields,$uidTask, $tableName,$firstLine
                         if($row[$field['COLUMN_CSV']]  != '')
                             $appData[$field['FIELD_NAME']] = _convert($row[$field['COLUMN_CSV']]);
                         else
-                            $appData[$field['FIELD_NAME']] = '';
+                            $appData[$field['FIELD_NAME']] = ''; // Attention en dev chaine vide et espace en pré-prod : POURQUOI ?
                     }
                     else
                     {
                         if($field['COLUMN_CSV']  != '')
                             $appData[$field['FIELD_NAME']] = _convert($field['COLUMN_CSV']);
                         else
-                            $appData[$field['FIELD_NAME']] = '';
+                            $appData[$field['FIELD_NAME']] = ''; // Attention en dev chaine vide et espace en pré-prod : POURQUOI ?
                     } 
                 }
                 else
@@ -2797,14 +2863,13 @@ function importCreateCaseDelete($jsonMatchFields,$uidTask, $tableName,$firstLine
                 {
                     if($row['FIELD_DEFAULT_VALUE'] == '')
                         $row['FIELD_DEFAULT_VALUE'] = 0;
-                            
                     if($row['FIELD_TYPE'] != 'yesno')
                     {
                         $appData[$row['FIELD_NAME']."_label"] = isset($appData[$row['FIELD_NAME']."_label"])?$appData[$row['FIELD_NAME']."_label"]:'';
                         ## Control label type field suggest
                         if($row['FIELD_TYPE'] == 'suggest')
                         {
-                            $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME']]) ? $appData[$row['FIELD_NAME']] : '';                              
+                            $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME']]) ? $appData[$row['FIELD_NAME']] : '';
                         }
                         ## end Control label type field suggest
                         if($appData[$row['FIELD_NAME']."_label"] =="")
@@ -2952,7 +3017,6 @@ function importCreateCaseDelete($jsonMatchFields,$uidTask, $tableName,$firstLine
         $totalCases++;
     }
     
-    
     # create file tmp
     createFileTmpCSV($csv,$csv_file);   
     # end create file tmp 
@@ -2960,6 +3024,7 @@ function importCreateCaseDelete($jsonMatchFields,$uidTask, $tableName,$firstLine
     unset($_SESSION['REQ_DATA_CSV']);
     return $totalCases;
 }
+
 function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLineHeader, $dataDeleteEdit, $updateOnly = 0) {
     G::LoadClass('case');
     $items = json_decode($jsonMatchFields, true);
@@ -3139,7 +3204,7 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                         ## Control label type field suggest
                         if($row['FIELD_TYPE'] == 'suggest')
                         {
-                            $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME']]) ? $appData[$row['FIELD_NAME']] : '';                              
+                            $appData[$row['FIELD_NAME'] . "_label"] = isset($appData[$row['FIELD_NAME']]) ? $appData[$row['FIELD_NAME']] : '';
                         }
                         ## end Control label type field suggest
                         if ($appData[$row['FIELD_NAME'] . "_label"] == "")
@@ -3196,7 +3261,6 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                                 }
                             }
                         }
-                            
                     }
                     else 
                     {
@@ -3204,6 +3268,7 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
                         if( $appData[$row['FIELD_NAME']] == '' || $appData[$row['FIELD_NAME']] == ' ' )
                         {
                             $appData[$row['FIELD_NAME']] = $row['FIELD_DEFAULT_VALUE'];
+                            //$appData = array_merge($record, $appData);
                         }
                     }
                     if($appData[$row['FIELD_NAME']] !='' && (isset($appData[$row['FIELD_NAME']."_label"]) && $appData[$row['FIELD_NAME']."_label"] ==''))
@@ -3254,7 +3319,6 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
             }
             $query = "SELECT APP_UID FROM $tableName WHERE $whereUpdate" . mysql_escape_string(getSqlWhere($_REQUEST['idInbox']));
             $updateData = executeQuery($query);
-            //G::pr($appDataNew); die;
             if (sizeof($updateData))
             {
                 $user = userInfo($USR_UID);
@@ -3311,9 +3375,11 @@ function importCreateCaseEdit($jsonMatchFields, $uidTask, $tableName, $firstLine
     unset($_SESSION['REQ_DATA_CSV']);
     return $totalCases;
 }
+
 function importCreateCaseTruncate($jsonMatchFields,$uidTask, $tableName,$firstLineHeader)
 {
-   // delete cases 
+    // delete cases 
+    //genDataReport($tableName);
     $query = "SELECT APP_UID FROM $tableName "; 
     $deleteData = executeQuery($query);
     if(sizeof($deleteData))
@@ -3335,13 +3401,12 @@ function importCreateCaseTruncate($jsonMatchFields,$uidTask, $tableName,$firstLi
     
     return $totalCases;
 }
-function DeleteDir($dir) {
 
+function DeleteDir($dir) {
     if (file_exists($dir))
     {
         foreach (glob($dir . "/*") as $files_dire)
         {
-
             if (is_dir($files_dire))
                 DeleteDir($files_dire);
             else
@@ -3350,14 +3415,14 @@ function DeleteDir($dir) {
         rmdir($dir);
     }
 }
+
 function saveFieldsCSV($idInbox, $fieldsImport, $firstLineHeader) {
     $items = json_decode($fieldsImport, true);
     $rolUser = getRolUserImport();
     $sSQL = "DELETE FROM PMT_CONFIG_CSV_IMPORT WHERE ROL_CODE  = '$rolUser' AND ID_INBOX = '$idInbox'";
     executeQuery($sSQL);
 
-    foreach ($items as $row)
-    {
+    foreach ($items as $row) {
         $requireColumn = isset($row['REQUIRED_COLUMN']) ? $row['REQUIRED_COLUMN'] : '';
         $sSQL = "INSERT INTO PMT_CONFIG_CSV_IMPORT (CSV_FIELD_NAME, CSV_COLUMN, CSV_FIRST_LINE_HEADER, ROL_CODE, ID_INBOX, CSV_TYPE, CSV_PIVOT_EDIT, CSV_REQUIRED) VALUES(
             '" . $row['CSV_FIELD_NAME'] . "',
@@ -3373,18 +3438,18 @@ function saveFieldsCSV($idInbox, $fieldsImport, $firstLineHeader) {
     }
     return true;
 }
+
 function resetFieldsCSV($idInbox) {
     $rolUser = getRolUserImport();
     $sSQL = "DELETE FROM PMT_CONFIG_CSV_IMPORT WHERE ROL_CODE  = '$rolUser' AND ID_INBOX = '$idInbox'";
-
     $aResult = executeQuery($sSQL);
     $bRes = '0';
-    if (is_array($aResult) && count($aResult) > 0)
-    {
+    if (is_array($aResult) && count($aResult) > 0) {
         $bRes = '1';
     }
     return $bRes;
 }
+
 /*             By Nico 28/08/2013 fix Bug on the import Background by CRON with header csv files.
  *
  * Simple function to get and put the header on the csv temp file
@@ -3397,6 +3462,7 @@ function getCSVHeader($dataCSV, $csv_sep) {
     $header = implode($csv_sep, $key);
     return $header;
 }
+
 ## end actions import CSV
 ## function load parameters csv
 function loadParametersCSV($idInbox, $pathCSV, $actionType, $fileNameCSV) {
@@ -3404,25 +3470,21 @@ function loadParametersCSV($idInbox, $pathCSV, $actionType, $fileNameCSV) {
     chmodr($directory, 0777);
     chownr($directory, 'apache');
     chgrpr($directory, 'apache');
-
     $directoryFile = $pathCSV . "/" . $fileNameCSV;
     chmodr($directoryFile, 0777);
     chownr($directoryFile, 'apache');
     chgrpr($directoryFile, 'apache');
-
     G::loadClass('pmTable');
     G::loadClass('pmFunctions');
     G::LoadClass('case');
 
     // load rol user
     require_once ("classes/model/Users.php");
-
     # Variables
     $users = $_SESSION['USER_LOGGED'];
     $Us = new Users();
     $Roles = $Us->load($users);
     $rolesAdmin = $Roles['USR_ROLE'];
-
     // Uid retrieve current case
     $appUidCasOrig = $_SESSION['APPLICATION'];
     $oCase = new Cases();
@@ -3431,15 +3493,12 @@ function loadParametersCSV($idInbox, $pathCSV, $actionType, $fileNameCSV) {
     //G::pr($fieldsCase);
     $query1 = "SELECT ID_TABLE FROM PMT_INBOX_PARENT_TABLE WHERE ID_INBOX = '" . $idInbox . "' AND ROL_CODE = '" . $rolesAdmin . "' ";
     $result = executeQuery($query1);
-
     $tableName = $result[1]['ID_TABLE'];
     $fieldsCSV = isset($_REQUEST["fieldsCSV"]) ? $_REQUEST["fieldsCSV"] : "";
     list($dataNum, $data) = getDynaformFields($fieldsCSV, $tableName);
-
     $query2 = "SELECT * FROM  PMT_CONFIG_CSV_IMPORT WHERE ID_INBOX  = '" . $idInbox . "' ";
     $resultFields = executeQuery($query2);
     $firstLineHeader = $resultFields[1]['CSV_FIRST_LINE_HEADER'];
-
     $resultConfig = getConfigCSV($data, $idInbox, "");
 
     $fieldsCSV = array();
@@ -3448,7 +3507,6 @@ function loadParametersCSV($idInbox, $pathCSV, $actionType, $fileNameCSV) {
     $query = "SELECT CSV_FIELD_NAME, CSV_COLUMN, CSV_REQUIRED, CSV_PIVOT_EDIT FROM PMT_CONFIG_CSV_IMPORT WHERE ID_INBOX = '" . $idInbox . "' AND ROL_CODE = '" . $rolesAdmin . "' ";
     $dataCsv = executeQuery($query);
     $dataImportCSV = array();
-
     foreach ($dataCsv as $index)
     {
         $record = array(
@@ -3458,9 +3516,7 @@ function loadParametersCSV($idInbox, $pathCSV, $actionType, $fileNameCSV) {
         );
         $dataImportCSV[] = $record;
         // deleteEdit
-        if ($index['CSV_PIVOT_EDIT'] == 1)
-        {
-
+        if ($index['CSV_PIVOT_EDIT'] == 1) {
             $record1 = array(
                 "FIELD_NAME" => $index['CSV_FIELD_NAME'],
                 "CSV_FIELD_NAME" => $index['CSV_FIELD_NAME'],
@@ -3488,7 +3544,6 @@ function loadParametersCSV($idInbox, $pathCSV, $actionType, $fileNameCSV) {
 
         $_SESSION['REQ_DATA_CSV'] = $informationCSV;
         $_SESSION['CSV_FILE_NAME'] = $fileCSV;
-
         switch ($actionType)
         {
             case "add":
@@ -3524,7 +3579,6 @@ function loadParametersCSV($idInbox, $pathCSV, $actionType, $fileNameCSV) {
         $FieldsCase = $oCase->loadCase($appUidCasOrig);
         $FieldsCase['APP_DATA'] = $dataAnt;
         $oCase->updateCase($appUidCasOrig, $FieldsCase);
-
         $fieldsCase1 = $oCase->loadCase($appUidCasOrig);
         $dataNew = $fieldsCase1['APP_DATA'];
     }
@@ -3535,8 +3589,8 @@ function loadParametersCSV($idInbox, $pathCSV, $actionType, $fileNameCSV) {
             "totalCases" => 0));
     }
 }
-function getDataCronCSV($firstLineCsvAs = 'on', $fileCSV, $totCasesCSV, $pathCSV) {
 
+function getDataCronCSV($firstLineCsvAs = 'on', $fileCSV, $totCasesCSV, $pathCSV) {
     set_include_path(PATH_PLUGINS . 'convergenceList' . PATH_SEPARATOR . get_include_path());
 
     //PATH_DOCUMENT . "csvTmp/".$fileCSV."csv"
@@ -3570,7 +3624,6 @@ function getDataCronCSV($firstLineCsvAs = 'on', $fileCSV, $totCasesCSV, $pathCSV
         else
         {
             $num = count($data);
-
             foreach ($data as $row)
             {
                 /* $csvData key is the header for good import after */
@@ -3595,10 +3648,10 @@ function getDataCronCSV($firstLineCsvAs = 'on', $fileCSV, $totCasesCSV, $pathCSV
     }
     return $csvData;
 }
+
 function chmodr($path, $filemode) {
     if (!is_dir($path))
         return chmod($path, $filemode);
-
     $dh = opendir($path);
     while (($file = readdir($dh)) !== false)
     {
@@ -3613,7 +3666,6 @@ function chmodr($path, $filemode) {
                 return FALSE;
         }
     }
-
     closedir($dh);
 
     if (chmod($path, $filemode))
@@ -3621,10 +3673,10 @@ function chmodr($path, $filemode) {
     else
         return FALSE;
 }
+
 function chownr($path, $owner) {
     if (!is_dir($path))
         return chown($path, $owner);
-
     $dh = opendir($path);
     while (($file = readdir($dh)) !== false)
     {
@@ -3639,7 +3691,6 @@ function chownr($path, $owner) {
                 return FALSE;
         }
     }
-
     closedir($dh);
 
     if (chown($path, $owner))
@@ -3647,10 +3698,10 @@ function chownr($path, $owner) {
     else
         return FALSE;
 }
+
 function chgrpr($path, $group) {
     if (!is_dir($path))
         return chgrp($path, $group);
-
     $dh = opendir($path);
     while (($file = readdir($dh)) !== false)
     {
@@ -3665,7 +3716,6 @@ function chgrpr($path, $group) {
                 return FALSE;
         }
     }
-
     closedir($dh);
 
     if (chgrp($path, $group))
@@ -3675,13 +3725,13 @@ function chgrpr($path, $group) {
 }
 
 /**
-* Permet de récupérer les dates des semaines précedant une date
-*
-* $MoinsNSemaine       @int        Nombre de semaine avant la date, 0 pour la semaine courante
-* $dateReferente       @string     Date à partir de laquelle on effectue la recherche
-*
-* $dateSemaine         @array      Contient les dates de début et fin de semaine voulue
-*/
+ * Permet de récupérer les dates des semaines précedant une date
+ *
+ * $MoinsNSemaine       @int        Nombre de semaine avant la date, 0 pour la semaine courante
+ * $dateReferente       @string     Date à partir de laquelle on effectue la recherche
+ *
+ * $dateSemaine         @array      Contient les dates de début et fin de semaine voulue
+ */
 function convergence_getDateLastWeek($MoinsNSemaine = 0, $dateReferente = NULL) {
 
     // INIT
@@ -4397,11 +4447,11 @@ function conv_validateRole($userName){
         else {
           $RBAC->updateUser($aData);
         }
-      
+
         if (isset($rolUser)) {
             $aData['USR_ROLE'] = $rolUser;
         }
-        
+
         require_once 'classes/model/Users.php';
         $oUser = new Users();
         $oUser->update($aData);
@@ -4424,6 +4474,4 @@ function conv_validateRole($userName){
     
     return true;
     }
-
-
 }
