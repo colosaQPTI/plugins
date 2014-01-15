@@ -2079,7 +2079,7 @@ function deletePMCases($caseId,$tableName) {
     $apps11 = executeQuery($query11);
     /*$query12 = "DELETE FROM wf_" . SYS_SYS . ".APP_HISTORY WHERE APP_UID='" . $caseId . "'";
     $apps12 = executeQuery($query12);*/
-    $query13="DELETE FROM wf_".SYS_SYS.$tableName." WHERE APP_UID='".$caseId."'";
+    $query13 = "DELETE FROM wf_" . SYS_SYS . "." . $tableName . " WHERE APP_UID='" . $caseId . "'";
     $apps13=executeQuery($query13);
 }
 
@@ -2639,7 +2639,7 @@ function importCreateCase($jsonMatchFields,$uidTask, $tableName,$firstLineHeader
                     }
                     if($appData[$row['FIELD_NAME']] !='' && (isset($appData[$row['FIELD_NAME']."_label"]) && $appData[$row['FIELD_NAME']."_label"] ==''))
                     {
-                    	$appData[$row['FIELD_NAME']."_label"] = $label;
+                        $appData[$row['FIELD_NAME']."_label"] = $label;
                     }
                 }
             }
@@ -3827,6 +3827,44 @@ function convergence_getListeOperation() {
         }
     }
     return $listOper;
+}
+
+function convergence_editDateCompta($appuidDate, $appuidEdit, $dateField, $newStatut = null) {
+    //je récupère mes valeurs courantes
+    $datas = convergence_getAllAppData($appuidDate);
+
+    //on modifie le case de la demande
+    $oCase = new Cases ();
+    $Fields = $oCase->loadCase($appuidEdit);
+    $Fields['APP_DATA'][$dateField] = $datas['DATE_EDITE'];
+    if ( !empty($newStatut) && isset($Fields['APP_DATA']['STATUT']) )
+        $Fields['APP_DATA']['STATUT'] = $newStatut;
+
+    $oCase->updateCase($appuidEdit, $Fields);
+}
+
+function convergence_updateLotVirementCompta($app_uid, $date, $directory) {
+    //INIT
+    // On récupère les informations
+    $query = 'SELECT * FROM  PMT_LOT_VIREMENT WHERE APP_UID = "' . $app_uid . '"';
+    $result = executeQuery($query);
+    $q = 'SELECT * FROM  PMT_LOT_VIREMENT_OPER WHERE NUM_DOSSIER = "' . $result[1]['NUM_DOSSIER'] . '"';
+    $r = executeQuery($q);
+
+    // Mettre à jour la date et le Statut
+    $qUpdate = 'UPDATE PMT_LOT_VIREMENT_OPER SET STATUT = "18", DATE_REMBOURSEMENT = "' . $date . '" WHERE UID ="' . $r[1]['UID'] . '"';
+    $rUpdate = executeQuery($qUpdate);
+
+    // Déposer le fichier de Lot de virement sur l'AS400
+    if ( !empty($r['PATHFILE_LOT_QZ']) )
+    {
+        $put = convergence_putFileByFtp($r['PATHFILE_LOT_QZ'], $directory);
+        if ( $put )
+            return 2; // Aucune erreur
+        else
+            return 1; // Erreur lors du dépôt
+    }
+    return 0; // Pas de fichier
 }
 
 ######### GLOBAL : function validate browser #########

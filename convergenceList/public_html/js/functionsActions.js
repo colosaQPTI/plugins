@@ -1949,7 +1949,7 @@ function actionDateExpedition(uidForm, app_uid)
         closeAction: 'hide',
         autoDestroy: true,
         maximizable: false,
-        title: 'Date d\'expÔøΩdition :',
+        title: 'Date d\'expédition :',
         modal: true,
         loadMask: true,
         items: [{

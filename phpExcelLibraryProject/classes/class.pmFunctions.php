@@ -64,6 +64,9 @@ function exportXls($title = 'Sample', $data = array(), $subTitle = array(), $pat
     );
 
     $styleDatas = array(
+        'font' => array(
+            'size' => 10
+        ),
         'alignment' => array(
             'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
         ),
@@ -272,6 +275,9 @@ function phpExcelLibraryProject_exportCompta($header = array( ), $datas = array(
         )
     );
     $styleDatas = array(
+        'font' => array(
+            'size' => 10
+        ),
         'alignment' => array(
             'horizontal' => PHPExcel_Style_Alignment::HORIZONTAL_CENTER,
         ),

@@ -32,8 +32,13 @@ if(isset($_POST['ville']) && $_POST['ville'] !=""){
     $POST['VILLE']=$_POST['ville'];
 }
 $sSQL = "SELECT PARTENAIRE_UID, RAISONSOCIALE, VILLE
-            FROM
-              PMT_PRESTATAIRE $sWhere ORDER BY RAISONSOCIALE";
+            FROM (SELECT PARTENAIRE_UID, RAISONSOCIALE, VILLE, STATUT, TYPE_PRESTA, TH_CINE, TH_SPECTACLE, TH_ACHAT, TH_ARTS, TH_SPORT, TH_ADH_ART, TH_ADH_SPORT
+                  FROM PMT_PRESTATAIRE
+                  WHERE ADR_ACTIV1 IS NULL
+                  UNION ALL
+                  SELECT PARTENAIRE_UID, ADR_ACTIV1, BUR_ACTIV, STATUT, TYPE_PRESTA, TH_CINE, TH_SPECTACLE, TH_ACHAT, TH_ARTS, TH_SPORT, TH_ADH_ART, TH_ADH_SPORT
+                  FROM PMT_PRESTATAIRE
+                  WHERE ADR_ACTIV1 IS NOT NULL ) tmpPartenaire $sWhere ORDER BY RAISONSOCIALE";
 $aResult = executeQuery ($sSQL);
 $aRows = array('PARTENAIRE_UID' => 'char', 'RAISONSOCIALE' => 'char', 'VILLE' => 'char', 'SELECT_ETAB' => 'char');
 $aDatas[] = $aRows;
