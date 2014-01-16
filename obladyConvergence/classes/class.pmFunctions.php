@@ -933,6 +933,10 @@ function convergence_exportToAS400($process_id, $file_base, $code, $liste = null
                                 ($count > 1) ? $dec = $value : $dec = $value . '00';
                                 $line .= substr(str_pad(str_replace('.', '', $dec), $field['LENGTH'], 0, STR_PAD_LEFT), 0, $field['LENGTH']);
                                 break;
+                            case 'mail':
+                                $string = removeAllAccents($row[$field['FIELD_NAME']], '/[^a-zA-Z0-9.@]+/i', '');
+                                $line .= substr(str_pad_unicode($string, $field['LENGTH'], $token), 0, $field['LENGTH']);
+                                break;
                             case 'Telephone':
                                 $char = array('-', '.', ' ');
                                 $line .= substr(str_pad(str_replace($char, '', $row[$field['FIELD_NAME']]), $field['LENGTH'], $token), 0, $field['LENGTH']);
@@ -1065,7 +1069,18 @@ function convergence_exportToAS400($process_id, $file_base, $code, $liste = null
     }
 }
 
-function removeAllAccents($str, $encoding = 'utf-8') {
+/* * *
+ *      Nettoye une chaine de caractère des accents, ligatures, ponctuations et autres
+ *
+ * @param       string  $str                la chaine de caractères à nettoyer.
+ * @param       string  $keepOther          0 pour ne conserver que les chiffres et les lettres, 1 garde la ponctuation et autre.
+ * @param       string  $keepPattern        si $keepOther à 1 on peut personaliser le pattern pour certain caractère comme . et @ pour les mails.
+ * @param       integer $replacePattern     ce par quoi on souhaite remplacer ce qui ne correspond pas à $keepPattern.
+ * @param       integer $encoding           le type d'encodage.
+ *
+ * @return      string  $str            retourne la chaine de caractère nettoyée.
+ * */
+function removeAllAccents($str, $keepOther = 0, $keepPattern = '/[^a-zA-Z0-9]+/i', $replacePattern = ' ', $encoding = 'utf-8') {
 
     // transformer les caractères accentués en entités HTML
     $str = htmlentities($str, ENT_NOQUOTES, $encoding);
@@ -1078,7 +1093,8 @@ function removeAllAccents($str, $encoding = 'utf-8') {
     // Supprimer tout le reste
     $str = preg_replace('#&[^;]+;#', '', $str);
     // Conserve les lettres et chiffre uniquement
-    $str = preg_replace('/[^a-zA-Z0-9]+/i', ' ', $str);
+    if ( $keepOther )
+        $str = preg_replace($keepPattern, $replacePattern, $str);
     return $str;
 }
 
